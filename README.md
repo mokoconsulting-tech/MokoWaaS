@@ -34,7 +34,7 @@ This plugin enables Moko Consulting to maintain authoritative governance over th
 * Centralized substitution of Joomla labels with MokoWaaS terminology.
 * Replacement of platform logos, titles, and meta naming with controlled brand assets.
 * Enforcement of standardized UI patterns that support a cohesive multi tenant WaaS environment.
-* Governance alignment with MokoDefaults for compliance, lifecycle management, and maintainability.
+* Governance alignment with [MokoStandards](https://github.com/mokoconsulting-tech/MokoStandards) for compliance, lifecycle management, and maintainability.
 
 ## Installation
 
@@ -48,15 +48,15 @@ The plugin exposes controlled parameters to ensure governance continuity. Config
 
 ## Versioning
 
-This extension follows the MokoDefaults version governance model. Version numbering aligns to major, minor, and patch level increments with strict change control.
+This extension follows the [MokoStandards](https://github.com/mokoconsulting-tech/MokoStandards) version governance model. Version numbering aligns to major, minor, and patch level increments with strict change control.
 
 ## Compliance
 
-All source code complies with the MokoDefaults coding and documentation standards. Brand assets referenced by the plugin must be licensed for internal WaaS use and stored within the designated media registry.
+All source code complies with the [MokoStandards](https://github.com/mokoconsulting-tech/MokoStandards) coding and documentation standards. Brand assets referenced by the plugin must be licensed for internal WaaS use and stored within the designated media registry.
 
 ## Documentation
 
-The plugin is documented through the MokoDefaults documentation framework. All reference materials, architectural notes, and governance artifacts are maintained within the `/docs/` directory of the repository. Documentation updates adhere to the same change control workflows as source code, ensuring traceability and alignment with platform standards.
+The plugin is documented through the [MokoStandards](https://github.com/mokoconsulting-tech/MokoStandards) documentation framework. All reference materials, architectural notes, and governance artifacts are maintained within the `/docs/` directory of the repository. Documentation updates adhere to the same change control workflows as source code, ensuring traceability and alignment with platform standards.
 
 ## Support
 

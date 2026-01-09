@@ -31,7 +31,7 @@ To build the plugin correctly, ensure the following environment prerequisites:
 * Joomla 5.x compatible environment available for testing
 * Git installed and configured
 * Zip CLI utility or equivalent archiving tool
-* Access to MokoCodingDefaults for header and structure compliance
+* Access to [MokoStandards](https://github.com/mokoconsulting-tech/MokoStandards) for header and structure compliance
 
 Optional but recommended:
 
