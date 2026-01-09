@@ -1,0 +1,28 @@
+# Global ownership
+
+* @jmiller-moko @mokoconsulting-tech/engineering
+
+# Plugin root
+
+/   @jmiller-moko
+
+# Source code
+
+/src/           @jmiller-moko
+/src/**/*.php   @jmiller-moko
+/src/**/*.xml   @jmiller-moko
+
+# Language files
+
+/language/      @jmiller-moko
+/language/**    @jmiller-moko
+
+# Documentation
+
+/docs/          @jmiller-moko
+/docs/**        @jmiller-moko
+
+# GitHub workflow and tooling
+
+/.github/       @jmiller-moko
+/.github/**     @jmiller-moko
