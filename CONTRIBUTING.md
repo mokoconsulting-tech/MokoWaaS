@@ -38,7 +38,7 @@ Internal teams must coordinate with governance before creating major feature bra
 
 ## 3. Coding and Documentation Standards
 All code must:
-- Follow MokoCodingDefaults
+- Follow [MokoStandards](https://github.com/mokoconsulting-tech/MokoStandards) coding standards
 - Include the unified SPDX license header
 - Include a FILE INFORMATION metadata block
 - Avoid deprecated Joomla APIs
@@ -83,7 +83,7 @@ Version updates must be reflected in:
 ## 7. Code Review Standards
 Reviewers validate:
 - Code quality and clarity
-- Compliance with MokoCodingDefaults
+- Compliance with [MokoStandards](https://github.com/mokoconsulting-tech/MokoStandards) coding standards
 - Impact to templates and WaaS branding rules
 - Backwards compatibility expectations
 

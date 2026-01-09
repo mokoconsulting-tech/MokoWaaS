@@ -68,7 +68,7 @@ Contributors should:
 
 * Maintain consistency with the established structure and tone of existing documents.
 * Validate cross-document references when updating terminology or behavior.
-* Follow MokoCodingDefaults for formatting, metadata placement, and content alignment.
+* Follow [MokoStandards](https://github.com/mokoconsulting-tech/MokoStandards) for formatting, metadata placement, and content alignment.
 
 ## Revision History
 
