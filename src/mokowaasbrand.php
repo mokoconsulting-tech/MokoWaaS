@@ -25,8 +25,6 @@
 defined('_JEXEC') or die;
 
 use Joomla\CMS\Plugin\CMSPlugin;
-use Joomla\CMS\Factory;
-use Joomla\CMS\Language\Text;
 
 /**
  * MokoWaaS Brand System Plugin
@@ -57,6 +55,9 @@ class PlgSystemMokoWaaSBrand extends CMSPlugin
 	/**
 	 * Event triggered after the framework has loaded and the application initialise method has been called.
 	 *
+	 * This plugin relies on Joomla's native language override system. Language override files
+	 * placed in the standard Joomla override directories will be automatically loaded by Joomla.
+	 *
 	 * @return  void
 	 *
 	 * @since   01.03.00
@@ -68,7 +69,8 @@ class PlgSystemMokoWaaSBrand extends CMSPlugin
 			return;
 		}
 
-		$this->loadLanguageOverrides();
+		// Language overrides are handled by Joomla's core system
+		// Additional branding functionality can be added here if needed
 	}
 
 	/**
@@ -86,42 +88,5 @@ class PlgSystemMokoWaaSBrand extends CMSPlugin
 		}
 
 		// Apply additional branding logic if needed
-	}
-
-	/**
-	 * Load language overrides for MokoWaaS branding.
-	 *
-	 * @return  void
-	 *
-	 * @since   01.03.00
-	 */
-	protected function loadLanguageOverrides()
-	{
-		$lang = Factory::getLanguage();
-		$tag = $lang->getTag();
-
-		// Determine the override file path based on client
-		if ($this->app->isClient('administrator'))
-		{
-			$overridePath = JPATH_ADMINISTRATOR . '/language/overrides/' . $tag . '.override.ini';
-		}
-		else
-		{
-			$overridePath = JPATH_SITE . '/language/overrides/' . $tag . '.override.ini';
-		}
-
-		// Load and parse the override file if it exists
-		if (file_exists($overridePath))
-		{
-			$overrides = parse_ini_file($overridePath);
-			
-			if ($overrides !== false && is_array($overrides))
-			{
-				foreach ($overrides as $key => $value)
-				{
-					$lang->_strings[$key] = $value;
-				}
-			}
-		}
 	}
 }
