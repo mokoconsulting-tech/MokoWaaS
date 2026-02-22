@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright (C) 2025 Moko Consulting <hello@mokoconsulting.tech>
+
+ This file is part of a Moko Consulting project.
+
+ SPDX-LICENSE-IDENTIFIER: GPL-3.0-or-later
+
+ This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License (./LICENSE.md).
+
+ # FILE INFORMATION
+ DEFGROUP: Joomla.Plugin
+ INGROUP: MokoWaaS-Brand
+ REPO: https://github.com/mokoconsulting-tech/mokowaasbrand
+ VERSION: 01.03.00
+ PATH: /src/mokowaasbrand.xml
+ BRIEF: Plugin manifest for MokoWaaS-Brand system plugin
+ NOTE: Defines installation metadata, files, and configuration for Joomla
+-->
+<extension type="plugin" group="system" method="upgrade">
+	<name>PLG_SYSTEM_MOKOWAASBRAND</name>
+	<author>Moko Consulting</author>
+	<creationDate>2025-12-11</creationDate>
+	<copyright>Copyright (C) 2025 Moko Consulting. All rights reserved.</copyright>
+	<license>GNU General Public License version 3 or later; see LICENSE.md</license>
+	<authorEmail>hello@mokoconsulting.tech</authorEmail>
+	<authorUrl>https://mokoconsulting.tech</authorUrl>
+	<version>01.03.00</version>
+	<description>PLG_SYSTEM_MOKOWAASBRAND_XML_DESCRIPTION</description>
+	<namespace path="src">Moko\Plugin\System\MokoWaaSBrand</namespace>
+
+	<files>
+		<filename plugin="mokowaasbrand">mokowaasbrand.php</filename>
+		<folder>services</folder>
+		<folder>language</folder>
+	</files>
+
+	<languages folder="language">
+		<language tag="en-GB">en-GB/plg_system_mokowaasbrand.ini</language>
+		<language tag="en-GB">en-GB/plg_system_mokowaasbrand.sys.ini</language>
+	</languages>
+
+	<administration>
+		<files folder="administrator">
+			<folder>language</folder>
+		</files>
+	</administration>
+
+	<config>
+		<fields name="params">
+			<fieldset name="basic">
+				<field
+					name="enable_branding"
+					type="radio"
+					label="PLG_SYSTEM_MOKOWAASBRAND_ENABLE_BRANDING_LABEL"
+					description="PLG_SYSTEM_MOKOWAASBRAND_ENABLE_BRANDING_DESC"
+					default="1"
+					class="btn-group btn-group-yesno"
+					>
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+			</fieldset>
+		</fields>
+	</config>
+</extension>
