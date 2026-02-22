@@ -100,7 +100,7 @@ class PlgSystemMokoWaaSBrand extends CMSPlugin
 		$lang = Factory::getLanguage();
 		$tag = $lang->getTag();
 
-		// Load language overrides from the plugin's language folder
+		// Determine the override file path based on client
 		if ($this->app->isClient('administrator'))
 		{
 			$overridePath = JPATH_ADMINISTRATOR . '/language/overrides/' . $tag . '.override.ini';
@@ -110,10 +110,18 @@ class PlgSystemMokoWaaSBrand extends CMSPlugin
 			$overridePath = JPATH_SITE . '/language/overrides/' . $tag . '.override.ini';
 		}
 
-		// Load overrides if the file exists
+		// Load and parse the override file if it exists
 		if (file_exists($overridePath))
 		{
-			$lang->load('', JPATH_BASE, $tag, true);
+			$overrides = parse_ini_file($overridePath);
+			
+			if ($overrides !== false && is_array($overrides))
+			{
+				foreach ($overrides as $key => $value)
+				{
+					$lang->_strings[$key] = $value;
+				}
+			}
 		}
 	}
 }
