@@ -16,7 +16,7 @@
  * DEFGROUP: Joomla.Plugin
  * INGROUP: MokoWaaS-Brand
  * REPO: https://github.com/mokoconsulting-tech/mokowaasbrand
- * VERSION: 01.03.00
+ * VERSION: 01.04.00
  * PATH: /src/services/provider.php
  * BRIEF: Service provider for dependency injection in Joomla 5.x
  * NOTE: Registers the plugin with Joomla's DI container
@@ -39,7 +39,7 @@ return new class () implements ServiceProviderInterface {
 	 *
 	 * @return  void
 	 *
-	 * @since   01.03.00
+	 * @since   01.04.00
 	 */
 	public function register(Container $container)
 	{

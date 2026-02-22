@@ -10,13 +10,13 @@
  DEFGROUP: Joomla.Plugin
  INGROUP: MokoWaaS-Brand.Guides
  REPO: https://github.com/mokoconsulting-tech/mokowaasbrand
- VERSION: 01.03.00
+ VERSION: 01.04.00
  PATH: /docs/guides/operations-guide.md
  BRIEF: Operational guide for administering and managing the MokoWaaS-Brand system plugin
  NOTE: Defines lifecycle, responsibilities, and operational behaviors
 -->
 
-# MokoWaaS-Brand Operations Guide (VERSION: 01.03.00)
+# MokoWaaS-Brand Operations Guide (VERSION: 01.04.00)
 
 ## Introduction
 

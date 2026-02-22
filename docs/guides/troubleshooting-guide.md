@@ -10,13 +10,13 @@
  DEFGROUP: Joomla.Plugin
  INGROUP: MokoWaaS-Brand.Guides
  REPO: https://github.com/mokoconsulting-tech/mokowaasbrand
- VERSION: 01.03.00
+ VERSION: 01.04.00
  PATH: /docs/guides/troubleshooting-guide.md
  BRIEF: Troubleshooting guide for diagnosing and resolving issues related to the MokoWaaS-Brand plugin
  NOTE: Designed for administrators and WaaS operations teams
 -->
 
-# MokoWaaS-Brand Troubleshooting Guide (VERSION: 01.03.00)
+# MokoWaaS-Brand Troubleshooting Guide (VERSION: 01.04.00)
 
 ## Introduction
 

@@ -10,13 +10,13 @@
  DEFGROUP: Joomla.Plugin
  INGROUP: MokoWaaS-Brand.Guides
  REPO: https://github.com/mokoconsulting-tech/mokowaasbrand
- VERSION: 01.03.00
+ VERSION: 01.04.00
  PATH: /docs/guides/upgrade-and-versioning-guide.md
  BRIEF: Guide for updating, versioning, and maintaining the MokoWaaS-Brand plugin
  NOTE: Defines release flow, version rules, and upgrade validation
 -->
 
-# MokoWaaS-Brand Upgrade and Versioning Guide (VERSION: 01.03.00)
+# MokoWaaS-Brand Upgrade and Versioning Guide (VERSION: 01.04.00)
 
 ## Introduction
 

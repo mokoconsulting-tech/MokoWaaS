@@ -14,10 +14,19 @@
  INGROUP: MokoWaaS-Brand.Documentation
  REPO: https://github.com/mokoconsulting-tech/mokowaasbrand
  PATH: ./CHANGELOG.md
- VERSION: 01.03.00
+ VERSION: 01.04.00
  BRIEF: Version history using `Keep a Changelog`
 -->
 # Changelog
+
+## [01.04.00] - 2026-02-22
+- Added complete Joomla 5.x system plugin implementation
+- Created `src/mokowaasbrand.php` - Main plugin class with event handlers
+- Created `src/mokowaasbrand.xml` - Plugin manifest with Joomla 5.x namespace support
+- Created `src/services/provider.php` - Dependency injection service provider
+- Created plugin language files in `src/language/en-GB/`
+- Plugin integrates with existing language override system
+- Added security index.html files throughout directory structure
 
 ## [01.03.00] - 2025-12-11
 - Cleanup

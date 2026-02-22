@@ -16,7 +16,7 @@
  DEFGROUP: Joomla.Plugin
  INGROUP: MokoWaaS-Brand
  REPO: https://github.com/mokoconsulting-tech/mokowaasbrand
- VERSION: 01.03.00
+ VERSION: 01.04.00
  PATH: /src/mokowaasbrand.xml
  BRIEF: Plugin manifest for MokoWaaS-Brand system plugin
  NOTE: Defines installation metadata, files, and configuration for Joomla
@@ -24,12 +24,12 @@
 <extension type="plugin" group="system" method="upgrade">
 	<name>PLG_SYSTEM_MOKOWAASBRAND</name>
 	<author>Moko Consulting</author>
-	<creationDate>2025-12-11</creationDate>
+	<creationDate>2026-02-22</creationDate>
 	<copyright>Copyright (C) 2025 Moko Consulting. All rights reserved.</copyright>
 	<license>GNU General Public License version 3 or later; see LICENSE.md</license>
 	<authorEmail>hello@mokoconsulting.tech</authorEmail>
 	<authorUrl>https://mokoconsulting.tech</authorUrl>
-	<version>01.03.00</version>
+	<version>01.04.00</version>
 	<description>PLG_SYSTEM_MOKOWAASBRAND_XML_DESCRIPTION</description>
 	<namespace path="src">Moko\Plugin\System\MokoWaaSBrand</namespace>
 

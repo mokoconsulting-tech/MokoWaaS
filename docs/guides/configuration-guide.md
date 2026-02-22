@@ -10,13 +10,13 @@
  DEFGROUP: Joomla.Plugin
  INGROUP: MokoWaaS-Brand.Guides
  REPO: https://github.com/mokoconsulting-tech/mokowaasbrand
- VERSION: 01.03.00
+ VERSION: 01.04.00
  PATH: /docs/guides/configuration-guide.md
  BRIEF: Configuration guide for the MokoWaaS-Brand system plugin
  NOTE: Defines plugin parameters, expected behaviors, and recommended defaults
 -->
 
-# MokoWaaS-Brand Configuration Guide (VERSION: 01.03.00)
+# MokoWaaS-Brand Configuration Guide (VERSION: 01.04.00)
 
 ## 1. Objective
 

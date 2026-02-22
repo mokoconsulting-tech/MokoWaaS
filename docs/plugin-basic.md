@@ -11,12 +11,12 @@
  INGROUP: MokoWaaS-Brand
  REPO: https://github.com/mokoconsulting-tech/mokowaasbrand
  PATH: /docs/plugin-basic.md
- VERSION: 01.03.00
+ VERSION: 01.04.00
  BRIEF: Baseline documentation for the MokoWaaS-Brand system plugin
  NOTE: Foundational reference for internal and external stakeholders
 -->
 
-# MokoWaaS-Brand Plugin Overview (VERSION: 01.03.00)
+# MokoWaaS-Brand Plugin Overview (VERSION: 01.04.00)
 
 ## Introduction
 
@@ -65,6 +65,42 @@ Primary configuration categories include:
 
 Configuration ensures a consistent and predictable WaaS identity across all managed sites.
 
+## Technical Implementation
+
+The plugin is implemented as a Joomla 5.x system plugin with the following architecture:
+
+### Core Components
+
+* **mokowaasbrand.php** - Main plugin class (`PlgSystemMokoWaaSBrand`) that extends `CMSPlugin`
+* **mokowaasbrand.xml** - Plugin manifest defining metadata, file structure, and configuration parameters
+* **services/provider.php** - Dependency injection service provider for Joomla 5.x container registration
+
+### Event Handlers
+
+The plugin implements the following Joomla system events:
+
+* `onAfterInitialise` - Triggered after framework initialization; provides hook for branding logic
+* `onAfterRoute` - Triggered after route determination; allows additional branding adjustments
+
+### Language Override Integration
+
+The plugin integrates with Joomla's native language override system:
+
+* Language overrides in `language/overrides/` (frontend)
+* Administrator overrides in `administrator/language/overrides/`
+* Joomla automatically loads these overrides without programmatic intervention
+* Plugin provides the framework while Joomla handles the actual string substitution
+
+### Configuration Options
+
+The plugin exposes the following configuration parameters:
+
+* **Enable Branding** - Toggle to enable/disable all branding functionality (default: enabled)
+
+### Namespace and Autoloading
+
+Uses Joomla 5.x namespace: `Moko\Plugin\System\MokoWaaSBrand` with PSR-4 autoloading through the service provider.
+
 ## Operational Expectations
 
 Platform operators should maintain the plugin in an enabled state at all times. Updates may affect downstream systems such as templates or modules, so operational workflows must include:
@@ -85,4 +121,5 @@ While the plugin provides broad branding coverage, certain constraints apply:
 
 | Date       | Author                          | Description                  |
 | ---------- | ------------------------------- | ---------------------------- |
+| 2026-02-22 | GitHub Copilot                  | Update for version 01.04.00  |
 | 2025-12-11 | Jonathan Miller (@jmiller-moko) | Rewrite for version 01.03.00 |

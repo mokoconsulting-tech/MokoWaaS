@@ -11,13 +11,13 @@
  INGROUP: MokoWaaS-Brand.Build
  REPO: https://github.com/mokoconsulting-tech/mokowaasbrand
  FILE: build-guide.md
- VERSION: 01.03.00
+ VERSION: 01.04.00
  PATH: /docs/guides/
  BRIEF: Build and packaging guide for the MokoWaaS-Brand system plugin
  NOTE: Defines environment setup, repository layout, packaging rules, and release preparation
 -->
 
-# MokoWaaS-Brand Build Guide (VERSION: 01.03.00)
+# MokoWaaS-Brand Build Guide (VERSION: 01.04.00)
 
 ## 1. Purpose
 
@@ -45,28 +45,36 @@ The repository should maintain a clean, predictable, and modular structure suita
 ```text
 mokowaasbrand/
   ├── src/
-  │     ├── plugin.php
-  │     ├── services/            (optional service providers)
-  │     ├── helpers/             (optional utility classes)
-  │     └── traits/              (optional logic modules)
+  │     ├── mokowaasbrand.php        (main plugin file)
+  │     ├── mokowaasbrand.xml        (plugin manifest)
+  │     ├── services/                (service providers for DI)
+  │     │   └── provider.php
+  │     ├── language/                (plugin language files)
+  │     │   ├── en-GB/*.ini
+  │     │   └── overrides/           (Joomla language overrides)
+  │     └── administrator/
+  │         └── language/
+  │             └── overrides/       (admin language overrides)
   │
-  ├── language/
-  │     └── en-GB/*.ini          (primary language definitions)
+  ├── LICENSE.md                     (standard GPL license)
+  ├── README.md                      (repository overview)
+  ├── CHANGELOG.md                   (version history)
+  ├── CONTRIBUTING.md                (contribution rules)
+  ├── CODE_OF_CONDUCT.md             (community guidelines)
   │
-  ├── media/                     (optional; images, CSS, JS)
-  │     └── assets/
-  │
-  ├── templateDetails.xml        (plugin manifest)
-  ├── LICENSE.md                 (standard GPL license)
-  ├── README.md                  (repository overview)
-  ├── CONTRIBUTING.md            (contribution rules)
-  ├── CODEOWNERS                 (ownership and review rules)
-  │
-  ├── docs/                      (documentation suite)
+  ├── docs/                          (documentation suite)
   │     ├── index.md
-  │     └── guides/*.md
+  │     ├── plugin-basic.md
+  │     ├── guides/*.md
+  │     └── reference/*.md
   │
-  └── scripts/                   (optional automation utilities, if used)
+  ├── scripts/                       (build and validation utilities)
+  │     ├── validate_manifest.sh
+  │     ├── verify_changelog.sh
+  │     └── update_changelog.sh
+  │
+  └── .github/                       (CI/CD workflows)
+        └── workflows/*.yml
 ```
 
 All files must contain the standardized Moko Consulting copyright header.
@@ -282,9 +290,10 @@ To prevent runtime failures, validate the following prior to packaging:
 
 Required files:
 
-* `templateDetails.xml`
-* `src/plugin.php`
-* At least one language file under `/language/en-GB/`
+* `mokowaasbrand.xml`
+* `mokowaasbrand.php`
+* `services/provider.php`
+* Language files under `language/en-GB/`
 * LICENSE.md
 * README.md
 * CONTRIBUTING.md

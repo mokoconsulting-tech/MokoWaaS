@@ -15,13 +15,13 @@
  DEFGROUP: Joomla.Plugin
  INGROUP: MokoWaaS-Brand
  REPO: https://github.com/mokoconsulting-tech/mokowaasbrand
- VERSION: 01.03.00
+ VERSION: 01.04.00
  PATH: /README.md
  BRIEF: Rebranding plugin for MokoWaaS platform
  NOTE: Internal WaaS identity abstraction layer
 -->
 
-## MokoWaaS-Brand Plugin (VERSION: 01.03.00)
+## MokoWaaS-Brand Plugin (VERSION: 01.04.00)
 
 MokoWaaS-Brand provides a structured identity override layer that aligns the Joomla administrative and front end experience with the MokoWaaS platform standard. The plugin operationalizes a unified naming convention, brand controlled visuals, and enforced terminology across all tenant sites to ensure consistent service delivery within the WaaS framework.
 
