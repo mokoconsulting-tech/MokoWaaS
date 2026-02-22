@@ -110,7 +110,7 @@ Remove any unneeded files:
 Using CLI:
 
 ```bash
-zip -r mokowaasbrand_v01.03.00.zip ./ -x "*.git*" "scripts/*" "docs/*"
+zip -r mokowaasbrand_v01.04.00.zip ./ -x "*.git*" "scripts/*" "docs/*"
 ```
 
 Ensure excluded paths match release governance and do not remove required runtime files.
