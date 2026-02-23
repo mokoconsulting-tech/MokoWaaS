@@ -14,35 +14,211 @@
  INGROUP: MokoWaaS-Brand.Documentation
  REPO: https://github.com/mokoconsulting-tech/mokowaasbrand
  PATH: ./CHANGELOG.md
- VERSION: 01.03.00
+ VERSION: 01.04.00
  BRIEF: Version history using `Keep a Changelog`
 -->
+
 # Changelog
 
+All notable changes to the MokoWaaS-Brand plugin will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+### Planned
+- Additional language override strings for extended Joomla components
+- Custom branding for media manager
+- Enhanced configuration options
+
+## [01.04.00] - 2026-02-22
+
+### Added
+- Complete Joomla 5.x system plugin implementation with modern architecture
+- Main plugin class (`src/mokowaasbrand.php`) with event handlers:
+  - `onAfterInitialise` event hook for framework initialization
+  - `onAfterRoute` event hook for routing integration
+- Plugin manifest (`src/mokowaasbrand.xml`) with Joomla 5.x namespace support
+  - Namespace: `Moko\Plugin\System\MokoWaaSBrand`
+  - Configuration parameter for enabling/disabling branding
+- Dependency injection service provider (`src/services/provider.php`)
+  - DI container registration for Joomla 5.x compatibility
+- Plugin language files in `src/language/en-GB/`:
+  - `plg_system_mokowaasbrand.ini` - Plugin UI strings
+  - `plg_system_mokowaasbrand.sys.ini` - System/installation strings
+- Enhanced language overrides (57+ strings):
+  - Installation sample data branding
+  - Site name labels
+  - Admin-specific UI elements
+  - Version and About sections
+- Security `index.html` files throughout directory structure
+- Comprehensive README.md with:
+  - Badges for version, license, Joomla, and PHP compatibility
+  - Table of contents with 12+ major sections
+  - Detailed installation instructions (2 methods)
+  - Technical implementation documentation
+  - Repository structure overview
+  - Development and build instructions
+
+### Changed
+- Updated all documentation to version 01.04.00
+- Enhanced language overrides with more comprehensive coverage
+- Improved plugin configuration options
+
+### Fixed
+- Typo in language override: "ERROR OCCURED" → "ERROR OCCURRED"
+- Repository references updated from placeholders to actual GitHub URLs
+
+### Technical
+- Integrates with Joomla's native language override system
+- No programmatic string loading (performance optimization)
+- Event-driven architecture for minimal overhead
+- PSR-4 autoloading through service provider
+
 ## [01.03.00] - 2025-12-11
-- Cleanup
+
+### Changed
+- General cleanup and code organization
+- Documentation structure improvements
 
 ## [01.02.01] - 2025-12-11
-- Version bump
+
+### Changed
+- Version bump for release alignment
 
 ## [01.02.00] - 2025-12-11
-- Created `/docs/`
-- Created `mokowaasbrand\.github\workflows\build.yml`
-- Added image and favicon replacement feature
+
+### Added
+- Documentation directory (`/docs/`) with comprehensive guides:
+  - Installation guide
+  - Configuration guide
+  - Build guide
+  - Operations guide
+  - Troubleshooting guide
+  - Upgrade and versioning guide
+  - Rollback and recovery guide
+- GitHub workflow for automated builds (`.github/workflows/build.yml`)
+- Image and favicon replacement feature for complete branding
+
+### Changed
+- Improved documentation structure and organization
 
 ## [01.01.05] - 2025-12-11
-- Version bump
+
+### Changed
+- Version bump for release coordination
 
 ## [01.01.04] - 2025-12-11
-- Manifest Fix
+
+### Fixed
+- Plugin manifest corrections and validation fixes
 
 ## [01.01.03] - 2025-12-11
-- Fixed Administrator Language location
+
+### Fixed
+- Administrator language file location corrected
+- Language override path alignment with Joomla standards
 
 ## [01.01.02] - 2025-12-11
-- Moved code to `/src/`
-- Alignment with Release Deployment pipeline
 
-## [1.0] - YYYY-MM-DD
+### Changed
+- Moved plugin code to `/src/` directory for better organization
+- Aligned repository structure with release deployment pipeline
+- Improved packaging workflow
+
 ### Added
-- First published draft
+- Release deployment pipeline integration
+- Automated build and validation scripts
+
+## [1.0.0] - 2025-12-11
+
+### Added
+- Initial release of MokoWaaS-Brand plugin
+- Basic language override system for Joomla rebranding
+- Frontend language overrides (en-GB, en-US)
+- Administrator language overrides (en-GB, en-US)
+- Core branding replacements:
+  - Footer "Powered by" text
+  - Control panel welcome messages
+  - Help and documentation links
+  - Generic Joomla→MokoWaaS replacements
+- Basic plugin structure and manifest
+- License (GPL-3.0-or-later)
+- Contributing guidelines
+- Code of conduct
+
+### Technical Details
+- Joomla 5.x compatible
+- PHP 8.1+ requirement
+- Language override mechanism using Joomla's native system
+
+---
+
+## Version History Summary
+
+| Version    | Date       | Type      | Summary                                    |
+|------------|------------|-----------|-------------------------------------------|
+| 01.04.00   | 2026-02-22 | Major     | Complete plugin implementation & enhanced docs |
+| 01.03.00   | 2025-12-11 | Minor     | Cleanup and organization                  |
+| 01.02.01   | 2025-12-11 | Patch     | Version alignment                         |
+| 01.02.00   | 2025-12-11 | Minor     | Documentation and build system            |
+| 01.01.05   | 2025-12-11 | Patch     | Version coordination                      |
+| 01.01.04   | 2025-12-11 | Patch     | Manifest fixes                            |
+| 01.01.03   | 2025-12-11 | Patch     | Language location fix                     |
+| 01.01.02   | 2025-12-11 | Patch     | Repository restructuring                  |
+| 1.0.0      | 2025-12-11 | Major     | Initial release                           |
+
+---
+
+## Upgrade Notes
+
+### Upgrading to 01.04.00
+
+**Breaking Changes:** None
+
+**New Features:**
+- Complete Joomla 5.x plugin implementation
+- Dependency injection support
+- Enhanced language overrides (14+ new strings)
+
+**Installation:**
+1. Backup your current installation
+2. Download the latest release package
+3. Install via Joomla Extension Manager
+4. Clear Joomla cache
+5. Verify branding appears correctly
+
+### Upgrading to 01.02.00
+
+**New Features:**
+- Comprehensive documentation in `/docs/`
+- Automated build workflows
+
+**Notes:**
+- Review new documentation for operational guidance
+- Check GitHub workflows for automated builds
+
+---
+
+## Contributing
+
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
+
+When adding entries to this changelog:
+1. Add new changes under `[Unreleased]` section
+2. Use categories: Added, Changed, Deprecated, Removed, Fixed, Security
+3. Include clear, concise descriptions
+4. Reference issue numbers where applicable
+5. Move items from Unreleased to versioned section upon release
+
+## Links
+
+- [MokoStandards](https://github.com/mokoconsulting-tech/MokoStandards) - Coding and documentation standards
+- [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) - Changelog format specification
+- [Semantic Versioning](https://semver.org/spec/v2.0.0.html) - Version numbering specification
+- [Repository](https://github.com/mokoconsulting-tech/mokowaasbrand) - Project repository
+
+---
+
+**Note:** For detailed technical documentation, see the `/docs/` directory and [README.md](README.md).
