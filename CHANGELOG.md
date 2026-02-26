@@ -33,6 +33,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Enhanced configuration options
 
 ### Added
+- Administrator language directories for plugin management
+  - Created `administrator/language/en-GB/plg_system_mokowaasbrand.sys.ini`
+  - Created `administrator/language/en-US/plg_system_mokowaasbrand.sys.ini`
+  - Updated manifest to declare administrator language files
+  - Added security index.html files to new directories
+- Plugin now has proper administrator-side language support for both en-GB and en-US locales
 - en-US language support for plugin
   - Created `language/en-US/plg_system_mokowaasbrand.ini` with US English strings
   - Created `language/en-US/plg_system_mokowaasbrand.sys.ini` with US English system strings

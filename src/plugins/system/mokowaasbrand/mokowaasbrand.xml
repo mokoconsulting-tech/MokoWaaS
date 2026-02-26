@@ -50,6 +50,10 @@
 		<files folder="administrator">
 			<folder>language</folder>
 		</files>
+		<languages folder="administrator/language">
+			<language tag="en-GB">en-GB/plg_system_mokowaasbrand.sys.ini</language>
+			<language tag="en-US">en-US/plg_system_mokowaasbrand.sys.ini</language>
+		</languages>
 	</administration>
 
 	<config>
