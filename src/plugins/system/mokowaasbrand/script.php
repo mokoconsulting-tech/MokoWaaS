@@ -76,7 +76,7 @@ class plgSystemMokoWaaSBrandInstallerScript implements InstallerScriptInterface
 	 *
 	 * @since   01.06.00
 	 */
-	public function preflight($type, $adapter)
+	public function preflight($type, $adapter): bool
 	{
 		// Check minimum Joomla version
 		if (version_compare(JVERSION, $this->minimumJoomla, '<'))
@@ -111,7 +111,7 @@ class plgSystemMokoWaaSBrandInstallerScript implements InstallerScriptInterface
 	 *
 	 * @since   01.06.00
 	 */
-	public function postflight($type, $adapter)
+	public function postflight($type, $adapter): bool
 	{
 		// Only install overrides on install or update
 		if ($type === 'install' || $type === 'update')
@@ -131,7 +131,7 @@ class plgSystemMokoWaaSBrandInstallerScript implements InstallerScriptInterface
 	 *
 	 * @since   01.06.00
 	 */
-	public function install(InstallerAdapter $adapter)
+	public function install(InstallerAdapter $adapter): bool
 	{
 		return true;
 	}
@@ -145,7 +145,7 @@ class plgSystemMokoWaaSBrandInstallerScript implements InstallerScriptInterface
 	 *
 	 * @since   01.06.00
 	 */
-	public function update(InstallerAdapter $adapter)
+	public function update(InstallerAdapter $adapter): bool
 	{
 		return true;
 	}
@@ -159,7 +159,7 @@ class plgSystemMokoWaaSBrandInstallerScript implements InstallerScriptInterface
 	 *
 	 * @since   01.06.00
 	 */
-	public function uninstall(InstallerAdapter $adapter)
+	public function uninstall(InstallerAdapter $adapter): bool
 	{
 		// Remove language overrides on uninstall
 		$this->uninstallLanguageOverrides();
