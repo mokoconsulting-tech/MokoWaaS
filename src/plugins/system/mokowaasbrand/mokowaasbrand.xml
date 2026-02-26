@@ -32,8 +32,10 @@
 	<version>01.06.00</version>
 	<description>PLG_SYSTEM_MOKOWAASBRAND_XML_DESCRIPTION</description>
 	<namespace path="src">Moko\Plugin\System\MokoWaaSBrand</namespace>
+	<scriptfile>script.php</scriptfile>
 
 	<files>
+		<filename plugin="mokowaasbrand">script.php</filename>
 		<folder>src</folder>
 		<folder>services</folder>
 		<folder>language</folder>
