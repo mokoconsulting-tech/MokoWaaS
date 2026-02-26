@@ -8,19 +8,19 @@
 
  # FILE INFORMATION
  DEFGROUP: Joomla.Plugin
- INGROUP: MokoWaaS-Brand.Guides
+ INGROUP: MokoWaaSBrand.Guides
  REPO: https://github.com/mokoconsulting-tech/mokowaasbrand
  VERSION: 01.04.00
  PATH: /docs/guides/upgrade-and-versioning-guide.md
- BRIEF: Guide for updating, versioning, and maintaining the MokoWaaS-Brand plugin
+ BRIEF: Guide for updating, versioning, and maintaining the MokoWaaSBrand plugin
  NOTE: Defines release flow, version rules, and upgrade validation
 -->
 
-# MokoWaaS-Brand Upgrade and Versioning Guide (VERSION: 01.04.00)
+# MokoWaaSBrand Upgrade and Versioning Guide (VERSION: 01.04.00)
 
 ## Introduction
 
-The MokoWaaS-Brand Upgrade and Versioning Guide establishes a consistent lifecycle management process for the plugin across WaaS governed environments. By defining clear versioning rules, upgrade requirements, and governance commitments, this guide ensures stability and predictable branding behavior throughout the platform.
+The MokoWaaSBrand Upgrade and Versioning Guide establishes a consistent lifecycle management process for the plugin across WaaS governed environments. By defining clear versioning rules, upgrade requirements, and governance commitments, this guide ensures stability and predictable branding behavior throughout the platform.
 
 ## Versioning Standards
 

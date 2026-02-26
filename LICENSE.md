@@ -12,7 +12,7 @@
 
 	# FILE INFORMATION
 	DEFGROUP: Joomla.Plugin
-	INGROUP: MokoWaaS-Brand.Documentation
+	INGROUP: MokoWaaSBrand.Documentation
   REPO: https://github.com/mokoconsulting-tech/mokowaasbrand
 	PATH: ./LICENSE.md
 	VERSION: 01.03.00

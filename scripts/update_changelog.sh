@@ -4,7 +4,7 @@ set -euo pipefail
 # scripts/update_changelog.sh
 #
 # Purpose:
-# - Apply the MokoWaaS-Brand CHANGELOG template entry for a given version.
+# - Apply the MokoWaaSBrand CHANGELOG template entry for a given version.
 # - Insert a new header at the top of CHANGELOG.md, immediately after "# Changelog".
 # - Avoid duplicates if an entry for the version already exists.
 # - Preserve the rest of the file verbatim.

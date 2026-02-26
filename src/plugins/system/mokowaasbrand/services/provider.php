@@ -14,7 +14,7 @@
  *
  * FILE INFORMATION
  * DEFGROUP: Joomla.Plugin
- * INGROUP: MokoWaaS-Brand
+ * INGROUP: MokoWaaSBrand
  * REPO: https://github.com/mokoconsulting-tech/mokowaasbrand
  * VERSION: 01.04.00
  * PATH: /src/plugins/system/mokowaasbrand/services/provider.php

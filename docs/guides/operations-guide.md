@@ -8,25 +8,25 @@
 
  # FILE INFORMATION
  DEFGROUP: Joomla.Plugin
- INGROUP: MokoWaaS-Brand.Guides
+ INGROUP: MokoWaaSBrand.Guides
  REPO: https://github.com/mokoconsulting-tech/mokowaasbrand
  VERSION: 01.04.00
  PATH: /docs/guides/operations-guide.md
- BRIEF: Operational guide for administering and managing the MokoWaaS-Brand system plugin
+ BRIEF: Operational guide for administering and managing the MokoWaaSBrand system plugin
  NOTE: Defines lifecycle, responsibilities, and operational behaviors
 -->
 
-# MokoWaaS-Brand Operations Guide (VERSION: 01.04.00)
+# MokoWaaSBrand Operations Guide (VERSION: 01.04.00)
 
 ## Introduction
 
-The MokoWaaS-Brand Operations Guide defines how the plugin is managed across WaaS governed Joomla environments. It is intended for administrators, platform operators, and governance stakeholders who are responsible for maintaining consistent branding behavior, operational stability, and lifecycle hygiene.
+The MokoWaaSBrand Operations Guide defines how the plugin is managed across WaaS governed Joomla environments. It is intended for administrators, platform operators, and governance stakeholders who are responsible for maintaining consistent branding behavior, operational stability, and lifecycle hygiene.
 
 This document focuses on day to day responsibilities, monitoring expectations, and coordination points with other parts of the WaaS platform.
 
 ## Operational Scope
 
-The MokoWaaS-Brand plugin operates as a system level extension that enforces WaaS branding, terminology, and identity across administrative user interfaces. Because it runs early in the request lifecycle, it requires explicit operational oversight to ensure:
+The MokoWaaSBrand plugin operates as a system level extension that enforces WaaS branding, terminology, and identity across administrative user interfaces. Because it runs early in the request lifecycle, it requires explicit operational oversight to ensure:
 
 * Consistent behavior after template or core updates
 * Stable interaction with other system plugins

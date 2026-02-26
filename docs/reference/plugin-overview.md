@@ -1,7 +1,7 @@
-# MokoWaaS-Brand Plugin Overview
+# MokoWaaSBrand Plugin Overview
 
 ## Executive Summary
-The MokoWaaS-Brand plugin operates as a core enablement layer within the WaaS delivery stack, aligning platform branding, terminology, and visual identity across administrative and user-facing touchpoints. It standardizes language, reinforces WaaS positioning, and reduces fragmentation risk across templates and extensions.
+The MokoWaaSBrand plugin operates as a core enablement layer within the WaaS delivery stack, aligning platform branding, terminology, and visual identity across administrative and user-facing touchpoints. It standardizes language, reinforces WaaS positioning, and reduces fragmentation risk across templates and extensions.
 
 ## Purpose
 - Replace default Joomla terminology with WaaS aligned naming.

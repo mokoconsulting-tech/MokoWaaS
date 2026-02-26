@@ -8,7 +8,7 @@
 
  # FILE INFORMATION
  DEFGROUP: Joomla.Plugin
- INGROUP: MokoWaaS-Brand.Guides
+ INGROUP: MokoWaaSBrand.Guides
  REPO: https://github.com/mokoconsulting-tech/mokowaasbrand
  VERSION: 01.04.00
  PATH: /docs/guides/rollback-and-recovery-guide.md
@@ -16,11 +16,11 @@
  NOTE: Completes the core guide set for WaaS plugin governance
 -->
 
-# MokoWaaS-Brand Rollback and Recovery Guide (VERSION: 01.04.00)
+# MokoWaaSBrand Rollback and Recovery Guide (VERSION: 01.04.00)
 
 ## Introduction
 
-The Rollback and Recovery Guide defines the procedures required to restore a stable operational state when the MokoWaaS-Brand plugin introduces issues or when an environment must revert to a previously validated condition. It ensures WaaS administrators, incident responders, and platform operators have a consistent and predictable process during incidents.
+The Rollback and Recovery Guide defines the procedures required to restore a stable operational state when the MokoWaaSBrand plugin introduces issues or when an environment must revert to a previously validated condition. It ensures WaaS administrators, incident responders, and platform operators have a consistent and predictable process during incidents.
 
 Rollback and recovery are essential components of WaaS governance, reducing downtime and ensuring branding and UI consistency across environments.
 
@@ -40,7 +40,7 @@ These symptoms indicate that immediate containment and structured recovery are n
 
 To prevent further disruption:
 
-1. Disable the MokoWaaS-Brand plugin via **System > Plugins**.
+1. Disable the MokoWaaSBrand plugin via **System > Plugins**.
 2. Clear Joomla cache.
 3. Retest impacted areas to confirm whether disabling stabilizes behavior.
 4. Review Joomla and PHP logs for indicators of root cause.

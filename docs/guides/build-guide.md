@@ -8,20 +8,20 @@
 
  # FILE INFORMATION
  DEFGROUP: Joomla.Plugin
- INGROUP: MokoWaaS-Brand.Build
+ INGROUP: MokoWaaSBrand.Build
  REPO: https://github.com/mokoconsulting-tech/mokowaasbrand
  FILE: build-guide.md
  VERSION: 01.04.00
  PATH: /docs/guides/
- BRIEF: Build and packaging guide for the MokoWaaS-Brand system plugin
+ BRIEF: Build and packaging guide for the MokoWaaSBrand system plugin
  NOTE: Defines environment setup, repository layout, packaging rules, and release preparation
 -->
 
-# MokoWaaS-Brand Build Guide (VERSION: 01.04.00)
+# MokoWaaSBrand Build Guide (VERSION: 01.04.00)
 
 ## 1. Purpose
 
-This document defines the complete build and packaging workflow for the MokoWaaS-Brand system plugin. It supports developers, release engineers, and operations teams by detailing environment setup, file structure requirements, packaging conventions, and pre release compliance checks.
+This document defines the complete build and packaging workflow for the MokoWaaSBrand system plugin. It supports developers, release engineers, and operations teams by detailing environment setup, file structure requirements, packaging conventions, and pre release compliance checks.
 
 ## 2. Build Requirements
 
@@ -165,7 +165,7 @@ A continuous integration and delivery pipeline is implemented using GitHub Actio
 ### 8.1 Build and Validate Workflow (`.github/workflows/build.yml`)
 
 ```yaml
-name: Build and Validate MokoWaaS-Brand
+name: Build and Validate MokoWaaSBrand
 
 on:
   push:
@@ -212,7 +212,7 @@ jobs:
 ### 8.2 Release Workflow (`.github/workflows/release.yml`)
 
 ```yaml
-name: Release MokoWaaS-Brand
+name: Release MokoWaaSBrand
 
 on:
   push:

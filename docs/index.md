@@ -8,19 +8,19 @@
 
  # FILE INFORMATION
  DEFGROUP: Joomla.Plugin
- INGROUP: MokoWaaS-Brand.Documentation
+ INGROUP: MokoWaaSBrand.Documentation
  REPO: https://github.com/mokoconsulting-tech/mokowaasbrand
  VERSION: 01.04.00
  PATH: /docs/index.md
- BRIEF: Master index of all documentation for the MokoWaaS-Brand plugin
+ BRIEF: Master index of all documentation for the MokoWaaSBrand plugin
  NOTE: Automatically maintained index for all guide canvases
 -->
 
-# MokoWaaS-Brand Documentation Index (VERSION: 01.04.00)
+# MokoWaaSBrand Documentation Index (VERSION: 01.04.00)
 
 ## Introduction
 
-The MokoWaaS-Brand Documentation Index provides the authoritative map of all documentation assets associated with the MokoWaaS-Brand system plugin. It ensures traceability, governance compliance, and visibility across all operational, technical, and administrative materials that support WaaS-managed Joomla environments.
+The MokoWaaSBrand Documentation Index provides the authoritative map of all documentation assets associated with the MokoWaaSBrand system plugin. It ensures traceability, governance compliance, and visibility across all operational, technical, and administrative materials that support WaaS-managed Joomla environments.
 
 This index serves as the entry point for contributors, administrators, and governance teams who require a single source of truth for locating and validating documentation files.
 

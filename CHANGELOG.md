@@ -11,7 +11,7 @@
  
  # FILE INFORMATION 
  DEFGROUP: 
- INGROUP: MokoWaaS-Brand.Documentation
+ INGROUP: MokoWaaSBrand.Documentation
  REPO: https://github.com/mokoconsulting-tech/mokowaasbrand
  PATH: ./CHANGELOG.md
  VERSION: 01.04.00
@@ -20,7 +20,7 @@
 
 # Changelog
 
-All notable changes to the MokoWaaS-Brand plugin will be documented in this file.
+All notable changes to the MokoWaaSBrand plugin will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
@@ -134,7 +134,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.0] - 2025-12-11
 
 ### Added
-- Initial release of MokoWaaS-Brand plugin
+- Initial release of MokoWaaSBrand plugin
 - Basic language override system for Joomla rebranding
 - Frontend language overrides (en-GB, en-US)
 - Administrator language overrides (en-GB, en-US)

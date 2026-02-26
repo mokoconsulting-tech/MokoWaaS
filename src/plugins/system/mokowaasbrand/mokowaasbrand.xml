@@ -14,11 +14,11 @@
 
  # FILE INFORMATION
  DEFGROUP: Joomla.Plugin
- INGROUP: MokoWaaS-Brand
+ INGROUP: MokoWaaSBrand
  REPO: https://github.com/mokoconsulting-tech/mokowaasbrand
  VERSION: 01.04.00
  PATH: /src/plugins/system/mokowaasbrand/mokowaasbrand.xml
- BRIEF: Plugin manifest for MokoWaaS-Brand system plugin
+ BRIEF: Plugin manifest for MokoWaaSBrand system plugin
  NOTE: Defines installation metadata, files, and configuration for Joomla
 -->
 <extension type="plugin" group="system" method="upgrade">

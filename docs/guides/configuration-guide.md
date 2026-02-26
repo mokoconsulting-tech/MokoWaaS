@@ -8,25 +8,25 @@
 
  # FILE INFORMATION
  DEFGROUP: Joomla.Plugin
- INGROUP: MokoWaaS-Brand.Guides
+ INGROUP: MokoWaaSBrand.Guides
  REPO: https://github.com/mokoconsulting-tech/mokowaasbrand
  VERSION: 01.04.00
  PATH: /docs/guides/configuration-guide.md
- BRIEF: Configuration guide for the MokoWaaS-Brand system plugin
+ BRIEF: Configuration guide for the MokoWaaSBrand system plugin
  NOTE: Defines plugin parameters, expected behaviors, and recommended defaults
 -->
 
-# MokoWaaS-Brand Configuration Guide (VERSION: 01.04.00)
+# MokoWaaSBrand Configuration Guide (VERSION: 01.04.00)
 
 ## 1. Objective
 
-This guide outlines the configuration parameters available within the MokoWaaS-Brand system plugin and establishes recommended defaults for WaaS governed environments. Proper configuration ensures consistent branding behavior across templates, modules, and administrative surfaces.
+This guide outlines the configuration parameters available within the MokoWaaSBrand system plugin and establishes recommended defaults for WaaS governed environments. Proper configuration ensures consistent branding behavior across templates, modules, and administrative surfaces.
 
 ## 2. Accessing Plugin Configuration
 
 1. Log in to Joomla Administrator.
 2. Navigate to **System > Plugins**.
-3. Search for **MokoWaaS-Brand**.
+3. Search for **MokoWaaSBrand**.
 4. Select the plugin name to open the configuration panel.
 
 ## 3. Configuration Sections

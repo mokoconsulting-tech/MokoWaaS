@@ -13,7 +13,7 @@
 
  # FILE INFORMATION
  DEFGROUP: Joomla.Plugin
- INGROUP: MokoWaaS-Brand
+ INGROUP: MokoWaaSBrand
  REPO: https://github.com/mokoconsulting-tech/mokowaasbrand
  VERSION: 01.04.00
  PATH: /README.md
@@ -21,14 +21,14 @@
  NOTE: Internal WaaS identity abstraction layer
 -->
 
-# MokoWaaS-Brand Plugin
+# MokoWaaSBrand Plugin
 
 [![Version](https://img.shields.io/badge/version-01.04.00-blue.svg)](https://github.com/mokoconsulting-tech/mokowaasbrand)
 [![License](https://img.shields.io/badge/license-GPL--3.0--or--later-green.svg)](LICENSE.md)
 [![Joomla](https://img.shields.io/badge/Joomla-5.x-orange.svg)](https://www.joomla.org)
 [![PHP](https://img.shields.io/badge/PHP-8.1%2B-blue.svg)](https://www.php.net)
 
-MokoWaaS-Brand is a Joomla 5.x system plugin that provides a comprehensive identity override layer for the MokoWaaS platform. It ensures consistent branding, terminology, and user experience across all Joomla administrative and frontend interfaces.
+MokoWaaSBrand is a Joomla 5.x system plugin that provides a comprehensive identity override layer for the MokoWaaS platform. It ensures consistent branding, terminology, and user experience across all Joomla administrative and frontend interfaces.
 
 ## Table of Contents
 
@@ -47,7 +47,7 @@ MokoWaaS-Brand is a Joomla 5.x system plugin that provides a comprehensive ident
 
 ## Overview
 
-The MokoWaaS-Brand plugin operationalizes a unified naming convention, brand-controlled visuals, and enforced terminology across all tenant sites. This ensures consistent service delivery within the WaaS (Website as a Service) framework by abstracting all upstream Joomla identifiers behind MokoWaaS-compliant terminology.
+The MokoWaaSBrand plugin operationalizes a unified naming convention, brand-controlled visuals, and enforced terminology across all tenant sites. This ensures consistent service delivery within the WaaS (Website as a Service) framework by abstracting all upstream Joomla identifiers behind MokoWaaS-compliant terminology.
 
 ## Features
 

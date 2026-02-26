@@ -8,19 +8,19 @@
 
  # FILE INFORMATION
  DEFGROUP: Joomla.Plugin
- INGROUP: MokoWaaS-Brand
+ INGROUP: MokoWaaSBrand
  REPO: https://github.com/mokoconsulting-tech/mokowaasbrand
  PATH: /docs/plugin-basic.md
  VERSION: 01.04.00
- BRIEF: Baseline documentation for the MokoWaaS-Brand system plugin
+ BRIEF: Baseline documentation for the MokoWaaSBrand system plugin
  NOTE: Foundational reference for internal and external stakeholders
 -->
 
-# MokoWaaS-Brand Plugin Overview (VERSION: 01.04.00)
+# MokoWaaSBrand Plugin Overview (VERSION: 01.04.00)
 
 ## Introduction
 
-The MokoWaaS-Brand plugin is a foundational system component used across WaaS-managed Joomla environments. It ensures consistent application of platform identity, terminology, and user experience standards. By centralizing key branding functions, the plugin supports multi‑tenant WaaS operations and reduces administrative fragmentation.
+The MokoWaaSBrand plugin is a foundational system component used across WaaS-managed Joomla environments. It ensures consistent application of platform identity, terminology, and user experience standards. By centralizing key branding functions, the plugin supports multi‑tenant WaaS operations and reduces administrative fragmentation.
 
 ## Role in the WaaS Platform
 
