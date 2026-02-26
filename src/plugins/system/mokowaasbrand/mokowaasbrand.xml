@@ -31,10 +31,10 @@
 	<authorUrl>https://mokoconsulting.tech</authorUrl>
 	<version>01.06.00</version>
 	<description>PLG_SYSTEM_MOKOWAASBRAND_XML_DESCRIPTION</description>
-	<namespace path=".">Moko\Plugin\System\MokoWaaSBrand</namespace>
+	<namespace path="src">Moko\Plugin\System\MokoWaaSBrand</namespace>
 
 	<files>
-		<folder>Extension</folder>
+		<folder>src</folder>
 		<folder>services</folder>
 		<folder>language</folder>
 	</files>
