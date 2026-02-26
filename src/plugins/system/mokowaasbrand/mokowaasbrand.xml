@@ -17,7 +17,7 @@
  INGROUP: MokoWaaS-Brand
  REPO: https://github.com/mokoconsulting-tech/mokowaasbrand
  VERSION: 01.04.00
- PATH: /src/mokowaasbrand.xml
+ PATH: /src/plugins/system/mokowaasbrand/mokowaasbrand.xml
  BRIEF: Plugin manifest for MokoWaaS-Brand system plugin
  NOTE: Defines installation metadata, files, and configuration for Joomla
 -->

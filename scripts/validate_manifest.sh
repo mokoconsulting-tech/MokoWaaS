@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-MANIFEST="src/mokowaasbrand.xml"
+MANIFEST="src/plugins/system/mokowaasbrand/mokowaasbrand.xml"
 
 echo "Validating Joomla manifest: $MANIFEST"
 

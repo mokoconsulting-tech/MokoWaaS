@@ -36,15 +36,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Complete Joomla 5.x system plugin implementation with modern architecture
-- Main plugin class (`src/mokowaasbrand.php`) with event handlers:
+- Main plugin class (`src/plugins/system/mokowaasbrand/mokowaasbrand.php`) with event handlers:
   - `onAfterInitialise` event hook for framework initialization
   - `onAfterRoute` event hook for routing integration
-- Plugin manifest (`src/mokowaasbrand.xml`) with Joomla 5.x namespace support
+- Plugin manifest (`src/plugins/system/mokowaasbrand/mokowaasbrand.xml`) with Joomla 5.x namespace support
   - Namespace: `Moko\Plugin\System\MokoWaaSBrand`
   - Configuration parameter for enabling/disabling branding
-- Dependency injection service provider (`src/services/provider.php`)
+- Dependency injection service provider (`src/plugins/system/mokowaasbrand/services/provider.php`)
   - DI container registration for Joomla 5.x compatibility
-- Plugin language files in `src/language/en-GB/`:
+- Plugin language files in `src/plugins/system/mokowaasbrand/language/en-GB/`:
   - `plg_system_mokowaasbrand.ini` - Plugin UI strings
   - `plg_system_mokowaasbrand.sys.ini` - System/installation strings
 - Enhanced language overrides (57+ strings):
@@ -123,7 +123,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [01.01.02] - 2025-12-11
 
 ### Changed
-- Moved plugin code to `/src/` directory for better organization
+- Moved plugin code to `/src/plugins/system/mokowaasbrand/` directory for better organization
 - Aligned repository structure with release deployment pipeline
 - Improved packaging workflow
 

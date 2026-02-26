@@ -167,17 +167,20 @@ Joomla automatically loads these overrides during initialization, ensuring optim
 
 ```
 mokowaasbrand/
-├── src/                              # Plugin source files
-│   ├── mokowaasbrand.php            # Main plugin class
-│   ├── mokowaasbrand.xml            # Plugin manifest
-│   ├── services/
-│   │   └── provider.php             # DI service provider
-│   ├── language/
-│   │   ├── en-GB/                   # Plugin language files
-│   │   └── overrides/               # Frontend language overrides
-│   └── administrator/
-│       └── language/
-│           └── overrides/           # Admin language overrides
+├── src/                              # Source files
+│   └── plugins/
+│       └── system/
+│           └── mokowaasbrand/       # Plugin source files
+│               ├── mokowaasbrand.php            # Main plugin class
+│               ├── mokowaasbrand.xml            # Plugin manifest
+│               ├── services/
+│               │   └── provider.php             # DI service provider
+│               ├── language/
+│               │   ├── en-GB/                   # Plugin language files
+│               │   └── overrides/               # Frontend language overrides
+│               └── administrator/
+│                   └── language/
+│                       └── overrides/           # Admin language overrides
 ├── docs/                            # Documentation
 │   ├── index.md                     # Documentation index
 │   ├── plugin-basic.md              # Plugin overview
