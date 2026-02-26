@@ -14,7 +14,7 @@
  INGROUP: MokoWaaSBrand.Documentation
  REPO: https://github.com/mokoconsulting-tech/mokowaasbrand
  PATH: ./CHANGELOG.md
- VERSION: 01.04.00
+ VERSION: 01.05.00
  BRIEF: Version history using `Keep a Changelog`
 -->
 
@@ -31,6 +31,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Additional language override strings for extended Joomla components
 - Custom branding for media manager
 - Enhanced configuration options
+
+## [01.05.00] - 2026-02-26
+
+### Added
+- Comprehensive frontend language overrides (35+ new strings):
+  - User authentication branding (login, logout, registration, password reset)
+  - Search functionality with MokoWaaS branding
+  - Contact form branding
+  - Error page customization
+  - Frontend module branding
+  - Meta generator tag with MokoWaaS branding
+- Frontend override file expanded from 58 to 93 lines for complete user-facing coverage
+
+### Changed
+- **Directory structure reorganization**: Plugin code relocated to standard Joomla plugin path
+  - Moved plugin files from `src/` to `src/plugins/system/mokowaasbrand/`
+  - Language overrides remain in standard Joomla locations:
+    - Frontend: `src/language/overrides/`
+    - Administrator: `src/administrator/language/overrides/`
+- **Naming standardization**: Removed hyphen from all project references
+  - Changed from "MokoWaaS-Brand" to "MokoWaaSBrand" across 26 files
+  - Updated 74 occurrences in documentation, code, and configuration
+- Updated all documentation to reflect new directory structure:
+  - README.md repository structure diagram
+  - Build guide directory references
+  - All file PATH headers in source files
+- Updated `validate_manifest.sh` script to reference new manifest location
+
+### Fixed
+- Corrected PATH comments in plugin language files to reflect new structure
+- Updated file header paths in `mokowaasbrand.php`, `mokowaasbrand.xml`, and `provider.php`
+
+### Technical
+- Improved adherence to Joomla plugin directory conventions
+- Clearer separation between plugin code and language override files
+- Better organization for long-term maintainability
+- All path references updated for consistency
 
 ## [01.04.00] - 2026-02-22
 

@@ -15,7 +15,7 @@
  DEFGROUP: Joomla.Plugin
  INGROUP: MokoWaaSBrand
  REPO: https://github.com/mokoconsulting-tech/mokowaasbrand
- VERSION: 01.04.00
+ VERSION: 01.05.00
  PATH: /README.md
  BRIEF: Rebranding plugin for MokoWaaS platform
  NOTE: Internal WaaS identity abstraction layer
@@ -23,7 +23,7 @@
 
 # MokoWaaSBrand Plugin
 
-[![Version](https://img.shields.io/badge/version-01.04.00-blue.svg)](https://github.com/mokoconsulting-tech/mokowaasbrand)
+[![Version](https://img.shields.io/badge/version-01.05.00-blue.svg)](https://github.com/mokoconsulting-tech/mokowaasbrand)
 [![License](https://img.shields.io/badge/license-GPL--3.0--or--later-green.svg)](LICENSE.md)
 [![Joomla](https://img.shields.io/badge/Joomla-5.x-orange.svg)](https://www.joomla.org)
 [![PHP](https://img.shields.io/badge/PHP-8.1%2B-blue.svg)](https://www.php.net)
@@ -51,13 +51,16 @@ The MokoWaaSBrand plugin operationalizes a unified naming convention, brand-cont
 
 ## Features
 
-- **Comprehensive Language Overrides**: 57+ language strings replacing Joomla branding with MokoWaaS terminology
+- **Comprehensive Language Overrides**: 90+ language strings replacing Joomla branding with MokoWaaS terminology
+  - 93 frontend strings covering user authentication, search, contact forms, error pages, and modules
+  - 61 administrator strings for backend branding
 - **Administrator & Frontend Coverage**: Applies branding across both Joomla backend and frontend
 - **Joomla 5.x Compatible**: Built using modern Joomla 5.x architecture with dependency injection
 - **Event-Driven Architecture**: Utilizes Joomla system events for optimal integration
 - **Configurable**: Enable/disable branding functionality through plugin parameters
 - **Multi-Language Support**: Currently supports en-GB and en-US locales
 - **Governance Compliant**: Aligned with [MokoStandards](https://github.com/mokoconsulting-tech/MokoStandards)
+- **Standards-Compliant Structure**: Follows Joomla plugin directory conventions with code in `src/plugins/system/mokowaasbrand/`
 
 ## System Requirements
 

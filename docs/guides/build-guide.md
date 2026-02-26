@@ -11,13 +11,13 @@
  INGROUP: MokoWaaSBrand.Build
  REPO: https://github.com/mokoconsulting-tech/mokowaasbrand
  FILE: build-guide.md
- VERSION: 01.04.00
+ VERSION: 01.05.00
  PATH: /docs/guides/
  BRIEF: Build and packaging guide for the MokoWaaSBrand system plugin
  NOTE: Defines environment setup, repository layout, packaging rules, and release preparation
 -->
 
-# MokoWaaSBrand Build Guide (VERSION: 01.04.00)
+# MokoWaaSBrand Build Guide (VERSION: 01.05.00)
 
 ## 1. Purpose
 
@@ -114,7 +114,7 @@ Remove any unneeded files:
 Using CLI:
 
 ```bash
-zip -r mokowaasbrand_v01.04.00.zip ./ -x "*.git*" "scripts/*" "docs/*"
+zip -r mokowaasbrand_v01.05.00.zip ./ -x "*.git*" "scripts/*" "docs/*"
 ```
 
 Ensure excluded paths match release governance and do not remove required runtime files.
@@ -329,6 +329,7 @@ Templates and plugins must remain synchronized to avoid inconsistencies.
 
 ## Revision History
 
-| Date       | Author                          | Description                     |
-| ---------- | ------------------------------- | ------------------------------- |
-| 2025-12-11 | Jonathan Miller (@jmiller-moko) | Initial creation of build guide |
+| Date       | Author                          | Description                               |
+| ---------- | ------------------------------- | ----------------------------------------- |
+| 2026-02-26 | GitHub Copilot                  | Update for version 01.05.00               |
+| 2025-12-11 | Jonathan Miller (@jmiller-moko) | Initial creation of build guide           |

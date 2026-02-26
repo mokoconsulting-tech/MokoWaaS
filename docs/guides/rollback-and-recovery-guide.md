@@ -10,13 +10,13 @@
  DEFGROUP: Joomla.Plugin
  INGROUP: MokoWaaSBrand.Guides
  REPO: https://github.com/mokoconsulting-tech/mokowaasbrand
- VERSION: 01.04.00
+ VERSION: 01.05.00
  PATH: /docs/guides/rollback-and-recovery-guide.md
  BRIEF: Rollback and recovery guide for restoring stable operation after plugin related incidents
  NOTE: Completes the core guide set for WaaS plugin governance
 -->
 
-# MokoWaaSBrand Rollback and Recovery Guide (VERSION: 01.04.00)
+# MokoWaaSBrand Rollback and Recovery Guide (VERSION: 01.05.00)
 
 ## Introduction
 
@@ -105,6 +105,7 @@ These strategies improve long term WaaS platform stability.
 
 ## Revision History
 
-| Date       | Author                          | Description                                 |
-| ---------- | ------------------------------- | ------------------------------------------- |
+| Date       | Author                          | Description                               |
+| ---------- | ------------------------------- | ----------------------------------------- |
+| 2026-02-26 | GitHub Copilot                  | Update for version 01.05.00               |
 | 2025-12-11 | Jonathan Miller (@jmiller-moko) | Full rewrite and update to version 01.03.00 |

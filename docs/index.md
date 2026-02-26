@@ -10,13 +10,13 @@
  DEFGROUP: Joomla.Plugin
  INGROUP: MokoWaaSBrand.Documentation
  REPO: https://github.com/mokoconsulting-tech/mokowaasbrand
- VERSION: 01.04.00
+ VERSION: 01.05.00
  PATH: /docs/index.md
  BRIEF: Master index of all documentation for the MokoWaaSBrand plugin
  NOTE: Automatically maintained index for all guide canvases
 -->
 
-# MokoWaaSBrand Documentation Index (VERSION: 01.04.00)
+# MokoWaaSBrand Documentation Index (VERSION: 01.05.00)
 
 ## Introduction
 
@@ -74,5 +74,5 @@ Contributors should:
 
 | Date       | Author                          | Description                                 |
 | ---------- | ------------------------------- | ------------------------------------------- |
-| 2026-02-22 | GitHub Copilot                  | Update to version 01.04.00                  |
+| 2026-02-26 | GitHub Copilot                  | Update to version 01.05.00                  |
 | 2025-12-11 | Jonathan Miller (@jmiller-moko) | Full rewrite and update to version 01.03.00 |

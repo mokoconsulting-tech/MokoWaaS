@@ -16,7 +16,7 @@
  * DEFGROUP: Joomla.Plugin
  * INGROUP: MokoWaaSBrand
  * REPO: https://github.com/mokoconsulting-tech/mokowaasbrand
- * VERSION: 01.04.00
+ * VERSION: 01.05.00
  * PATH: /src/plugins/system/mokowaasbrand/mokowaasbrand.php
  * BRIEF: Main plugin file for MokoWaaSBrand system plugin
  * NOTE: Handles Joomla system events for rebranding functionality

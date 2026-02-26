@@ -10,13 +10,13 @@
  DEFGROUP: Joomla.Plugin
  INGROUP: MokoWaaSBrand.Guides
  REPO: https://github.com/mokoconsulting-tech/mokowaasbrand
- VERSION: 01.04.00
+ VERSION: 01.05.00
  PATH: /docs/guides/configuration-guide.md
  BRIEF: Configuration guide for the MokoWaaSBrand system plugin
  NOTE: Defines plugin parameters, expected behaviors, and recommended defaults
 -->
 
-# MokoWaaSBrand Configuration Guide (VERSION: 01.04.00)
+# MokoWaaSBrand Configuration Guide (VERSION: 01.05.00)
 
 ## 1. Objective
 
@@ -102,4 +102,5 @@ To ensure continuity across managed environments:
 
 | Version  | Date       | Author                          | Description                                    |
 | -------- | ---------- | ------------------------------- | ---------------------------------------------- |
+| 01.05.00 | 2026-02-26 | GitHub Copilot                  | Update for version 01.05.00                    |
 | 01.02.00 | 2025-12-11 | Jonathan Miller (@jmiller-moko) | Initial standalone configuration guide created |

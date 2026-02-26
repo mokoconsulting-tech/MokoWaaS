@@ -11,12 +11,12 @@
  INGROUP: MokoWaaSBrand
  REPO: https://github.com/mokoconsulting-tech/mokowaasbrand
  PATH: /docs/plugin-basic.md
- VERSION: 01.04.00
+ VERSION: 01.05.00
  BRIEF: Baseline documentation for the MokoWaaSBrand system plugin
  NOTE: Foundational reference for internal and external stakeholders
 -->
 
-# MokoWaaSBrand Plugin Overview (VERSION: 01.04.00)
+# MokoWaaSBrand Plugin Overview (VERSION: 01.05.00)
 
 ## Introduction
 
@@ -119,7 +119,8 @@ While the plugin provides broad branding coverage, certain constraints apply:
 
 ## Revision History
 
-| Date       | Author                          | Description                  |
-| ---------- | ------------------------------- | ---------------------------- |
-| 2026-02-22 | GitHub Copilot                  | Update for version 01.04.00  |
-| 2025-12-11 | Jonathan Miller (@jmiller-moko) | Rewrite for version 01.03.00 |
+| Date       | Author                          | Description                               |
+| ---------- | ------------------------------- | ----------------------------------------- |
+| 2026-02-26 | GitHub Copilot                  | Update for version 01.05.00, directory restructuring |
+| 2026-02-22 | GitHub Copilot                  | Update for version 01.04.00               |
+| 2025-12-11 | Jonathan Miller (@jmiller-moko) | Rewrite for version 01.03.00              |
