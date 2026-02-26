@@ -17,10 +17,12 @@
  * INGROUP: MokoWaaS-Brand
  * REPO: https://github.com/mokoconsulting-tech/mokowaasbrand
  * VERSION: 01.04.00
- * PATH: /src/mokowaasbrand.php
- * BRIEF: Main plugin file for MokoWaaS-Brand system plugin
+ * PATH: /src/plugins/system/mokowaasbrand/src/Extension/MokoWaaSBrand.php
+ * BRIEF: Main plugin class for MokoWaaS-Brand system plugin
  * NOTE: Handles Joomla system events for rebranding functionality
  */
+
+namespace Moko\Plugin\System\MokoWaaSBrand\Extension;
 
 defined('_JEXEC') or die;
 
@@ -34,7 +36,7 @@ use Joomla\CMS\Plugin\CMSPlugin;
  *
  * @since  01.04.00
  */
-class PlgSystemMokoWaaSBrand extends CMSPlugin
+class MokoWaaSBrand extends CMSPlugin
 {
 	/**
 	 * Load the language file on instantiation.
