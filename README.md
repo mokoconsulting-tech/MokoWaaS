@@ -177,8 +177,9 @@ mokowaasbrand/
 │   ├── plugins/
 │   │   └── system/
 │   │       └── mokowaasbrand/       # Plugin source files
-│   │           ├── mokowaasbrand.php            # Main plugin class
 │   │           ├── mokowaasbrand.xml            # Plugin manifest
+│   │           ├── Extension/
+│   │           │   └── MokoWaaSBrand.php        # Main plugin class (namespaced)
 │   │           ├── services/
 │   │           │   └── provider.php             # DI service provider
 │   │           └── language/
