@@ -32,6 +32,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Custom branding for media manager
 - Enhanced configuration options
 
+### Changed
+- **Restructured language overrides** - moved all override files into plugin language folders
+  - Moved `src/language/overrides/*.override.ini` → `src/plugins/system/mokowaasbrand/language/en-GB/` and `en-US/`
+  - Moved `src/administrator/language/overrides/*.override.ini` → `src/plugins/system/mokowaasbrand/administrator/language/en-GB/` and `en-US/`
+  - Removed empty override directories
+  - Updated file paths in all override file headers to reflect new locations
+  - All language files now consolidated within plugin structure for better organization
+
 ### Added
 - Administrator language directories for plugin management
   - Created `administrator/language/en-GB/plg_system_mokowaasbrand.sys.ini`
