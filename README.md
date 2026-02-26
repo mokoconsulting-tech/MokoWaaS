@@ -145,21 +145,24 @@ PlgSystemMokoWaaSBrand
 4. **language/en-GB/**
    - Plugin-specific language strings
    - Installation and configuration UI text
+   - Located in `src/plugins/system/mokowaasbrand/language/en-GB/`
 
 5. **language/overrides/**
    - Frontend language override files
    - Replaces Joomla terminology with MokoWaaS branding
+   - Located in `src/language/overrides/`
 
 6. **administrator/language/overrides/**
    - Administrator language override files
    - Backend-specific branding replacements
+   - Located in `src/administrator/language/overrides/`
 
 ### Language Override Integration
 
-The plugin leverages Joomla's native language override system rather than programmatically loading strings. Language override files are placed in standard Joomla locations:
+The plugin leverages Joomla's native language override system rather than programmatically loading strings. Language override files are placed in standard Joomla locations within the source directory:
 
-- Frontend: `language/overrides/{locale}.override.ini`
-- Administrator: `administrator/language/overrides/{locale}.override.ini`
+- Frontend: `src/language/overrides/{locale}.override.ini`
+- Administrator: `src/administrator/language/overrides/{locale}.override.ini`
 
 Joomla automatically loads these overrides during initialization, ensuring optimal performance and compatibility.
 
@@ -168,19 +171,20 @@ Joomla automatically loads these overrides during initialization, ensuring optim
 ```
 mokowaasbrand/
 ├── src/                              # Source files
-│   └── plugins/
-│       └── system/
-│           └── mokowaasbrand/       # Plugin source files
-│               ├── mokowaasbrand.php            # Main plugin class
-│               ├── mokowaasbrand.xml            # Plugin manifest
-│               ├── services/
-│               │   └── provider.php             # DI service provider
-│               ├── language/
-│               │   ├── en-GB/                   # Plugin language files
-│               │   └── overrides/               # Frontend language overrides
-│               └── administrator/
-│                   └── language/
-│                       └── overrides/           # Admin language overrides
+│   ├── plugins/
+│   │   └── system/
+│   │       └── mokowaasbrand/       # Plugin source files
+│   │           ├── mokowaasbrand.php            # Main plugin class
+│   │           ├── mokowaasbrand.xml            # Plugin manifest
+│   │           ├── services/
+│   │           │   └── provider.php             # DI service provider
+│   │           └── language/
+│   │               └── en-GB/                   # Plugin language files
+│   ├── language/
+│   │   └── overrides/               # Frontend language overrides
+│   └── administrator/
+│       └── language/
+│           └── overrides/           # Admin language overrides
 ├── docs/                            # Documentation
 │   ├── index.md                     # Documentation index
 │   ├── plugin-basic.md              # Plugin overview

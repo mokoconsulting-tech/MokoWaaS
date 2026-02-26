@@ -45,19 +45,20 @@ The repository should maintain a clean, predictable, and modular structure suita
 ```text
 mokowaasbrand/
   ├── src/
-  │     └── plugins/
-  │           └── system/
-  │                 └── mokowaasbrand/
-  │                       ├── mokowaasbrand.php        (main plugin file)
-  │                       ├── mokowaasbrand.xml        (plugin manifest)
-  │                       ├── services/                (service providers for DI)
-  │                       │   └── provider.php
-  │                       ├── language/                (plugin language files)
-  │                       │   ├── en-GB/*.ini
-  │                       │   └── overrides/           (Joomla language overrides)
-  │                       └── administrator/
-  │                           └── language/
-  │                               └── overrides/       (admin language overrides)
+  │     ├── plugins/
+  │     │     └── system/
+  │     │           └── mokowaasbrand/
+  │     │                 ├── mokowaasbrand.php        (main plugin file)
+  │     │                 ├── mokowaasbrand.xml        (plugin manifest)
+  │     │                 ├── services/                (service providers for DI)
+  │     │                 │   └── provider.php
+  │     │                 └── language/                (plugin language files)
+  │     │                     └── en-GB/*.ini
+  │     ├── language/
+  │     │     └── overrides/           (Joomla frontend language overrides)
+  │     └── administrator/
+  │           └── language/
+  │                 └── overrides/       (admin language overrides)
   │
   ├── LICENSE.md                     (standard GPL license)
   ├── README.md                      (repository overview)
