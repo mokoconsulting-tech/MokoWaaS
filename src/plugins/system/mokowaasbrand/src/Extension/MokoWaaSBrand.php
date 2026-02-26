@@ -27,6 +27,7 @@ namespace Moko\Plugin\System\MokoWaaSBrand\Extension;
 defined('_JEXEC') or die;
 
 use Joomla\CMS\Plugin\CMSPlugin;
+use Joomla\CMS\Language\Language;
 
 /**
  * MokoWaaS Brand System Plugin
@@ -57,8 +58,8 @@ class MokoWaaSBrand extends CMSPlugin
 	/**
 	 * Event triggered after the framework has loaded and the application initialise method has been called.
 	 *
-	 * This plugin relies on Joomla's native language override system. Language override files
-	 * placed in the standard Joomla override directories will be automatically loaded by Joomla.
+	 * This method loads language override files from the plugin directory to rebrand Joomla
+	 * with MokoWaaS identity. The override files replace core Joomla language strings.
 	 *
 	 * @return  void
 	 *
@@ -71,8 +72,100 @@ class MokoWaaSBrand extends CMSPlugin
 			return;
 		}
 
-		// Language overrides are handled by Joomla's core system
-		// Additional branding functionality can be added here if needed
+		// Load language overrides
+		$this->loadLanguageOverrides();
+	}
+
+	/**
+	 * Load language override files from the plugin directory.
+	 *
+	 * This method loads the override files that replace core Joomla language strings
+	 * with MokoWaaS branding.
+	 *
+	 * @return  void
+	 *
+	 * @since   01.06.00
+	 */
+	protected function loadLanguageOverrides()
+	{
+		$language = $this->app->getLanguage();
+		$tag = $language->getTag();
+		
+		// Get the plugin path
+		$pluginPath = JPATH_PLUGINS . '/system/mokowaasbrand';
+		
+		// Determine if we're in administrator or site
+		$isAdmin = $this->app->isClient('administrator');
+		
+		// Load the appropriate override file
+		if ($isAdmin)
+		{
+			$overridePath = $pluginPath . '/administrator/language/overrides/' . $tag . '.override.ini';
+		}
+		else
+		{
+			$overridePath = $pluginPath . '/language/overrides/' . $tag . '.override.ini';
+		}
+		
+		// Load the override file if it exists
+		if (file_exists($overridePath))
+		{
+			$language->load('', $pluginPath, $tag, true, false);
+			
+			// Parse and load the override file manually
+			$strings = $this->parseLanguageFile($overridePath);
+			
+			if (!empty($strings))
+			{
+				foreach ($strings as $key => $value)
+				{
+					$language->_strings[$key] = $value;
+				}
+			}
+		}
+	}
+
+	/**
+	 * Parse a language INI file and return the strings.
+	 *
+	 * @param   string  $filePath  The path to the language file
+	 *
+	 * @return  array  Array of language strings
+	 *
+	 * @since   01.06.00
+	 */
+	protected function parseLanguageFile($filePath)
+	{
+		$strings = [];
+		
+		if (!file_exists($filePath))
+		{
+			return $strings;
+		}
+		
+		$content = file_get_contents($filePath);
+		$lines = explode("\n", $content);
+		
+		foreach ($lines as $line)
+		{
+			$line = trim($line);
+			
+			// Skip empty lines and comments
+			if (empty($line) || $line[0] === ';')
+			{
+				continue;
+			}
+			
+			// Parse KEY="VALUE" format
+			if (preg_match('/^([A-Z0-9_]+)="(.+)"$/i', $line, $matches))
+			{
+				$key = strtoupper($matches[1]);
+				$value = $matches[2];
+				$strings[$key] = $value;
+			}
+		}
+		
+		return $strings;
 	}
 
 	/**
