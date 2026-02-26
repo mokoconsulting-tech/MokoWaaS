@@ -42,9 +42,7 @@
 
 	<languages folder="language">
 		<language tag="en-GB">en-GB/plg_system_mokowaasbrand.ini</language>
-		<language tag="en-GB">en-GB/plg_system_mokowaasbrand.sys.ini</language>
 		<language tag="en-US">en-US/plg_system_mokowaasbrand.ini</language>
-		<language tag="en-US">en-US/plg_system_mokowaasbrand.sys.ini</language>
 	</languages>
 
 	<languages folder="administrator/language">
