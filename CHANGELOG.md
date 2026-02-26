@@ -14,7 +14,7 @@
  INGROUP: MokoWaaSBrand.Documentation
  REPO: https://github.com/mokoconsulting-tech/mokowaasbrand
  PATH: ./CHANGELOG.md
- VERSION: 01.05.00
+ VERSION: 01.06.00
  BRIEF: Version history using `Keep a Changelog`
 -->
 
@@ -31,6 +31,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Additional language override strings for extended Joomla components
 - Custom branding for media manager
 - Enhanced configuration options
+
+## [01.06.00] - 2026-02-26
+
+### Fixed
+- **Critical**: Fixed "Class 'PlgSystemMokoWaaSBrand' not found" error by implementing proper Joomla 5.x namespace structure
+  - Created namespaced class `Moko\Plugin\System\MokoWaaSBrand\Extension\MokoWaaSBrand`
+  - Moved class to `Extension/` directory at plugin root level
+  - Updated service provider to use fully qualified class name
+  - Updated manifest with correct namespace path (`.` instead of `src`)
+- Removed old non-namespaced `mokowaasbrand.php` file
+- Updated plugin manifest to include `Extension` folder in files
+
+### Changed
+- Plugin now uses proper Joomla 5.x PSR-4 autoloading with namespaces
+- Class structure follows Joomla 5.x plugin conventions with Extension subdirectory
+- Updated documentation to reflect new class structure
+
+### Technical
+- Namespace: `Moko\Plugin\System\MokoWaaSBrand\Extension\MokoWaaSBrand`
+- Class file location: `Extension/MokoWaaSBrand.php`
+- Service provider properly imports and instantiates namespaced class
+- Manifest declares namespace with path="." for plugin root
 
 ## [01.05.00] - 2026-02-26
 

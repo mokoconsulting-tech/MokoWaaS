@@ -15,7 +15,7 @@
  DEFGROUP: Joomla.Plugin
  INGROUP: MokoWaaSBrand
  REPO: https://github.com/mokoconsulting-tech/mokowaasbrand
- VERSION: 01.05.00
+ VERSION: 01.06.00
  PATH: /README.md
  BRIEF: Rebranding plugin for MokoWaaS platform
  NOTE: Internal WaaS identity abstraction layer
@@ -23,7 +23,7 @@
 
 # MokoWaaSBrand Plugin
 
-[![Version](https://img.shields.io/badge/version-01.05.00-blue.svg)](https://github.com/mokoconsulting-tech/mokowaasbrand)
+[![Version](https://img.shields.io/badge/version-01.06.00-blue.svg)](https://github.com/mokoconsulting-tech/mokowaasbrand)
 [![License](https://img.shields.io/badge/license-GPL--3.0--or--later-green.svg)](LICENSE.md)
 [![Joomla](https://img.shields.io/badge/Joomla-5.x-orange.svg)](https://www.joomla.org)
 [![PHP](https://img.shields.io/badge/PHP-8.1%2B-blue.svg)](https://www.php.net)
@@ -130,14 +130,15 @@ PlgSystemMokoWaaSBrand
 
 ### Core Components
 
-1. **mokowaasbrand.php**
+1. **Extension/MokoWaaSBrand.php**
    - Main plugin class extending `CMSPlugin`
-   - Implements system event handlers
-   - Namespace: `Moko\Plugin\System\MokoWaaSBrand`
+   - Implements system event handlers  
+   - Namespace: `Moko\Plugin\System\MokoWaaSBrand\Extension\MokoWaaSBrand`
+   - Event handlers: `onAfterInitialise`, `onAfterRoute`
 
 2. **mokowaasbrand.xml**
    - Plugin manifest defining metadata and structure
-   - Joomla 5.x namespace configuration
+   - Joomla 5.x namespace configuration (path=".")
    - File and folder definitions
 
 3. **services/provider.php**
