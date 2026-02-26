@@ -32,6 +32,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Custom branding for media manager
 - Enhanced configuration options
 
+### Added
+- en-US language support for plugin
+  - Created `language/en-US/plg_system_mokowaasbrand.ini` with US English strings
+  - Created `language/en-US/plg_system_mokowaasbrand.sys.ini` with US English system strings
+  - Updated manifest to include en-US language declarations
+- Plugin now supports both en-GB and en-US locales
+
 ## [01.06.00] - 2026-02-26
 
 ### Fixed
