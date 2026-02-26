@@ -34,9 +34,9 @@
 	<namespace path="src">Moko\Plugin\System\MokoWaaSBrand</namespace>
 
 	<files>
-		<filename plugin="mokowaasbrand">mokowaasbrand.php</filename>
 		<folder>services</folder>
 		<folder>language</folder>
+		<folder>src</folder>
 	</files>
 
 	<languages folder="language">
