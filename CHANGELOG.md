@@ -35,24 +35,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [01.06.00] - 2026-02-26
 
 ### Fixed
-- **Critical**: Fixed "Class 'PlgSystemMokoWaaSBrand' not found" error by implementing proper Joomla 5.x namespace structure
-  - Created namespaced class `Moko\Plugin\System\MokoWaaSBrand\Extension\MokoWaaSBrand`
-  - Moved class to `Extension/` directory at plugin root level
-  - Updated service provider to use fully qualified class name
-  - Updated manifest with correct namespace path (`.` instead of `src`)
-- Removed old non-namespaced `mokowaasbrand.php` file
-- Updated plugin manifest to include `Extension` folder in files
+- **Critical**: Fixed "Class 'PlgSystemMokoWaaSBrand' not found" error by implementing correct Joomla 5.x namespace structure
+  - Moved Extension folder from plugin root to `src/Extension` subdirectory
+  - Updated manifest namespace path from "." to "src" for proper PSR-4 autoloading
+  - Updated manifest files section to include `src` folder instead of `Extension` folder
+  - Fixed PATH comment in MokoWaaSBrand.php to reflect new location
+- Plugin now correctly loads with Joomla 5.x autoloader
 
 ### Changed
-- Plugin now uses proper Joomla 5.x PSR-4 autoloading with namespaces
-- Class structure follows Joomla 5.x plugin conventions with Extension subdirectory
-- Updated documentation to reflect new class structure
+- Plugin directory structure reorganized to match Joomla 5.x PSR-4 conventions
+- Class file location: `src/Extension/MokoWaaSBrand.php` (was `Extension/MokoWaaSBrand.php`)
+- Manifest namespace declaration: `<namespace path="src">` (was `<namespace path=".">`)
+- Updated documentation to reflect new structure
 
 ### Technical
 - Namespace: `Moko\Plugin\System\MokoWaaSBrand\Extension\MokoWaaSBrand`
-- Class file location: `Extension/MokoWaaSBrand.php`
-- Service provider properly imports and instantiates namespaced class
-- Manifest declares namespace with path="." for plugin root
+- Namespace path in manifest points to `src` subdirectory where Extension folder resides
+- Joomla's PSR-4 autoloader now correctly locates class files
+- Structure aligns with Joomla 5.x best practices for namespaced plugins
 
 ## [01.05.00] - 2026-02-26
 

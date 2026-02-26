@@ -130,7 +130,7 @@ PlgSystemMokoWaaSBrand
 
 ### Core Components
 
-1. **Extension/MokoWaaSBrand.php**
+1. **src/Extension/MokoWaaSBrand.php**
    - Main plugin class extending `CMSPlugin`
    - Implements system event handlers  
    - Namespace: `Moko\Plugin\System\MokoWaaSBrand\Extension\MokoWaaSBrand`
@@ -138,7 +138,7 @@ PlgSystemMokoWaaSBrand
 
 2. **mokowaasbrand.xml**
    - Plugin manifest defining metadata and structure
-   - Joomla 5.x namespace configuration (path=".")
+   - Joomla 5.x namespace configuration (path="src")
    - File and folder definitions
 
 3. **services/provider.php**
@@ -179,8 +179,9 @@ mokowaasbrand/
 │   │   └── system/
 │   │       └── mokowaasbrand/       # Plugin source files
 │   │           ├── mokowaasbrand.xml            # Plugin manifest
-│   │           ├── Extension/
-│   │           │   └── MokoWaaSBrand.php        # Main plugin class (namespaced)
+│   │           ├── src/
+│   │           │   └── Extension/
+│   │           │       └── MokoWaaSBrand.php    # Main plugin class (namespaced)
 │   │           ├── services/
 │   │           │   └── provider.php             # DI service provider
 │   │           └── language/
