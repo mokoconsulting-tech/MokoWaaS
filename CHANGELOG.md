@@ -33,6 +33,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Enhanced configuration options
 
 ### Changed
+- **Restructured administrator language overrides** - moved to dedicated overrides subdirectory
+  - Moved `administrator/language/en-GB/en-GB.override.ini` → `administrator/language/overrides/en-GB.override.ini`
+  - Moved `administrator/language/en-US/en-US.override.ini` → `administrator/language/overrides/en-US.override.ini`
+  - Updated file paths in override file headers
+  - Administrator overrides now in dedicated directory, separate from plugin `.sys.ini` files
 - **Restructured language overrides** - moved all override files into plugin language folders
   - Moved `src/language/overrides/*.override.ini` → `src/plugins/system/mokowaasbrand/language/en-GB/` and `en-US/`
   - Moved `src/administrator/language/overrides/*.override.ini` → `src/plugins/system/mokowaasbrand/administrator/language/en-GB/` and `en-US/`
