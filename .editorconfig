@@ -18,14 +18,53 @@ indent_style = tab
 tab_width = 2
 end_of_line = crlf
 
-# Markdown files — keep trailing whitespace for line breaks
+# Markdown files — keep trailing whitespace for line breaks, use tabs for indentation
+# No max_line_length specified - Markdown lines can be any length
 [*.md]
 trim_trailing_whitespace = false
-
-# JSON / YAML files — tabs, 2-space visual width
-[*.{json,yml,yaml}]
 indent_style = tab
 tab_width = 2
+max_line_length = off
+
+# YAML files — spaces only (YAML spec forbids tabs)
+[*.{yml,yaml}]
+indent_style = space
+indent_size = 2
+
+# Python files — spaces only (PEP 8 standard)
+[*.py]
+indent_style = space
+indent_size = 4
+
+# Haskell files — spaces only (layout rules)
+[*.{hs,lhs}]
+indent_style = space
+indent_size = 2
+
+# F# files — spaces only (indentation-sensitive syntax)
+[*.{fs,fsx,fsi}]
+indent_style = space
+indent_size = 4
+
+# CoffeeScript files — spaces only (whitespace-significant)
+[*.coffee]
+indent_style = space
+indent_size = 2
+
+# Nim files — spaces only (style guide)
+[*.{nim,nims,nimble}]
+indent_style = space
+indent_size = 2
+
+# JSON files — spaces only (parser compatibility)
+[*.json]
+indent_style = space
+indent_size = 2
+
+# reStructuredText files — spaces only (indentation requirement)
+[*.rst]
+indent_style = space
+indent_size = 3
 
 # Makefiles — always tabs, default width
 [Makefile]

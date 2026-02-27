@@ -95,6 +95,22 @@ After installation, verify the branding is active:
 - Verify the control panel shows "Welcome to MokoWaaS!"
 - Clear browser cache if branding doesn't appear immediately
 
+### Automatic Updates
+
+This plugin supports Joomla's automatic update system. Once installed:
+
+1. Navigate to **System → Update → Extensions**
+2. The plugin will automatically check for updates from the MokoWaaS-Brand update server
+3. When a new version is available, it will appear in the update list
+4. Click **Update** to install the latest version
+
+The update server URL is configured in the plugin manifest and points to:
+```
+https://raw.githubusercontent.com/mokoconsulting-tech/MokoWaaSBrand/main/updates.xml
+```
+
+Updates are published automatically when new releases are created through the GitHub release workflow.
+
 ## Configuration
 
 The plugin provides the following configuration options accessible through **System → Plugins → System - MokoWaaS Brand**:
