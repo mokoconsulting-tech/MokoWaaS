@@ -276,3 +276,119 @@ jobs:
         run: |
           echo "Deleting branch ${BRANCH} after squash merge and release"
           git push origin --delete "${BRANCH}" || echo "Branch already deleted or cannot delete"
+
+  update-xml:
+    name: Update updates.xml in repository
+    runs-on: ubuntu-latest
+    needs: [meta, pr-merge-release]
+    if: needs.meta.outputs.is_prerelease == 'false'
+
+    steps:
+      - name: Check out main branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+
+      - name: Update updates.xml with new release information
+        env:
+          VERSION: ${{ needs.meta.outputs.version }}
+        run: |
+          REPO_NAME="${GITHUB_REPOSITORY##*/}"
+          DOWNLOAD_URL="https://github.com/${GITHUB_REPOSITORY}/releases/download/${VERSION}/${REPO_NAME}-${VERSION}.zip"
+          
+          python << 'PY'
+          import os
+          import xml.etree.ElementTree as ET
+          from datetime import datetime
+          
+          version = os.environ["VERSION"]
+          download_url = os.environ["DOWNLOAD_URL"]
+          
+          # Parse the existing updates.xml
+          tree = ET.parse("updates.xml")
+          root = tree.getroot()
+          
+          # Check if this version already exists
+          existing_update = None
+          for update in root.findall("update"):
+              version_elem = update.find("version")
+              if version_elem is not None and version_elem.text == version:
+                  existing_update = update
+                  break
+          
+          # If version doesn't exist, create a new update element
+          if existing_update is None:
+              update = ET.SubElement(root, "update")
+          else:
+              update = existing_update
+          
+          # Helper function to set or update element text
+          def set_element(parent, tag, text, attribs=None):
+              elem = parent.find(tag)
+              if elem is None:
+                  elem = ET.SubElement(parent, tag, attribs or {})
+              else:
+                  # Update attributes if provided
+                  if attribs:
+                      for key, value in attribs.items():
+                          elem.set(key, value)
+              elem.text = text
+              return elem
+          
+          # Update all fields
+          set_element(update, "name", "MokoWaaS-Brand")
+          set_element(update, "description", "MokoWaaS-Brand system plugin for Joomla")
+          set_element(update, "element", "mokowaasbrand")
+          set_element(update, "type", "plugin")
+          set_element(update, "folder", "system")
+          set_element(update, "client", "site")
+          set_element(update, "version", version)
+          set_element(update, "infourl", "https://github.com/mokoconsulting-tech/mokowaasbrand", {"title": "MokoWaaS-Brand"})
+          
+          # Update downloads section
+          downloads = update.find("downloads")
+          if downloads is None:
+              downloads = ET.SubElement(update, "downloads")
+          
+          # Remove existing downloadurl elements
+          for dl in downloads.findall("downloadurl"):
+              downloads.remove(dl)
+          
+          # Add new downloadurl
+          downloadurl = ET.SubElement(downloads, "downloadurl", {"type": "full", "format": "zip"})
+          downloadurl.text = download_url
+          
+          set_element(update, "maintainer", "Moko Consulting")
+          set_element(update, "maintainerurl", "https://mokoconsulting.tech")
+          
+          # Update or add targetplatform
+          targetplatform = update.find("targetplatform")
+          if targetplatform is None:
+              targetplatform = ET.SubElement(update, "targetplatform", {"name": "joomla", "version": "5\\.[0-9]"})
+          
+          set_element(update, "category", "MokoWaaS-Brand")
+          
+          # Write the updated XML with proper formatting
+          ET.indent(tree, space="	", level=0)
+          tree.write("updates.xml", encoding="utf-8", xml_declaration=True)
+          
+          print(f"Updated updates.xml with version {version}")
+          print(f"Download URL: {download_url}")
+          PY
+
+      - name: Commit and push updates.xml to main
+        env:
+          VERSION: ${{ needs.meta.outputs.version }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          if git diff --quiet updates.xml; then
+            echo "No changes to updates.xml"
+            exit 0
+          fi
+          
+          git add updates.xml
+          git commit -m "chore: update updates.xml for version ${VERSION}"
+          git push origin main

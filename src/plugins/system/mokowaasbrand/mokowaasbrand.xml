@@ -34,6 +34,11 @@
 	<namespace path="src">Moko\Plugin\System\MokoWaaSBrand</namespace>
 	<scriptfile>script.php</scriptfile>
 
+	<!-- Update server configuration -->
+	<updateservers>
+		<server type="extension" priority="1" name="MokoWaaS-Brand Update Server">https://raw.githubusercontent.com/mokoconsulting-tech/MokoWaaSBrand/main/updates.xml</server>
+	</updateservers>
+
 	<files>
 		<filename plugin="mokowaasbrand">script.php</filename>
 		<folder>src</folder>
