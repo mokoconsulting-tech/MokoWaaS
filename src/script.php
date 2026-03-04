@@ -17,7 +17,7 @@
  * INGROUP: MokoWaaSBrand
  * REPO: https://github.com/mokoconsulting-tech/mokowaasbrand
  * VERSION: 01.06.00
- * PATH: /src/plugins/system/mokowaasbrand/script.php
+ * PATH: /src/script.php
  * BRIEF: Installation script for MokoWaaSBrand plugin
  * NOTE: Handles installation, update, and uninstallation tasks including language override deployment
  */
