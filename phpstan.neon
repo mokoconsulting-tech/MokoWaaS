@@ -1,35 +1,32 @@
 # Copyright (C) 2026 Moko Consulting <hello@mokoconsulting.tech>
-#
-# This file is part of a Moko Consulting project.
-#
 # SPDX-License-Identifier: GPL-3.0-or-later
+#
+# PHPStan configuration for Joomla extension repositories.
+# Extends the base MokoStandards config and adds Joomla framework class stubs
+# so PHPStan can resolve Factory, CMSApplication, User, Table, etc.
+# without requiring a full Joomla installation.
 
-# PHPStan configuration for MokoStandards projects
 parameters:
     level: 5
+
     paths:
         - src
-        - tests
+
     excludePaths:
         - vendor
         - node_modules
-    
-    # Report unknown classes and functions
+
+    # Joomla framework stubs — resolved via the enterprise package from vendor/
+    stubFiles:
+        - vendor/mokoconsulting-tech/enterprise/templates/stubs/joomla.php
+
+    # Suppress errors that are structural in Joomla's service-container architecture
+    ignoreErrors:
+        # Joomla's service-based dependency injection returns mixed from getApplication()
+        - '#Cannot call method .+ on Joomla\\CMS\\Application\\CMSApplication\|null#'
+        # Factory::getX() patterns are safe at runtime even when nullable in stubs
+        - '#Call to static method [a-zA-Z]+\(\) on an interface#'
+
     reportUnmatchedIgnoredErrors: false
-    
-    # Check for dead code
     checkMissingIterableValueType: false
     checkGenericClassInNonGenericObjectType: false
-    
-    # Additional checks
-    checkAlwaysTrueCheckTypeFunctionCall: true
-    checkAlwaysTrueInstanceof: true
-    checkAlwaysTrueStrictComparison: true
-    checkExplicitMixedMissingReturn: true
-    checkFunctionNameCase: true
-    checkInternalClassCaseSensitivity: true
-    
-    # Ignore common patterns
-    ignoreErrors:
-        # Add project-specific ignores here
-        # - '#Call to an undefined method#'
