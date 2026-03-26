@@ -1,6 +1,6 @@
 {
-    "name": "mokoconsulting-tech/mokowaasbrand",
-    "description": "MokoWaaSBrand Joomla component by Moko Consulting",
+    "name": "mokoconsulting-tech/mokowaas",
+    "description": "MokoWaaS Joomla component by Moko Consulting",
     "type": "joomla-component",
     "version": "01.00.00",
     "license": "GPL-3.0-or-later",
@@ -23,12 +23,12 @@
     },
     "autoload": {
         "psr-4": {
-            "MokoConsulting\\MokoWaaSBrand\\": "src/"
+            "MokoConsulting\\MokoWaaS\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "MokoConsulting\\MokoWaaSBrand\\Tests\\": "tests/"
+            "MokoConsulting\\MokoWaaS\\Tests\\": "tests/"
         }
     },
     "repositories": [
