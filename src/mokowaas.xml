@@ -30,7 +30,7 @@
 	<authorEmail>hello@mokoconsulting.tech</authorEmail>
 	<authorUrl>https://mokoconsulting.tech</authorUrl>
 	<version>01.06.00</version>
-	<description>PLG_SYSTEM_MOKOWAAS_XML_DESCRIPTION</description>
+	<description>This plugin rebrands the Joomla system interface with MokoWaaS identity. It applies language overrides and ensures consistent branding across the platform.</description>
 	<namespace path=".">Moko\Plugin\System\MokoWaaS</namespace>
 	<scriptfile>script.php</scriptfile>
 
