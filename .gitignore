@@ -560,7 +560,6 @@ htdocs/logs/
 /administrator/language/en-GB/en-GB.tpl_isis.sys.ini
 /administrator/language/en-GB/en-GB.xml
 /administrator/language/en-GB/install.xml
-/administrator/language/overrides/*
 /administrator/language/index.html
 /administrator/logs/*
 /administrator/manifests/files/joomla.xml
@@ -716,7 +715,6 @@ htdocs/logs/
 /language/en-GB/en-GB.tpl_protostar.sys.ini
 /language/en-GB/en-GB.xml
 /language/en-GB/install.xml
-/language/overrides/*
 /language/index.html
 /layouts/joomla/*
 /layouts/libraries/*
@@ -918,3 +916,4 @@ htdocs/logs/
 # Keep-empty folders helper
 # ============================================================
 !.gitkeep
+.claude/settings.local.json
