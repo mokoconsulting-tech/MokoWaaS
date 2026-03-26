@@ -77,6 +77,27 @@
 					<option value="1">JYES</option>
 					<option value="0">JNO</option>
 				</field>
+				<field
+					name="brand_name"
+					type="text"
+					label="PLG_SYSTEM_MOKOWAAS_BRAND_NAME_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_BRAND_NAME_DESC"
+					default="MokoWaaS"
+					/>
+				<field
+					name="company_name"
+					type="text"
+					label="PLG_SYSTEM_MOKOWAAS_COMPANY_NAME_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_COMPANY_NAME_DESC"
+					default="Moko Consulting"
+					/>
+				<field
+					name="support_url"
+					type="url"
+					label="PLG_SYSTEM_MOKOWAAS_SUPPORT_URL_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_SUPPORT_URL_DESC"
+					default="https://mokoconsulting.tech"
+					/>
 			</fieldset>
 		</fields>
 	</config>

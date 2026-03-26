@@ -76,10 +76,28 @@ class MokoWaaS extends CMSPlugin
 	}
 
 	/**
-	 * Load language override files from the plugin directory.
+	 * Build the placeholder → value map from plugin params.
 	 *
-	 * This method loads the override files that replace core Joomla language strings
-	 * with MokoWaaS branding.
+	 * @return  array  Associative array of placeholder => replacement value
+	 *
+	 * @since   02.00.00
+	 */
+	protected function getPlaceholders()
+	{
+		return [
+			'{{BRAND_NAME}}'   => $this->params->get('brand_name', 'MokoWaaS'),
+			'{{COMPANY_NAME}}' => $this->params->get('company_name', 'Moko Consulting'),
+			'{{SUPPORT_URL}}'  => $this->params->get('support_url', 'https://mokoconsulting.tech'),
+		];
+	}
+
+	/**
+	 * Load language override templates and inject resolved strings into Joomla.
+	 *
+	 * Reads the override template shipped with the plugin, replaces
+	 * {{BRAND_NAME}}, {{COMPANY_NAME}} and {{SUPPORT_URL}} with the
+	 * values from plugin params, then injects the resolved strings into
+	 * the active Language object.
 	 *
 	 * @return  void
 	 *
@@ -87,83 +105,69 @@ class MokoWaaS extends CMSPlugin
 	 */
 	protected function loadLanguageOverrides()
 	{
-		$language = $this->app->getLanguage();
-		$tag = $language->getTag();
-		
-		// Get the plugin path
-		$pluginPath = JPATH_PLUGINS . '/system/mokowaas';
-		
-		// Determine if we're in administrator or site
-		$isAdmin = $this->app->isClient('administrator');
-		
-		// Load the appropriate override file
-		if ($isAdmin)
+		$language    = $this->app->getLanguage();
+		$tag         = $language->getTag();
+		$pluginPath  = JPATH_PLUGINS . '/system/mokowaas';
+		$isAdmin     = $this->app->isClient('administrator');
+
+		$overridePath = $isAdmin
+			? $pluginPath . '/administrator/language/overrides/' . $tag . '.override.ini'
+			: $pluginPath . '/language/overrides/' . $tag . '.override.ini';
+
+		if (!file_exists($overridePath))
 		{
-			$overridePath = $pluginPath . '/administrator/language/overrides/' . $tag . '.override.ini';
+			return;
 		}
-		else
+
+		$strings      = $this->parseLanguageFile($overridePath);
+		$placeholders = $this->getPlaceholders();
+
+		foreach ($strings as $key => $value)
 		{
-			$overridePath = $pluginPath . '/language/overrides/' . $tag . '.override.ini';
-		}
-		
-		// Load the override file if it exists
-		if (file_exists($overridePath))
-		{
-			$language->load('', $pluginPath, $tag, true, false);
-			
-			// Parse and load the override file manually
-			$strings = $this->parseLanguageFile($overridePath);
-			
-			if (!empty($strings))
-			{
-				foreach ($strings as $key => $value)
-				{
-					$language->_strings[$key] = $value;
-				}
-			}
+			$language->_strings[$key] = str_replace(
+				array_keys($placeholders),
+				array_values($placeholders),
+				$value
+			);
 		}
 	}
 
 	/**
-	 * Parse a language INI file and return the strings.
+	 * Parse a language INI file and return the raw strings (with placeholders).
 	 *
 	 * @param   string  $filePath  The path to the language file
 	 *
-	 * @return  array  Array of language strings
+	 * @return  array  Array of language strings (key => raw value)
 	 *
 	 * @since   02.00.00
 	 */
 	protected function parseLanguageFile($filePath)
 	{
 		$strings = [];
-		
+
 		if (!file_exists($filePath))
 		{
 			return $strings;
 		}
-		
+
 		$content = file_get_contents($filePath);
-		$lines = explode("\n", $content);
-		
+		$lines   = explode("\n", $content);
+
 		foreach ($lines as $line)
 		{
 			$line = trim($line);
-			
-			// Skip empty lines and comments
-			if (empty($line) || $line[0] === ';')
+
+			if ($line === '' || $line[0] === ';')
 			{
 				continue;
 			}
-			
-			// Parse KEY="VALUE" format
+
 			if (preg_match('/^([A-Z0-9_]+)="(.+)"$/i', $line, $matches))
 			{
-				$key = strtoupper($matches[1]);
-				$value = $matches[2];
-				$strings[$key] = $value;
+				$strings[strtoupper($matches[1])] = $matches[2];
 			}
 		}
-		
+
 		return $strings;
 	}
 

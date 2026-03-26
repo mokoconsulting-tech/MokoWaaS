@@ -174,9 +174,77 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 	private const BLOCK_END = '; ===== END MokoWaaS Overrides =====';
 
 	/**
+	 * Build the placeholder → value map from the plugin's saved params.
+	 *
+	 * On first install the params row may not exist yet, so every value
+	 * falls back to a sensible default.
+	 *
+	 * @return  array  Associative array of placeholder => replacement value
+	 *
+	 * @since   02.00.00
+	 */
+	private function getPlaceholders()
+	{
+		$params = $this->getPluginParams();
+
+		return [
+			'{{BRAND_NAME}}'   => $params->get('brand_name', 'MokoWaaS'),
+			'{{COMPANY_NAME}}' => $params->get('company_name', 'Moko Consulting'),
+			'{{SUPPORT_URL}}'  => $params->get('support_url', 'https://mokoconsulting.tech'),
+		];
+	}
+
+	/**
+	 * Load the plugin's saved params from the database.
+	 *
+	 * @return  \Joomla\Registry\Registry
+	 *
+	 * @since   02.00.00
+	 */
+	private function getPluginParams()
+	{
+		$db    = Factory::getDbo();
+		$query = $db->getQuery(true)
+			->select($db->quoteName('params'))
+			->from($db->quoteName('#__extensions'))
+			->where($db->quoteName('element') . ' = ' . $db->quote('mokowaas'))
+			->where($db->quoteName('folder') . ' = ' . $db->quote('system'))
+			->where($db->quoteName('type') . ' = ' . $db->quote('plugin'));
+
+		$db->setQuery($query);
+		$json = $db->loadResult();
+
+		return new \Joomla\Registry\Registry($json ?: '{}');
+	}
+
+	/**
+	 * Resolve placeholders in an array of language strings.
+	 *
+	 * @param   array  $strings  Key/value pairs (values may contain {{…}} tokens)
+	 *
+	 * @return  array  The same array with placeholders replaced
+	 *
+	 * @since   02.00.00
+	 */
+	private function resolvePlaceholders(array $strings)
+	{
+		$placeholders = $this->getPlaceholders();
+		$search       = array_keys($placeholders);
+		$replace      = array_values($placeholders);
+
+		foreach ($strings as $key => $value)
+		{
+			$strings[$key] = str_replace($search, $replace, $value);
+		}
+
+		return $strings;
+	}
+
+	/**
 	 * Install language override files to Joomla's global override directories.
 	 *
-	 * Reads each source override shipped with the plugin, then merges the keys
+	 * Reads each source override template shipped with the plugin, resolves
+	 * {{BRAND_NAME}} etc. from plugin params, then merges the resolved keys
 	 * into the destination file inside a clearly delimited block.  Existing
 	 * overrides outside the block are never touched.
 	 *
@@ -212,7 +280,7 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 					Folder::create($destDir);
 				}
 
-				$pluginOverrides = $this->parseLanguageFile($source);
+				$pluginOverrides = $this->resolvePlaceholders($this->parseLanguageFile($source));
 
 				if (empty($pluginOverrides))
 				{
