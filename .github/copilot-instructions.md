@@ -17,21 +17,21 @@
 >
 > | Placeholder | Where to find the value |
 > |---|---|
-> | `MokoWaaSBrand` | The GitHub repository name (visible in the URL, `README.md` heading, or `git remote -v`) |
-> | `https://github.com/mokoconsulting-tech/MokoWaaSBrand` | Full GitHub URL, e.g. `https://github.com/mokoconsulting-tech/<repo-name>` |
+> | `MokoWaaS` | The GitHub repository name (visible in the URL, `README.md` heading, or `git remote -v`) |
+> | `https://github.com/mokoconsulting-tech/MokoWaaS` | Full GitHub URL, e.g. `https://github.com/mokoconsulting-tech/<repo-name>` |
 > | `{{EXTENSION_NAME}}` | The `<name>` element in `manifest.xml` at the repository root |
 > | `{{EXTENSION_TYPE}}` | The `type` attribute of the `<extension>` tag in `manifest.xml` (`component`, `module`, `plugin`, or `template`) |
 > | `{{EXTENSION_ELEMENT}}` | The `<element>` tag in `manifest.xml`, or the filename prefix (e.g. `com_myextension`, `mod_mymodule`) |
 >
 > ---
 
-# MokoWaaSBrand — GitHub Copilot Custom Instructions
+# MokoWaaS — GitHub Copilot Custom Instructions
 
 ## What This Repo Is
 
 This is a **Moko Consulting MokoWaaS** (Joomla) repository governed by [MokoStandards](https://github.com/mokoconsulting-tech/MokoStandards). All coding standards, workflows, and policies are defined there and enforced here via bulk sync.
 
-Repository URL: https://github.com/mokoconsulting-tech/MokoWaaSBrand
+Repository URL: https://github.com/mokoconsulting-tech/MokoWaaS
 Extension name: **{{EXTENSION_NAME}}**
 Extension type: **{{EXTENSION_TYPE}}** (`{{EXTENSION_ELEMENT}}`)
 Platform: **Joomla 4.x / MokoWaaS**
@@ -58,9 +58,9 @@ Every new file needs a copyright header as its first content.
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
  * FILE INFORMATION
- * DEFGROUP: MokoWaaSBrand.{{EXTENSION_TYPE}}
- * INGROUP: MokoWaaSBrand
- * REPO: https://github.com/mokoconsulting-tech/MokoWaaSBrand
+ * DEFGROUP: MokoWaaS.{{EXTENSION_TYPE}}
+ * INGROUP: MokoWaaS
+ * REPO: https://github.com/mokoconsulting-tech/MokoWaaS
  * PATH: /path/to/file.php
  * VERSION: XX.YY.ZZ
  * BRIEF: One-line description of purpose
@@ -79,9 +79,9 @@ This file is part of a Moko Consulting project.
 SPDX-License-Identifier: GPL-3.0-or-later
 
 # FILE INFORMATION
-DEFGROUP: MokoWaaSBrand.Documentation
-INGROUP: MokoWaaSBrand
-REPO: https://github.com/mokoconsulting-tech/MokoWaaSBrand
+DEFGROUP: MokoWaaS.Documentation
+INGROUP: MokoWaaS
+REPO: https://github.com/mokoconsulting-tech/MokoWaaS
 PATH: /docs/file.md
 VERSION: XX.YY.ZZ
 BRIEF: One-line description
@@ -119,7 +119,7 @@ The version in `README.md` **must always match** the `<version>` tag in `manifes
 		<version>01.02.04</version>
 		<downloads>
 			<downloadurl type="full" format="zip">
-				https://github.com/mokoconsulting-tech/MokoWaaSBrand/releases/download/01.02.04/{{EXTENSION_ELEMENT}}-01.02.04.zip
+				https://github.com/mokoconsulting-tech/MokoWaaS/releases/download/01.02.04/{{EXTENSION_ELEMENT}}-01.02.04.zip
 			</downloadurl>
 		</downloads>
 		<targetplatform name="joomla" version="4\.[0-9]+" />
@@ -133,7 +133,7 @@ The version in `README.md` **must always match** the `<version>` tag in `manifes
 ## Joomla Extension Structure
 
 ```
-MokoWaaSBrand/
+MokoWaaS/
 ├── manifest.xml          # Joomla installer manifest (root — required)
 ├── update.xml            # Update server manifest (root — required, see below)
 ├── site/                 # Frontend (site) code
@@ -172,7 +172,7 @@ The `manifest.xml` must reference it via:
 ```xml
 <updateservers>
 	<server type="extension" priority="1" name="{{EXTENSION_NAME}}">
-		https://github.com/mokoconsulting-tech/MokoWaaSBrand/raw/main/update.xml
+		https://github.com/mokoconsulting-tech/MokoWaaS/raw/main/update.xml
 	</server>
 </updateservers>
 ```
