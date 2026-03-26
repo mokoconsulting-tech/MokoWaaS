@@ -8,7 +8,7 @@
   The manifest.xml in this repository must reference this file:
     <updateservers>
       <server type="extension" priority="1" name="{{EXTENSION_NAME}}">
-        https://github.com/mokoconsulting-tech/MokoWaaSBrand/raw/main/update.xml
+        https://github.com/mokoconsulting-tech/MokoWaaS/raw/main/update.xml
       </server>
     </updateservers>
 
@@ -18,11 +18,11 @@
 <updates>
 	<update>
 		<name>{{EXTENSION_NAME}}</name>
-		<description>MokoWaaSBrand — Moko Consulting Joomla extension</description>
+		<description>MokoWaaS — Moko Consulting Joomla extension</description>
 		<element>{{EXTENSION_ELEMENT}}</element>
 		<type>{{EXTENSION_TYPE}}</type>
 		<version>{{VERSION}}</version>
-		<infourl title="Release Information">https://github.com/mokoconsulting-tech/MokoWaaSBrand/releases/tag/{{VERSION}}</infourl>
+		<infourl title="Release Information">https://github.com/mokoconsulting-tech/MokoWaaS/releases/tag/{{VERSION}}</infourl>
 		<downloads>
 			<downloadurl type="full" format="zip">{{DOWNLOAD_URL}}</downloadurl>
 		</downloads>

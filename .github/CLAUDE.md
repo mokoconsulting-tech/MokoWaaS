@@ -17,9 +17,9 @@
 >
 > | Placeholder | Where to find the value |
 > |---|---|
-> | `MokoWaaSBrand` | The GitHub repository name (visible in the URL, `README.md` heading, or `git remote -v`) |
-> | `https://github.com/mokoconsulting-tech/MokoWaaSBrand` | Full GitHub URL, e.g. `https://github.com/mokoconsulting-tech/<repo-name>` |
-> | `` | First paragraph of `README.md` body, or the GitHub repo description |
+> | `MokoWaaS` | The GitHub repository name (visible in the URL, `README.md` heading, or `git remote -v`) |
+> | `https://github.com/mokoconsulting-tech/MokoWaaS` | Full GitHub URL, e.g. `https://github.com/mokoconsulting-tech/<repo-name>` |
+> | `MokoWaaS is a Joomla 5.x system plugin that provides a comprehensive identity override layer for the MokoWaaS platform. It ensures consistent branding, terminology, and user experience across all Joomla administrative and frontend interfaces.` | First paragraph of `README.md` body, or the GitHub repo description |
 > | `{{EXTENSION_NAME}}` | The `<name>` element in `manifest.xml` at the repository root |
 > | `{{EXTENSION_TYPE}}` | The `type` attribute of the `<extension>` tag in `manifest.xml` (`component`, `module`, `plugin`, or `template`) |
 > | `{{EXTENSION_ELEMENT}}` | The `<element>` tag in `manifest.xml`, or the filename prefix (e.g. `com_myextension`, `mod_mymodule`) |
@@ -28,13 +28,13 @@
 
 # What This Repo Is
 
-**MokoWaaSBrand** is a Moko Consulting **MokoWaaS** (Joomla) extension repository.
+**MokoWaaS** is a Moko Consulting **MokoWaaS** (Joomla) extension repository.
 
-
+MokoWaaS is a Joomla 5.x system plugin that provides a comprehensive identity override layer for the MokoWaaS platform. It ensures consistent branding, terminology, and user experience across all Joomla administrative and frontend interfaces.
 
 Extension name: **{{EXTENSION_NAME}}**
 Extension type: **{{EXTENSION_TYPE}}** (`{{EXTENSION_ELEMENT}}`)
-Repository URL: https://github.com/mokoconsulting-tech/MokoWaaSBrand
+Repository URL: https://github.com/mokoconsulting-tech/MokoWaaS
 
 This repository is governed by [MokoStandards](https://github.com/mokoconsulting-tech/MokoStandards) — the single source of truth for coding standards, file-header policies, GitHub Actions workflows, and Terraform configuration templates across all Moko Consulting repositories.
 
@@ -43,7 +43,7 @@ This repository is governed by [MokoStandards](https://github.com/mokoconsulting
 # Repo Structure
 
 ```
-MokoWaaSBrand/
+MokoWaaS/
 ├── manifest.xml          # Joomla installer manifest (root — required)
 ├── update.xml            # Update server manifest (root — required)
 ├── site/                 # Frontend (site) code
@@ -109,7 +109,7 @@ The `make release` command / release workflow syncs all three automatically.
 <!-- In manifest.xml -->
 <updateservers>
 	<server type="extension" priority="1" name="{{EXTENSION_NAME}}">
-		https://github.com/mokoconsulting-tech/MokoWaaSBrand/raw/main/update.xml
+		https://github.com/mokoconsulting-tech/MokoWaaS/raw/main/update.xml
 	</server>
 </updateservers>
 ```
@@ -125,14 +125,14 @@ Example `update.xml` entry for a new release:
 <updates>
 	<update>
 		<name>{{EXTENSION_NAME}}</name>
-		<description>MokoWaaSBrand</description>
+		<description>MokoWaaS</description>
 		<element>{{EXTENSION_ELEMENT}}</element>
 		<type>{{EXTENSION_TYPE}}</type>
 		<version>01.02.04</version>
-		<infourl title="Release Information">https://github.com/mokoconsulting-tech/MokoWaaSBrand/releases/tag/01.02.04</infourl>
+		<infourl title="Release Information">https://github.com/mokoconsulting-tech/MokoWaaS/releases/tag/01.02.04</infourl>
 		<downloads>
 			<downloadurl type="full" format="zip">
-				https://github.com/mokoconsulting-tech/MokoWaaSBrand/releases/download/01.02.04/{{EXTENSION_ELEMENT}}-01.02.04.zip
+				https://github.com/mokoconsulting-tech/MokoWaaS/releases/download/01.02.04/{{EXTENSION_ELEMENT}}-01.02.04.zip
 			</downloadurl>
 		</downloads>
 		<targetplatform name="joomla" version="4\.[0-9]+" />
@@ -159,9 +159,9 @@ Every new file **must** have a copyright header as its first content. JSON files
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
  * FILE INFORMATION
- * DEFGROUP: MokoWaaSBrand.{{EXTENSION_TYPE}}
- * INGROUP: MokoWaaSBrand
- * REPO: https://github.com/mokoconsulting-tech/MokoWaaSBrand
+ * DEFGROUP: MokoWaaS.{{EXTENSION_TYPE}}
+ * INGROUP: MokoWaaS
+ * REPO: https://github.com/mokoconsulting-tech/MokoWaaS
  * PATH: /site/controllers/item.php
  * VERSION: XX.YY.ZZ
  * BRIEF: One-line description of file purpose
