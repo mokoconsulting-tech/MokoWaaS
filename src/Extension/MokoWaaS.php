@@ -16,7 +16,7 @@
  * DEFGROUP: Joomla.Plugin
  * INGROUP: MokoWaaS
  * REPO: https://github.com/mokoconsulting-tech/mokowaas
- * VERSION: 01.06.00
+ * VERSION: 02.00.00
  * PATH: /src/Extension/MokoWaaS.php
  * NOTE: Handles Joomla system events for rebranding functionality
  */
@@ -83,7 +83,7 @@ class MokoWaaS extends CMSPlugin
 	 *
 	 * @return  void
 	 *
-	 * @since   01.06.00
+	 * @since   02.00.00
 	 */
 	protected function loadLanguageOverrides()
 	{
@@ -131,7 +131,7 @@ class MokoWaaS extends CMSPlugin
 	 *
 	 * @return  array  Array of language strings
 	 *
-	 * @since   01.06.00
+	 * @since   02.00.00
 	 */
 	protected function parseLanguageFile($filePath)
 	{

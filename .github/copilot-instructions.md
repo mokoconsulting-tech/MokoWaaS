@@ -110,7 +110,7 @@ Every PHP, XML, shell, and Markdown file must include:
 
 ## Version Management
 
-- Versioning: `MAJOR.MINOR.PATCH` with zero-padded two-digit components (e.g., `01.06.00`) — this is intentional per MokoStandards for consistent sorting and display
+- Versioning: `MAJOR.MINOR.PATCH` with zero-padded two-digit components (e.g., `02.00.00`) — this is intentional per MokoStandards for consistent sorting and display
 - Version must be updated consistently across:
   - `src/plugins/system/mokowaas/mokowaas.xml`
   - All PHP file headers

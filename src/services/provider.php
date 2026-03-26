@@ -16,7 +16,7 @@
  * DEFGROUP: Joomla.Plugin
  * INGROUP: MokoWaaS
  * REPO: https://github.com/mokoconsulting-tech/mokowaas
- * VERSION: 01.06.00
+ * VERSION: 02.00.00
  * PATH: /src/services/provider.php
  * BRIEF: Service provider for dependency injection in Joomla 5.x
  * NOTE: Registers the plugin with Joomla's DI container
