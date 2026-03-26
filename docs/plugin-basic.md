@@ -8,19 +8,19 @@
 
  # FILE INFORMATION
  DEFGROUP: Joomla.Plugin
- INGROUP: MokoWaaS-Brand
- REPO: https://github.com/mokoconsulting-tech/mokowaasbrand
+ INGROUP: MokoWaaS
+ REPO: https://github.com/mokoconsulting-tech/mokowaas
  PATH: /docs/plugin-basic.md
  VERSION: 01.04.00
- BRIEF: Baseline documentation for the MokoWaaS-Brand system plugin
+ BRIEF: Baseline documentation for the MokoWaaS system plugin
  NOTE: Foundational reference for internal and external stakeholders
 -->
 
-# MokoWaaS-Brand Plugin Overview (VERSION: 01.04.00)
+# MokoWaaS Plugin Overview (VERSION: 01.04.00)
 
 ## Introduction
 
-The MokoWaaS-Brand plugin is a foundational system component used across WaaS-managed Joomla environments. It ensures consistent application of platform identity, terminology, and user experience standards. By centralizing key branding functions, the plugin supports multi‑tenant WaaS operations and reduces administrative fragmentation.
+The MokoWaaS plugin is a foundational system component used across WaaS-managed Joomla environments. It ensures consistent application of platform identity, terminology, and user experience standards. By centralizing key branding functions, the plugin supports multi‑tenant WaaS operations and reduces administrative fragmentation.
 
 ## Role in the WaaS Platform
 
@@ -71,8 +71,8 @@ The plugin is implemented as a Joomla 5.x system plugin with the following archi
 
 ### Core Components
 
-* **mokowaasbrand.php** - Main plugin class (`PlgSystemMokoWaaSBrand`) that extends `CMSPlugin`
-* **mokowaasbrand.xml** - Plugin manifest defining metadata, file structure, and configuration parameters
+* **mokowaas.php** - Main plugin class (`PlgSystemMokoWaaS`) that extends `CMSPlugin`
+* **mokowaas.xml** - Plugin manifest defining metadata, file structure, and configuration parameters
 * **services/provider.php** - Dependency injection service provider for Joomla 5.x container registration
 
 ### Event Handlers
@@ -99,7 +99,7 @@ The plugin exposes the following configuration parameters:
 
 ### Namespace and Autoloading
 
-Uses Joomla 5.x namespace: `Moko\Plugin\System\MokoWaaSBrand` with PSR-4 autoloading through the service provider.
+Uses Joomla 5.x namespace: `Moko\Plugin\System\MokoWaaS` with PSR-4 autoloading through the service provider.
 
 ## Operational Expectations
 

@@ -8,20 +8,20 @@
 
  # FILE INFORMATION
  DEFGROUP: Joomla.Plugin
- INGROUP: MokoWaaS-Brand.Build
- REPO: https://github.com/mokoconsulting-tech/mokowaasbrand
+ INGROUP: MokoWaaS.Build
+ REPO: https://github.com/mokoconsulting-tech/mokowaas
  FILE: build-guide.md
  VERSION: 01.04.00
  PATH: /docs/guides/
- BRIEF: Build and packaging guide for the MokoWaaS-Brand system plugin
+ BRIEF: Build and packaging guide for the MokoWaaS system plugin
  NOTE: Defines environment setup, repository layout, packaging rules, and release preparation
 -->
 
-# MokoWaaS-Brand Build Guide (VERSION: 01.04.00)
+# MokoWaaS Build Guide (VERSION: 01.04.00)
 
 ## 1. Purpose
 
-This document defines the complete build and packaging workflow for the MokoWaaS-Brand system plugin. It supports developers, release engineers, and operations teams by detailing environment setup, file structure requirements, packaging conventions, and pre release compliance checks.
+This document defines the complete build and packaging workflow for the MokoWaaS system plugin. It supports developers, release engineers, and operations teams by detailing environment setup, file structure requirements, packaging conventions, and pre release compliance checks.
 
 ## 2. Build Requirements
 
@@ -43,10 +43,10 @@ Optional but recommended:
 The repository should maintain a clean, predictable, and modular structure suitable for Joomla system plugins, WaaS platform governance, and automated build tooling. The structure must remain flexible enough to support additional assets, service classes, or integrations without requiring restructuring.
 
 ```text
-mokowaasbrand/
+mokowaas/
   ├── src/
-  │     ├── mokowaasbrand.php        (main plugin file)
-  │     ├── mokowaasbrand.xml        (plugin manifest)
+  │     ├── mokowaas.php        (main plugin file)
+  │     ├── mokowaas.xml        (plugin manifest)
   │     ├── services/                (service providers for DI)
   │     │   └── provider.php
   │     ├── language/                (plugin language files)
@@ -110,7 +110,7 @@ Remove any unneeded files:
 Using CLI:
 
 ```bash
-zip -r mokowaasbrand_v01.04.00.zip ./ -x "*.git*" "scripts/*" "docs/*"
+zip -r mokowaas_v01.04.00.zip ./ -x "*.git*" "scripts/*" "docs/*"
 ```
 
 Ensure excluded paths match release governance and do not remove required runtime files.
@@ -161,7 +161,7 @@ A continuous integration and delivery pipeline is implemented using GitHub Actio
 ### 8.1 Build and Validate Workflow (`.github/workflows/build.yml`)
 
 ```yaml
-name: Build and Validate MokoWaaS-Brand
+name: Build and Validate MokoWaaS
 
 on:
   push:
@@ -196,19 +196,19 @@ jobs:
 
       - name: Create build artifact
         run: |
-          zip -r mokowaasbrand_ci_build.zip ./ -x "*.git*" "docs/*" "scripts/*"
+          zip -r mokowaas_ci_build.zip ./ -x "*.git*" "docs/*" "scripts/*"
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: mokowaasbrand-build
-          path: mokowaasbrand_ci_build.zip
+          name: mokowaas-build
+          path: mokowaas_ci_build.zip
 ```
 
 ### 8.2 Release Workflow (`.github/workflows/release.yml`)
 
 ```yaml
-name: Release MokoWaaS-Brand
+name: Release MokoWaaS
 
 on:
   push:
@@ -226,14 +226,14 @@ jobs:
       - name: Download build artifact
         uses: actions/download-artifact@v4
         with:
-          name: mokowaasbrand-build
+          name: mokowaas-build
           path: ./dist
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            dist/mokowaasbrand_ci_build.zip
+            dist/mokowaas_ci_build.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
@@ -290,8 +290,8 @@ To prevent runtime failures, validate the following prior to packaging:
 
 Required files:
 
-* `mokowaasbrand.xml`
-* `mokowaasbrand.php`
+* `mokowaas.xml`
+* `mokowaas.php`
 * `services/provider.php`
 * Language files under `language/en-GB/`
 * LICENSE.md

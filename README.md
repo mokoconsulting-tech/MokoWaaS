@@ -13,22 +13,22 @@
 
  # FILE INFORMATION
  DEFGROUP: Joomla.Plugin
- INGROUP: MokoWaaS-Brand
- REPO: https://github.com/mokoconsulting-tech/mokowaasbrand
+ INGROUP: MokoWaaS
+ REPO: https://github.com/mokoconsulting-tech/mokowaas
  VERSION: 01.04.00
  PATH: /README.md
  BRIEF: Rebranding plugin for MokoWaaS platform
  NOTE: Internal WaaS identity abstraction layer
 -->
 
-# MokoWaaS-Brand Plugin
+# MokoWaaS Plugin
 
-[![Version](https://img.shields.io/badge/version-01.04.00-blue.svg)](https://github.com/mokoconsulting-tech/mokowaasbrand)
+[![Version](https://img.shields.io/badge/version-01.04.00-blue.svg)](https://github.com/mokoconsulting-tech/mokowaas)
 [![License](https://img.shields.io/badge/license-GPL--3.0--or--later-green.svg)](LICENSE.md)
 [![Joomla](https://img.shields.io/badge/Joomla-5.x-orange.svg)](https://www.joomla.org)
 [![PHP](https://img.shields.io/badge/PHP-8.1%2B-blue.svg)](https://www.php.net)
 
-MokoWaaS-Brand is a Joomla 5.x system plugin that provides a comprehensive identity override layer for the MokoWaaS platform. It ensures consistent branding, terminology, and user experience across all Joomla administrative and frontend interfaces.
+MokoWaaS is a Joomla 5.x system plugin that provides a comprehensive identity override layer for the MokoWaaS platform. It ensures consistent branding, terminology, and user experience across all Joomla administrative and frontend interfaces.
 
 ## Table of Contents
 
@@ -47,7 +47,7 @@ MokoWaaS-Brand is a Joomla 5.x system plugin that provides a comprehensive ident
 
 ## Overview
 
-The MokoWaaS-Brand plugin operationalizes a unified naming convention, brand-controlled visuals, and enforced terminology across all tenant sites. This ensures consistent service delivery within the WaaS (Website as a Service) framework by abstracting all upstream Joomla identifiers behind MokoWaaS-compliant terminology.
+The MokoWaaS plugin operationalizes a unified naming convention, brand-controlled visuals, and enforced terminology across all tenant sites. This ensures consistent service delivery within the WaaS (Website as a Service) framework by abstracting all upstream Joomla identifiers behind MokoWaaS-compliant terminology.
 
 ## Features
 
@@ -100,13 +100,13 @@ After installation, verify the branding is active:
 This plugin supports Joomla's automatic update system. Once installed:
 
 1. Navigate to **System → Update → Extensions**
-2. The plugin will automatically check for updates from the MokoWaaS-Brand update server
+2. The plugin will automatically check for updates from the MokoWaaS update server
 3. When a new version is available, it will appear in the update list
 4. Click **Update** to install the latest version
 
 The update server URL is configured in the plugin manifest and points to:
 ```
-https://raw.githubusercontent.com/mokoconsulting-tech/MokoWaaSBrand/main/updates.xml
+https://raw.githubusercontent.com/mokoconsulting-tech/MokoWaaS/main/updates.xml
 ```
 
 Updates are published automatically when new releases are created through the GitHub release workflow.
@@ -131,7 +131,7 @@ Configuration options are intentionally limited to preserve WaaS brand integrity
 The plugin follows Joomla 5.x system plugin architecture:
 
 ```
-PlgSystemMokoWaaSBrand
+PlgSystemMokoWaaS
 ├── Event Handlers
 │   ├── onAfterInitialise  - Framework initialization hook
 │   └── onAfterRoute       - Route determination hook
@@ -143,12 +143,12 @@ PlgSystemMokoWaaSBrand
 
 ### Core Components
 
-1. **mokowaasbrand.php**
+1. **mokowaas.php**
    - Main plugin class extending `CMSPlugin`
    - Implements system event handlers
-   - Namespace: `Moko\Plugin\System\MokoWaaSBrand`
+   - Namespace: `Moko\Plugin\System\MokoWaaS`
 
-2. **mokowaasbrand.xml**
+2. **mokowaas.xml**
    - Plugin manifest defining metadata and structure
    - Joomla 5.x namespace configuration
    - File and folder definitions
@@ -182,10 +182,10 @@ Joomla automatically loads these overrides during initialization, ensuring optim
 ## Repository Structure
 
 ```
-mokowaasbrand/
+mokowaas/
 ├── src/                              # Plugin source files
-│   ├── mokowaasbrand.php            # Main plugin class
-│   ├── mokowaasbrand.xml            # Plugin manifest
+│   ├── mokowaas.php            # Main plugin class
+│   ├── mokowaas.xml            # Plugin manifest
 │   ├── services/
 │   │   └── provider.php             # DI service provider
 │   ├── language/
@@ -223,7 +223,7 @@ Build the installable plugin package from source:
 
 ```bash
 cd src
-zip -r ../mokowaasbrand_v01.04.00.zip . -x "*.git*"
+zip -r ../mokowaas_v01.04.00.zip . -x "*.git*"
 ```
 
 ### Running Validation Scripts

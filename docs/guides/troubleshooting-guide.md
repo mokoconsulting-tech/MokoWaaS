@@ -8,25 +8,25 @@
 
  # FILE INFORMATION
  DEFGROUP: Joomla.Plugin
- INGROUP: MokoWaaS-Brand.Guides
- REPO: https://github.com/mokoconsulting-tech/mokowaasbrand
+ INGROUP: MokoWaaS.Guides
+ REPO: https://github.com/mokoconsulting-tech/mokowaas
  VERSION: 01.04.00
  PATH: /docs/guides/troubleshooting-guide.md
- BRIEF: Troubleshooting guide for diagnosing and resolving issues related to the MokoWaaS-Brand plugin
+ BRIEF: Troubleshooting guide for diagnosing and resolving issues related to the MokoWaaS plugin
  NOTE: Designed for administrators and WaaS operations teams
 -->
 
-# MokoWaaS-Brand Troubleshooting Guide (VERSION: 01.04.00)
+# MokoWaaS Troubleshooting Guide (VERSION: 01.04.00)
 
 ## Introduction
 
-The MokoWaaS-Brand Troubleshooting Guide provides a structured, repeatable approach for diagnosing and resolving issues related to branding enforcement across WaaS managed Joomla environments. It assists administrators, support engineers, and operations staff in identifying symptoms, validating root causes, and restoring consistent platform behavior.
+The MokoWaaS Troubleshooting Guide provides a structured, repeatable approach for diagnosing and resolving issues related to branding enforcement across WaaS managed Joomla environments. It assists administrators, support engineers, and operations staff in identifying symptoms, validating root causes, and restoring consistent platform behavior.
 
 This guide focuses on actionable diagnostics, minimizing downtime, and ensuring that WaaS branding policy is applied consistently.
 
 ## Understanding the Plugin’s Operational Behavior
 
-As a system level extension, the MokoWaaS-Brand plugin:
+As a system level extension, the MokoWaaS plugin:
 
 * Loads early in the Joomla lifecycle
 * Influences visible terminology and branding markers
@@ -72,7 +72,7 @@ Labels or UI strings do not match expected WaaS terminology.
 
 1. Validate the integrity of all language files.
 2. Check extension overrides.
-3. Reapply updated MokoWaaS-Brand language packs.
+3. Reapply updated MokoWaaS language packs.
 4. Review recent Joomla updates for changes in language constants.
 
 ---
@@ -134,7 +134,7 @@ If your troubleshooting steps do not resolve the issue:
 4. Include environmental details such as:
 
    * Joomla version
-   * MokoWaaS-Brand plugin version
+   * MokoWaaS plugin version
    * Template version
    * Installed third party extensions
 

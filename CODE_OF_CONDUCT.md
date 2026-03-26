@@ -12,8 +12,8 @@
 
 	# FILE INFORMATION
 	DEFGROUP: Joomla.Plugin
-	INGROUP: MokoWaaS-Brand.Documentation
-	REPO: https://github.com/mokoconsulting-tech/mokowaasbrand
+	INGROUP: MokoWaaS.Documentation
+	REPO: https://github.com/mokoconsulting-tech/mokowaas
 	VERSION: 01.03.00
 	PATH: ./CODE_OF_CONDUCT.md
 	BRIEF: Reference + packaging repo for Moko Consulting Developer GPT Other Default

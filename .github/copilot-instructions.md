@@ -1,17 +1,17 @@
-# Copilot Instructions for MokoWaaS-Brand
+# Copilot Instructions for MokoWaaS
 
 This is a **Joomla 5.x system plugin** written in PHP 8.1+ that provides a comprehensive identity override layer for the MokoWaaS platform. It replaces Joomla branding with MokoWaaS terminology across both the administrator backend and frontend interfaces.
 
 ## Repository Structure
 
 ```
-MokoWaaSBrand/
+MokoWaaS/
 ├── src/                                      # Installable plugin source (zipped for release)
-│   └── plugins/system/mokowaasbrand/
-│       ├── mokowaasbrand.xml                 # Joomla plugin manifest
+│   └── plugins/system/mokowaas/
+│       ├── mokowaas.xml                 # Joomla plugin manifest
 │       ├── script.php                        # Installation/upgrade script
 │       ├── services/provider.php             # DI service provider (Joomla 5.x)
-│       ├── src/Extension/MokoWaaSBrand.php  # Main plugin class
+│       ├── src/Extension/MokoWaaS.php  # Main plugin class
 │       ├── language/                         # Frontend language files and overrides
 │       └── administrator/language/          # Administrator language files and overrides
 ├── docs/                                     # Documentation
@@ -56,8 +56,8 @@ find src -type f -name "*.php" -print0 | xargs -0 -n 1 -P 4 php -l
 
 ### Build Installable ZIP
 ```bash
-cd src/plugins/system/mokowaasbrand
-zip -r ../../../../dist/MokoWaaSBrand-<version>.zip .
+cd src/plugins/system/mokowaas
+zip -r ../../../../dist/MokoWaaS-<version>.zip .
 ```
 
 ### CI Pipeline (runs on every PR and push to `main`/`version/*`)
@@ -85,8 +85,8 @@ Every PHP, XML, shell, and Markdown file must include:
    ```
    # FILE INFORMATION
    DEFGROUP: Joomla.Plugin
-   INGROUP: MokoWaaS-Brand[.<subgroup>]
-   REPO: https://github.com/mokoconsulting-tech/mokowaasbrand
+   INGROUP: MokoWaaS[.<subgroup>]
+   REPO: https://github.com/mokoconsulting-tech/mokowaas
    VERSION: <current version>
    PATH: /<path-from-repo-root>
    BRIEF: <one-line description>
@@ -94,8 +94,8 @@ Every PHP, XML, shell, and Markdown file must include:
 
 ### Joomla 5.x Plugin Architecture
 
-- Plugin namespace: `Moko\Plugin\System\MokoWaaSBrand` (declared **before** `defined('_JEXEC')`)
-- Main class: `MokoWaaSBrand` in `src/Extension/MokoWaaSBrand.php`
+- Plugin namespace: `Moko\Plugin\System\MokoWaaS` (declared **before** `defined('_JEXEC')`)
+- Main class: `MokoWaaS` in `src/Extension/MokoWaaS.php`
 - Service provider: `services/provider.php` registers the plugin via DI container
 - All methods implementing `InstallerScriptInterface` must have explicit `: bool` return types
 - Avoid deprecated Joomla APIs; use Joomla 5.x event-driven patterns
@@ -112,7 +112,7 @@ Every PHP, XML, shell, and Markdown file must include:
 
 - Versioning: `MAJOR.MINOR.PATCH` with zero-padded two-digit components (e.g., `01.06.00`) — this is intentional per MokoStandards for consistent sorting and display
 - Version must be updated consistently across:
-  - `src/plugins/system/mokowaasbrand/mokowaasbrand.xml`
+  - `src/plugins/system/mokowaas/mokowaas.xml`
   - All PHP file headers
   - `CHANGELOG.md`
   - `updates.xml`

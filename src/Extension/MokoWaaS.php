@@ -14,14 +14,14 @@
  *
  * FILE INFORMATION
  * DEFGROUP: Joomla.Plugin
- * INGROUP: MokoWaaS-Brand
- * REPO: https://github.com/mokoconsulting-tech/mokowaasbrand
+ * INGROUP: MokoWaaS
+ * REPO: https://github.com/mokoconsulting-tech/mokowaas
  * VERSION: 01.06.00
- * PATH: /src/Extension/MokoWaaSBrand.php
+ * PATH: /src/Extension/MokoWaaS.php
  * NOTE: Handles Joomla system events for rebranding functionality
  */
 
-namespace Moko\Plugin\System\MokoWaaSBrand\Extension;
+namespace Moko\Plugin\System\MokoWaaS\Extension;
 
 defined('_JEXEC') or die;
 
@@ -36,7 +36,7 @@ use Joomla\CMS\Language\Language;
  *
  * @since  01.04.00
  */
-class MokoWaaSBrand extends CMSPlugin
+class MokoWaaS extends CMSPlugin
 {
 	/**
 	 * Load the language file on instantiation.
@@ -91,7 +91,7 @@ class MokoWaaSBrand extends CMSPlugin
 		$tag = $language->getTag();
 		
 		// Get the plugin path
-		$pluginPath = JPATH_PLUGINS . '/system/mokowaasbrand';
+		$pluginPath = JPATH_PLUGINS . '/system/mokowaas';
 		
 		// Determine if we're in administrator or site
 		$isAdmin = $this->app->isClient('administrator');

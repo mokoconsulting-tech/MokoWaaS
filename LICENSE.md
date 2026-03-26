@@ -12,8 +12,8 @@
 
 	# FILE INFORMATION
 	DEFGROUP: Joomla.Plugin
-	INGROUP: MokoWaaS-Brand.Documentation
-  REPO: https://github.com/mokoconsulting-tech/mokowaasbrand
+	INGROUP: MokoWaaS.Documentation
+  REPO: https://github.com/mokoconsulting-tech/mokowaas
 	PATH: ./LICENSE.md
 	VERSION: 01.03.00
 	BRIEF: Project license (GPL-3.0-or-later)

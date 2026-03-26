@@ -14,8 +14,8 @@
  *
  * FILE INFORMATION
  * DEFGROUP: Joomla.Plugin
- * INGROUP: MokoWaaS-Brand
- * REPO: https://github.com/mokoconsulting-tech/mokowaasbrand
+ * INGROUP: MokoWaaS
+ * REPO: https://github.com/mokoconsulting-tech/mokowaas
  * VERSION: 01.06.00
  * PATH: /src/services/provider.php
  * BRIEF: Service provider for dependency injection in Joomla 5.x
@@ -30,7 +30,7 @@ use Joomla\CMS\Plugin\PluginHelper;
 use Joomla\DI\Container;
 use Joomla\DI\ServiceProviderInterface;
 use Joomla\Event\DispatcherInterface;
-use Moko\Plugin\System\MokoWaaSBrand\Extension\MokoWaaSBrand;
+use Moko\Plugin\System\MokoWaaS\Extension\MokoWaaS;
 
 return new class () implements ServiceProviderInterface {
 	/**
@@ -47,9 +47,9 @@ return new class () implements ServiceProviderInterface {
 		$container->set(
 			PluginInterface::class,
 			function (Container $container) {
-				$plugin = new MokoWaaSBrand(
+				$plugin = new MokoWaaS(
 					$container->get(DispatcherInterface::class),
-					(array) PluginHelper::getPlugin('system', 'mokowaasbrand')
+					(array) PluginHelper::getPlugin('system', 'mokowaas')
 				);
 				$plugin->setApplication(Factory::getApplication());
 

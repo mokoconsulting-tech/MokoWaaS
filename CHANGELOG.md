@@ -11,8 +11,8 @@
  
  # FILE INFORMATION 
  DEFGROUP: 
- INGROUP: MokoWaaS-Brand.Documentation
- REPO: https://github.com/mokoconsulting-tech/mokowaasbrand
+ INGROUP: MokoWaaS.Documentation
+ REPO: https://github.com/mokoconsulting-tech/mokowaas
  PATH: ./CHANGELOG.md
  VERSION: 01.04.00
  BRIEF: Version history using `Keep a Changelog`
@@ -20,7 +20,7 @@
 
 # Changelog
 
-All notable changes to the MokoWaaS-Brand plugin will be documented in this file.
+All notable changes to the MokoWaaS plugin will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
@@ -36,17 +36,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Complete Joomla 5.x system plugin implementation with modern architecture
-- Main plugin class (`src/mokowaasbrand.php`) with event handlers:
+- Main plugin class (`src/mokowaas.php`) with event handlers:
   - `onAfterInitialise` event hook for framework initialization
   - `onAfterRoute` event hook for routing integration
-- Plugin manifest (`src/mokowaasbrand.xml`) with Joomla 5.x namespace support
-  - Namespace: `Moko\Plugin\System\MokoWaaSBrand`
+- Plugin manifest (`src/mokowaas.xml`) with Joomla 5.x namespace support
+  - Namespace: `Moko\Plugin\System\MokoWaaS`
   - Configuration parameter for enabling/disabling branding
 - Dependency injection service provider (`src/services/provider.php`)
   - DI container registration for Joomla 5.x compatibility
 - Plugin language files in `src/language/en-GB/`:
-  - `plg_system_mokowaasbrand.ini` - Plugin UI strings
-  - `plg_system_mokowaasbrand.sys.ini` - System/installation strings
+  - `plg_system_mokowaas.ini` - Plugin UI strings
+  - `plg_system_mokowaas.sys.ini` - System/installation strings
 - Enhanced language overrides (57+ strings):
   - Installation sample data branding
   - Site name labels
@@ -134,7 +134,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.0] - 2025-12-11
 
 ### Added
-- Initial release of MokoWaaS-Brand plugin
+- Initial release of MokoWaaS plugin
 - Basic language override system for Joomla rebranding
 - Frontend language overrides (en-GB, en-US)
 - Administrator language overrides (en-GB, en-US)
@@ -217,7 +217,7 @@ When adding entries to this changelog:
 - [MokoStandards](https://github.com/mokoconsulting-tech/MokoStandards) - Coding and documentation standards
 - [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) - Changelog format specification
 - [Semantic Versioning](https://semver.org/spec/v2.0.0.html) - Version numbering specification
-- [Repository](https://github.com/mokoconsulting-tech/mokowaasbrand) - Project repository
+- [Repository](https://github.com/mokoconsulting-tech/mokowaas) - Project repository
 
 ---
 
