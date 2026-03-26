@@ -22,7 +22,7 @@
  NOTE: Defines installation metadata, files, and configuration for Joomla
 -->
 <extension type="plugin" group="system" method="upgrade">
-	<name>PLG_SYSTEM_MOKOWAAS</name>
+	<name>System - MokoWaaS</name>
 	<author>Moko Consulting</author>
 	<creationDate>2026-03-26</creationDate>
 	<copyright>Copyright (C) 2025 Moko Consulting. All rights reserved.</copyright>

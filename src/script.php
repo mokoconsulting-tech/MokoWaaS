@@ -167,11 +167,18 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 		return true;
 	}
 
+	/** Sentinel comment that marks the start of MokoWaaS overrides inside a Joomla override file. */
+	private const BLOCK_START = '; ===== BEGIN MokoWaaS Overrides (do not edit this block) =====';
+
+	/** Sentinel comment that marks the end of MokoWaaS overrides inside a Joomla override file. */
+	private const BLOCK_END = '; ===== END MokoWaaS Overrides =====';
+
 	/**
 	 * Install language override files to Joomla's global override directories.
 	 *
-	 * This method copies the plugin's language override files to Joomla's global
-	 * language override directories where they will be automatically loaded by Joomla.
+	 * Reads each source override shipped with the plugin, then merges the keys
+	 * into the destination file inside a clearly delimited block.  Existing
+	 * overrides outside the block are never touched.
 	 *
 	 * @return  void
 	 *
@@ -182,92 +189,47 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 		$app = Factory::getApplication();
 		$pluginPath = JPATH_PLUGINS . '/system/mokowaas';
 
-		// Install frontend overrides
-		foreach ($this->languageTags as $tag)
-		{
-			$source = $pluginPath . '/language/overrides/' . $tag . '.override.ini';
-			$dest = JPATH_ROOT . '/language/overrides/' . $tag . '.override.ini';
+		$overrideSets = [
+			// [source folder relative to plugin, Joomla destination base]
+			['language/overrides', JPATH_ROOT . '/language/overrides', 'frontend'],
+			['administrator/language/overrides', JPATH_ADMINISTRATOR . '/language/overrides', 'administrator'],
+		];
 
-			if (file_exists($source))
+		foreach ($overrideSets as [$sourceDir, $destDir, $label])
+		{
+			foreach ($this->languageTags as $tag)
 			{
-				// Ensure destination directory exists
-				$destDir = dirname($dest);
+				$source = $pluginPath . '/' . $sourceDir . '/' . $tag . '.override.ini';
+				$dest   = $destDir . '/' . $tag . '.override.ini';
+
+				if (!file_exists($source))
+				{
+					continue;
+				}
+
 				if (!is_dir($destDir))
 				{
 					Folder::create($destDir);
 				}
 
-				// Read existing overrides if they exist
-				$existingOverrides = [];
-				if (file_exists($dest))
-				{
-					$existingOverrides = $this->parseLanguageFile($dest);
-				}
-
-				// Read plugin overrides
 				$pluginOverrides = $this->parseLanguageFile($source);
 
-				// Merge overrides (plugin overrides take precedence)
-				$mergedOverrides = array_merge($existingOverrides, $pluginOverrides);
+				if (empty($pluginOverrides))
+				{
+					continue;
+				}
 
-				// Write merged overrides
-				if ($this->writeLanguageFile($dest, $mergedOverrides))
+				if ($this->mergeOverridesIntoFile($dest, $pluginOverrides))
 				{
 					$app->enqueueMessage(
-						sprintf('Installed frontend language overrides for %s', $tag),
+						sprintf('Installed %s language overrides for %s', $label, $tag),
 						'message'
 					);
 				}
 				else
 				{
 					$app->enqueueMessage(
-						sprintf('Failed to install frontend language overrides for %s', $tag),
-						'warning'
-					);
-				}
-			}
-		}
-
-		// Install administrator overrides
-		foreach ($this->languageTags as $tag)
-		{
-			$source = $pluginPath . '/administrator/language/overrides/' . $tag . '.override.ini';
-			$dest = JPATH_ADMINISTRATOR . '/language/overrides/' . $tag . '.override.ini';
-
-			if (file_exists($source))
-			{
-				// Ensure destination directory exists
-				$destDir = dirname($dest);
-				if (!is_dir($destDir))
-				{
-					Folder::create($destDir);
-				}
-
-				// Read existing overrides if they exist
-				$existingOverrides = [];
-				if (file_exists($dest))
-				{
-					$existingOverrides = $this->parseLanguageFile($dest);
-				}
-
-				// Read plugin overrides
-				$pluginOverrides = $this->parseLanguageFile($source);
-
-				// Merge overrides (plugin overrides take precedence)
-				$mergedOverrides = array_merge($existingOverrides, $pluginOverrides);
-
-				// Write merged overrides
-				if ($this->writeLanguageFile($dest, $mergedOverrides))
-				{
-					$app->enqueueMessage(
-						sprintf('Installed administrator language overrides for %s', $tag),
-						'message'
-					);
-				}
-				else
-				{
-					$app->enqueueMessage(
-						sprintf('Failed to install administrator language overrides for %s', $tag),
+						sprintf('Failed to install %s language overrides for %s', $label, $tag),
 						'warning'
 					);
 				}
@@ -276,10 +238,11 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 	}
 
 	/**
-	 * Remove language override files from Joomla's global override directories.
+	 * Remove only MokoWaaS overrides from Joomla's global override files.
 	 *
-	 * This method removes the plugin's language overrides from Joomla's global
-	 * language override directories on uninstallation.
+	 * Strips the delimited MokoWaaS block and any duplicate keys that appear
+	 * outside the block (safety net for upgrades from older versions that wrote
+	 * keys inline).  All other content is preserved verbatim.
 	 *
 	 * @return  void
 	 *
@@ -290,79 +253,216 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 		$app = Factory::getApplication();
 		$pluginPath = JPATH_PLUGINS . '/system/mokowaas';
 
-		// Remove frontend overrides
-		foreach ($this->languageTags as $tag)
+		$overrideSets = [
+			['language/overrides', JPATH_ROOT . '/language/overrides', 'frontend'],
+			['administrator/language/overrides', JPATH_ADMINISTRATOR . '/language/overrides', 'administrator'],
+		];
+
+		foreach ($overrideSets as [$sourceDir, $destDir, $label])
 		{
-			$source = $pluginPath . '/language/overrides/' . $tag . '.override.ini';
-			$dest = JPATH_ROOT . '/language/overrides/' . $tag . '.override.ini';
-
-			if (file_exists($source) && file_exists($dest))
+			foreach ($this->languageTags as $tag)
 			{
-				// Read plugin overrides
-				$pluginOverrides = $this->parseLanguageFile($source);
+				$source = $pluginPath . '/' . $sourceDir . '/' . $tag . '.override.ini';
+				$dest   = $destDir . '/' . $tag . '.override.ini';
 
-				// Read existing overrides
-				$existingOverrides = $this->parseLanguageFile($dest);
-
-				// Remove plugin overrides from existing
-				foreach (array_keys($pluginOverrides) as $key)
+				if (!file_exists($dest))
 				{
-					unset($existingOverrides[$key]);
+					continue;
 				}
 
-				// Write remaining overrides or delete file if empty
-				if (!empty($existingOverrides))
-				{
-					$this->writeLanguageFile($dest, $existingOverrides);
-				}
-				else
-				{
-					File::delete($dest);
-				}
+				$pluginKeys = array_keys($this->parseLanguageFile($source));
 
-				$app->enqueueMessage(
-					sprintf('Removed frontend language overrides for %s', $tag),
-					'message'
-				);
+				if ($this->removeOverridesFromFile($dest, $pluginKeys))
+				{
+					$app->enqueueMessage(
+						sprintf('Removed %s language overrides for %s', $label, $tag),
+						'message'
+					);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Merge plugin overrides into an existing Joomla override file.
+	 *
+	 * The method:
+	 *  1. Reads the destination file (if it exists) and preserves every line.
+	 *  2. Strips any previous MokoWaaS block so it can be rewritten cleanly.
+	 *  3. Removes duplicate keys that now live inside the MokoWaaS block.
+	 *  4. Appends a new MokoWaaS block at the end of the file.
+	 *
+	 * @param   string  $dest       Absolute path to the Joomla override file
+	 * @param   array   $overrides  Key/value pairs to inject
+	 *
+	 * @return  boolean  True on success
+	 *
+	 * @since   02.00.00
+	 */
+	private function mergeOverridesIntoFile($dest, array $overrides)
+	{
+		$existingLines = [];
+
+		if (file_exists($dest))
+		{
+			$existingLines = file($dest, FILE_IGNORE_NEW_LINES);
+		}
+
+		// Strip any previous MokoWaaS block
+		$existingLines = $this->stripMokoWaaSBlock($existingLines);
+
+		// Remove any keys outside the block that we are about to inject
+		$overrideKeys = array_map('strtoupper', array_keys($overrides));
+		$cleanedLines = [];
+
+		foreach ($existingLines as $line)
+		{
+			$trimmed = trim($line);
+
+			if ($trimmed !== '' && $trimmed[0] !== ';')
+			{
+				if (preg_match('/^([A-Z0-9_]+)\s*=/i', $trimmed, $m))
+				{
+					if (in_array(strtoupper($m[1]), $overrideKeys, true))
+					{
+						// Skip - this key will be in the MokoWaaS block
+						continue;
+					}
+				}
+			}
+
+			$cleanedLines[] = $line;
+		}
+
+		// Remove trailing blank lines so the block starts cleanly
+		while (!empty($cleanedLines) && trim(end($cleanedLines)) === '')
+		{
+			array_pop($cleanedLines);
+		}
+
+		// Build the MokoWaaS block
+		$block   = [];
+		$block[] = '';
+		$block[] = self::BLOCK_START;
+		$block[] = '; Auto-generated on ' . date('Y-m-d H:i:s') . ' — do not edit manually.';
+
+		foreach ($overrides as $key => $value)
+		{
+			$block[] = strtoupper($key) . '="' . $value . '"';
+		}
+
+		$block[] = self::BLOCK_END;
+		$block[] = '';
+
+		$content = implode("\n", array_merge($cleanedLines, $block));
+
+		return File::write($dest, $content);
+	}
+
+	/**
+	 * Remove MokoWaaS overrides from an existing Joomla override file.
+	 *
+	 * Strips the delimited block and any stray keys that match, then rewrites
+	 * the file.  If the file would be empty (or comments-only) it is deleted.
+	 *
+	 * @param   string  $dest  Absolute path to the override file
+	 * @param   array   $keys  The override keys to remove (uppercase)
+	 *
+	 * @return  boolean  True on success
+	 *
+	 * @since   02.00.00
+	 */
+	private function removeOverridesFromFile($dest, array $keys)
+	{
+		if (!file_exists($dest))
+		{
+			return true;
+		}
+
+		$lines = file($dest, FILE_IGNORE_NEW_LINES);
+
+		// Strip the MokoWaaS block
+		$lines = $this->stripMokoWaaSBlock($lines);
+
+		// Also strip any stray keys that match (legacy installs)
+		$upperKeys = array_map('strtoupper', $keys);
+		$cleaned   = [];
+
+		foreach ($lines as $line)
+		{
+			$trimmed = trim($line);
+
+			if ($trimmed !== '' && $trimmed[0] !== ';')
+			{
+				if (preg_match('/^([A-Z0-9_]+)\s*=/i', $trimmed, $m))
+				{
+					if (in_array(strtoupper($m[1]), $upperKeys, true))
+					{
+						continue;
+					}
+				}
+			}
+
+			$cleaned[] = $line;
+		}
+
+		// Check whether any real keys remain
+		$hasKeys = false;
+
+		foreach ($cleaned as $line)
+		{
+			$trimmed = trim($line);
+
+			if ($trimmed !== '' && $trimmed[0] !== ';')
+			{
+				$hasKeys = true;
+				break;
 			}
 		}
 
-		// Remove administrator overrides
-		foreach ($this->languageTags as $tag)
+		if (!$hasKeys)
 		{
-			$source = $pluginPath . '/administrator/language/overrides/' . $tag . '.override.ini';
-			$dest = JPATH_ADMINISTRATOR . '/language/overrides/' . $tag . '.override.ini';
+			return File::delete($dest);
+		}
 
-			if (file_exists($source) && file_exists($dest))
+		return File::write($dest, implode("\n", $cleaned) . "\n");
+	}
+
+	/**
+	 * Remove the MokoWaaS sentinel block from an array of file lines.
+	 *
+	 * @param   array  $lines  Lines of the file (no trailing newlines)
+	 *
+	 * @return  array  Lines with the block removed
+	 *
+	 * @since   02.00.00
+	 */
+	private function stripMokoWaaSBlock(array $lines)
+	{
+		$out     = [];
+		$inBlock = false;
+
+		foreach ($lines as $line)
+		{
+			if (trim($line) === self::BLOCK_START)
 			{
-				// Read plugin overrides
-				$pluginOverrides = $this->parseLanguageFile($source);
+				$inBlock = true;
+				continue;
+			}
 
-				// Read existing overrides
-				$existingOverrides = $this->parseLanguageFile($dest);
+			if (trim($line) === self::BLOCK_END)
+			{
+				$inBlock = false;
+				continue;
+			}
 
-				// Remove plugin overrides from existing
-				foreach (array_keys($pluginOverrides) as $key)
-				{
-					unset($existingOverrides[$key]);
-				}
-
-				// Write remaining overrides or delete file if empty
-				if (!empty($existingOverrides))
-				{
-					$this->writeLanguageFile($dest, $existingOverrides);
-				}
-				else
-				{
-					File::delete($dest);
-				}
-
-				$app->enqueueMessage(
-					sprintf('Removed administrator language overrides for %s', $tag),
-					'message'
-				);
+			if (!$inBlock)
+			{
+				$out[] = $line;
 			}
 		}
+
+		return $out;
 	}
 
 	/**
@@ -384,14 +484,14 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 		}
 
 		$content = file_get_contents($filePath);
-		$lines = explode("\n", $content);
+		$lines   = explode("\n", $content);
 
 		foreach ($lines as $line)
 		{
 			$line = trim($line);
 
 			// Skip empty lines and comments
-			if (empty($line) || $line[0] === ';')
+			if ($line === '' || $line[0] === ';')
 			{
 				continue;
 			}
@@ -399,43 +499,10 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 			// Parse KEY="VALUE" format
 			if (preg_match('/^([A-Z0-9_]+)="(.+)"$/i', $line, $matches))
 			{
-				$key = strtoupper($matches[1]);
-				$value = $matches[2];
-				$strings[$key] = $value;
+				$strings[strtoupper($matches[1])] = $matches[2];
 			}
 		}
 
 		return $strings;
-	}
-
-	/**
-	 * Write language strings to an INI file.
-	 *
-	 * @param   string  $filePath  The path to the language file
-	 * @param   array   $strings   Array of language strings (key => value)
-	 *
-	 * @return  boolean  True on success, false on failure
-	 *
-	 * @since   02.00.00
-	 */
-	private function writeLanguageFile($filePath, $strings)
-	{
-		if (empty($strings))
-		{
-			return false;
-		}
-
-		$content = "; MokoWaaS Language Overrides\n";
-		$content .= "; Generated by MokoWaaS Plugin\n";
-		$content .= "; Last updated: " . date('Y-m-d H:i:s') . "\n\n";
-
-		foreach ($strings as $key => $value)
-		{
-			// Escape quotes in value
-			$value = str_replace('"', '\"', $value);
-			$content .= strtoupper($key) . '="' . $value . '"' . "\n";
-		}
-
-		return File::write($filePath, $content);
 	}
 }
