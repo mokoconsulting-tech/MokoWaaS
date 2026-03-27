@@ -740,10 +740,16 @@ jobs:
           fi
 
           # Check for recommended workflows
-          if [ -f "$WORKFLOWS_DIR/ci.yml" ] || [ -f "$WORKFLOWS_DIR/build.yml" ]; then
-            echo "✅ CI workflow present" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "⚠️ No CI workflow found (ci.yml or build.yml)" >> $GITHUB_STEP_SUMMARY
+          CI_FOUND=false
+          for wf in ci.yml build.yml ci-dolibarr.yml ci-joomla.yml; do
+            if [ -f "$WORKFLOWS_DIR/$wf" ]; then
+              echo "✅ CI workflow present ($wf)" >> $GITHUB_STEP_SUMMARY
+              CI_FOUND=true
+              break
+            fi
+          done
+          if [ "$CI_FOUND" = "false" ]; then
+            echo "⚠️ No CI workflow found (ci.yml, build.yml, ci-dolibarr.yml, or ci-joomla.yml)" >> $GITHUB_STEP_SUMMARY
           fi
 
           if [ -f "$WORKFLOWS_DIR/codeql-analysis.yml" ]; then
@@ -751,6 +757,15 @@ jobs:
           else
             echo "⚠️ CodeQL workflow not found" >> $GITHUB_STEP_SUMMARY
           fi
+
+          # Check for MokoStandards-synced workflows
+          for wf in deploy-dev.yml deploy-demo.yml deploy-rs.yml sync-version-on-merge.yml auto-release.yml standards-compliance.yml enterprise-firewall-setup.yml; do
+            if [ -f "$WORKFLOWS_DIR/$wf" ]; then
+              echo "✅ ${wf}" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "⚠️ ${wf} not found (synced from MokoStandards)" >> $GITHUB_STEP_SUMMARY
+            fi
+          done
 
       - name: Validate Workflow Syntax
         run: |
