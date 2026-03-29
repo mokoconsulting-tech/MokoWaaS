@@ -22,7 +22,7 @@
 # INGROUP: MokoStandards.Deploy
 # REPO: https://github.com/mokoconsulting-tech/MokoStandards
 # PATH: /templates/workflows/shared/deploy-demo.yml
-# VERSION: 04.01.00
+# VERSION: 04.01.09
 # BRIEF: SFTP deployment workflow for demo server — synced to all governed repos
 # NOTE: Synced via bulk-repo-sync to .github/workflows/deploy-demo.yml in all governed repos.
 #       Port is resolved in order: DEMO_FTP_PORT variable → :port suffix in DEMO_FTP_HOST → 22.
@@ -69,6 +69,9 @@ on:
 permissions:
   contents: read
   pull-requests: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   check-permission:
@@ -241,7 +244,6 @@ jobs:
               fi
             done
             $SKIP && continue
-            if [ -f ".gitignore" ]; then
             if [ -f ".gitignore" ]; then
               git check-ignore -q "$rel" 2>/dev/null && {
                 IGNORED_FILES+=("$rel | .gitignore")
@@ -424,8 +426,11 @@ jobs:
           cd /tmp/mokostandards
           composer install --no-dev --no-interaction --quiet
 
-      - name: Clear remote destination folder
-        if: steps.source.outputs.skip == 'false' && steps.remote.outputs.skip != 'true'
+      - name: Clear remote destination folder (manual only)
+        if: >-
+          steps.source.outputs.skip == 'false' &&
+          steps.remote.outputs.skip != 'true' &&
+          inputs.clear_remote == true
         env:
           SFTP_HOST:      ${{ steps.conn.outputs.host }}
           SFTP_PORT:      ${{ steps.conn.outputs.port }}
