@@ -22,7 +22,7 @@
 # INGROUP: MokoStandards.Deploy
 # REPO: https://github.com/mokoconsulting-tech/MokoStandards
 # PATH: /templates/workflows/shared/deploy-rs.yml
-# VERSION: 04.01.00
+# VERSION: 04.01.09
 # BRIEF: SFTP deployment workflow for release staging server — synced to all governed repos
 # NOTE: Synced via bulk-repo-sync to .github/workflows/deploy-rs.yml in all governed repos.
 #       Port is resolved in order: RS_FTP_PORT variable → :port suffix in RS_FTP_HOST → 22.
@@ -69,6 +69,9 @@ on:
 permissions:
   contents: read
   pull-requests: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   check-permission:
@@ -404,8 +407,11 @@ jobs:
           cd /tmp/mokostandards
           composer install --no-dev --no-interaction --quiet
 
-      - name: Clear remote destination folder
-        if: steps.source.outputs.skip == 'false' && steps.remote.outputs.skip != 'true'
+      - name: Clear remote destination folder (manual only)
+        if: >-
+          steps.source.outputs.skip == 'false' &&
+          steps.remote.outputs.skip != 'true' &&
+          inputs.clear_remote == true
         env:
           SFTP_HOST:      ${{ steps.conn.outputs.host }}
           SFTP_PORT:      ${{ steps.conn.outputs.port }}
