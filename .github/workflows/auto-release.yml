@@ -9,7 +9,7 @@
 # INGROUP: MokoStandards.Release
 # REPO: https://github.com/mokoconsulting-tech/MokoStandards
 # PATH: /templates/workflows/shared/auto-release.yml
-# VERSION: 04.01.00
+# VERSION: 04.01.09
 # BRIEF: Auto-create a GitHub Release on every push to main with version from README.md
 # NOTE: Synced via bulk-repo-sync to .github/workflows/auto-release.yml in all governed repos.
 #       For Dolibarr (crm-module) repos, also updates $this->version in the module descriptor.
@@ -148,6 +148,42 @@ jobs:
             --target main
 
           echo "🚀 Release ${VERSION} created: $TAG"
+
+      - name: Write update.json for Dolibarr update checks
+        if: >-
+          steps.version.outputs.skip != 'true' &&
+          steps.tag_check.outputs.exists != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN || github.token }}
+        run: |
+          PLATFORM=""
+          if [ -f ".moko-standards" ]; then
+            PLATFORM=$(grep -E '^platform:' .moko-standards | sed 's/.*:[[:space:]]*//' | tr -d '"')
+          fi
+
+          if [ "$PLATFORM" = "crm-module" ]; then
+            VERSION="${{ steps.version.outputs.version }}"
+            TAG="${{ steps.version.outputs.tag }}"
+
+            # update.json — read by Dolibarr's module update checker via $this->url_last_version
+            # Points to: https://raw.githubusercontent.com/mokoconsulting-tech/{repo}/main/update.json
+            jq -n \
+              --arg version "$VERSION" \
+              --arg tag "$TAG" \
+              --arg repo "${{ github.repository }}" \
+              --arg release "https://github.com/${{ github.repository }}/releases/tag/${TAG}" \
+              --arg updated "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+              '{version: $version, tag: $tag, repo: $repo, release_url: $release, updated: $updated}' \
+              > update.json
+
+            git config --local user.email "github-actions[bot]@users.noreply.github.com"
+            git config --local user.name "github-actions[bot]"
+            git add update.json
+            git commit -m "chore(release): update update.json to ${VERSION} [skip ci]" \
+              --author="github-actions[bot] <github-actions[bot]@users.noreply.github.com>"
+            git push
+            echo "📦 update.json written with version ${VERSION}" >> $GITHUB_STEP_SUMMARY
+          fi
 
       - name: Summary
         if: steps.version.outputs.skip != 'true'
