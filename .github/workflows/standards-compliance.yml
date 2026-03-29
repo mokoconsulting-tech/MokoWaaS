@@ -5,7 +5,7 @@
 # INGROUP: MokoStandards.Compliance
 # REPO: https://github.com/mokoconsulting-tech/MokoStandards
 # PATH: /.github/workflows/standards-compliance.yml
-# VERSION: 04.01.00
+# VERSION: 04.01.09
 # BRIEF: MokoStandards compliance validation workflow
 # NOTE: Validates repository structure, documentation, and coding standards
 
@@ -1271,58 +1271,63 @@ jobs:
           echo "### Secret Patterns" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
 
+          # Helper: scan with a pattern, show results with file:line, return count
+          scan_pattern() {
+            local label="$1" icon="$2" tmpfile="$3"
+            local count=0
+            if [ -f "$tmpfile" ]; then
+              count=$(wc -l < "$tmpfile")
+            fi
+            if [ "$count" -gt 0 ]; then
+              echo "${icon} **${label}**: ${count} finding(s)" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "<details>" >> $GITHUB_STEP_SUMMARY
+              echo "<summary>View locations</summary>" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "| File | Line | Match |" >> $GITHUB_STEP_SUMMARY
+              echo "|------|------|-------|" >> $GITHUB_STEP_SUMMARY
+              head -20 "$tmpfile" | while IFS= read -r line; do
+                FILE=$(echo "$line" | cut -d: -f1 | sed 's|^\./||')
+                LINENO=$(echo "$line" | cut -d: -f2)
+                MATCH=$(echo "$line" | cut -d: -f3- | head -c 80 | sed 's/|/\\|/g')
+                echo "| \`${FILE}\` | ${LINENO} | \`${MATCH}\` |" >> $GITHUB_STEP_SUMMARY
+              done
+              if [ "$count" -gt 20 ]; then
+                echo "" >> $GITHUB_STEP_SUMMARY
+                echo "*... and $((count - 20)) more*" >> $GITHUB_STEP_SUMMARY
+              fi
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "</details>" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+              VIOLATIONS=$((VIOLATIONS + count))
+            fi
+          }
+
           # Pattern 1: password/secret assignments
-          # Exclusions:
-          #   test|example|sample     - test/example files
-          #   getenv                  - environment-variable reads
-          #   /\.\*/|^\s*//           - regex patterns and commented lines
-          #   CREDENTIAL_PATTERNS|SecurityValidator|SECRET_PATTERN - scanner internals
-          #   ===|!==                 - strict comparison operators (not assignments)
-          #   ApiClient               - constructor calls where token is a variable arg
-          if grep -r -n -E "(password|passwd|pwd|secret|api[_-]?key|token).*=.*['\"]" . \
+          grep -r -n -E "(password|passwd|pwd|secret|api[_-]?key|token).*=.*['\"]" . \
             --include="*.php" --include="*.py" --include="*.js" --include="*.ts" \
             --exclude-dir=".git" --exclude-dir="vendor" --exclude-dir="node_modules" 2>/dev/null | \
             grep -v -E '(test|example|sample|getenv|/\.\*/|^\s*//|CREDENTIAL_PATTERNS|SecurityValidator|SECRET_PATTERN|===|!==|ApiClient)' | \
-            grep -v "= ''" | grep -v '= ""' > /tmp/secrets1.txt 2>/dev/null; then
-            COUNT=$(wc -l < /tmp/secrets1.txt)
-            if [ "$COUNT" -gt 0 ]; then
-              echo "⚠️ Found $COUNT potential secret assignment(s)" >> $GITHUB_STEP_SUMMARY
-              VIOLATIONS=$((VIOLATIONS + COUNT))
-            fi
-          fi
+            grep -v "= ''" | grep -v '= ""' > /tmp/secrets1.txt 2>/dev/null || true
+          scan_pattern "Secret assignments" "⚠️" /tmp/secrets1.txt
 
           # Pattern 2: Private keys
-          if grep -r -n "BEGIN.*PRIVATE KEY" . \
+          grep -r -n "BEGIN.*PRIVATE KEY" . \
             --include="*.pem" --include="*.key" --include="*.txt" \
-            --exclude-dir=".git" --exclude-dir="vendor" --exclude-dir="node_modules" 2>/dev/null > /tmp/secrets2.txt; then
-            COUNT=$(wc -l < /tmp/secrets2.txt)
-            if [ "$COUNT" -gt 0 ]; then
-              echo "❌ Found $COUNT private key file(s)" >> $GITHUB_STEP_SUMMARY
-              VIOLATIONS=$((VIOLATIONS + COUNT))
-            fi
-          fi
+            --exclude-dir=".git" --exclude-dir="vendor" --exclude-dir="node_modules" 2>/dev/null > /tmp/secrets2.txt || true
+          scan_pattern "Private keys" "❌" /tmp/secrets2.txt
 
           # Pattern 3: AWS keys
-          if grep -r -n -E "AKIA[0-9A-Z]{16}" . \
+          grep -r -n -E "AKIA[0-9A-Z]{16}" . \
             --include="*.php" --include="*.py" --include="*.js" --include="*.txt" --include="*.env" \
-            --exclude-dir=".git" --exclude-dir="vendor" --exclude-dir="node_modules" 2>/dev/null > /tmp/secrets3.txt; then
-            COUNT=$(wc -l < /tmp/secrets3.txt)
-            if [ "$COUNT" -gt 0 ]; then
-              echo "❌ Found $COUNT potential AWS access key(s)" >> $GITHUB_STEP_SUMMARY
-              VIOLATIONS=$((VIOLATIONS + COUNT))
-            fi
-          fi
+            --exclude-dir=".git" --exclude-dir="vendor" --exclude-dir="node_modules" 2>/dev/null > /tmp/secrets3.txt || true
+          scan_pattern "AWS access keys" "❌" /tmp/secrets3.txt
 
           # Pattern 4: GitHub tokens
-          if grep -r -n -E "gh[ps]_[a-zA-Z0-9]{36}" . \
+          grep -r -n -E "gh[ps]_[a-zA-Z0-9]{36}" . \
             --include="*.php" --include="*.py" --include="*.js" --include="*.txt" --include="*.env" \
-            --exclude-dir=".git" --exclude-dir="vendor" --exclude-dir="node_modules" 2>/dev/null > /tmp/secrets4.txt; then
-            COUNT=$(wc -l < /tmp/secrets4.txt)
-            if [ "$COUNT" -gt 0 ]; then
-              echo "❌ Found $COUNT potential GitHub token(s)" >> $GITHUB_STEP_SUMMARY
-              VIOLATIONS=$((VIOLATIONS + COUNT))
-            fi
-          fi
+            --exclude-dir=".git" --exclude-dir="vendor" --exclude-dir="node_modules" 2>/dev/null > /tmp/secrets4.txt || true
+          scan_pattern "GitHub tokens" "❌" /tmp/secrets4.txt
 
           echo "" >> $GITHUB_STEP_SUMMARY
 
