@@ -1,93 +1,128 @@
 <!--
- Copyright (C) 2025 Moko Consulting <hello@mokoconsulting.tech>
+ Copyright (C) 2026 Moko Consulting <hello@mokoconsulting.tech>
+
  This file is part of a Moko Consulting project.
- SPDX-LICENSE-IDENTIFIER: GPL-3.0-or-later
+
+ SPDX-License-Identifier: GPL-3.0-or-later
+
  This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.
+
  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- You should have received a copy of the GNU General Public License (./LICENSE.md).
+
+ You should have received a copy of the GNU General Public License (./LICENSE).
 
  # FILE INFORMATION
- DEFGROUP: Joomla.Plugin
- INGROUP: MokoWaaS-Brand.Contributing
- REPO: https://github.com/mokoconsulting-tech/mokowaasbrand
- VERSION: 01.03.00
- PATH: /CONTRIBUTING.md
- BRIEF: Contribution guidelines for the MokoWaaS-Brand plugin
--->
+ DEFGROUP: {{DEFGROUP}}
+ INGROUP: Project.Documentation
+ REPO: https://github.com/mokoconsulting-tech/MokoWaaS
+ VERSION: 04.04.00
+ PATH: ./CONTRIBUTING.md
+ BRIEF: How to contribute; branch strategy, commit conventions, PR workflow, and release pipeline
+ -->
 
-# Contributing to MokoWaaS-Brand (VERSION: 01.03.00)
+# Contributing
 
-## Overview
-Contributions to the MokoWaaS-Brand plugin follow standardized development, governance, and quality control expectations defined by Moko Consulting. This document outlines contribution requirements, acceptable change types, branch management, testing expectations, and release readiness standards.
+Thank you for your interest in contributing to **MokoWaaS**!
 
-## 1. Contribution Workflow
-All contributions must follow the established workflow:
-1. Fork the repository or create a feature branch (if internal).
-2. Ensure your environment matches the supported Joomla and PHP versions.
-3. Implement changes following coding, documentation, and metadata standards.
-4. Validate plugin functionality locally.
-5. Submit a Pull Request (PR) for review.
+This repository is governed by **[MokoStandards](https://github.com/mokoconsulting-tech/MokoStandards)** — the authoritative source of coding standards, workflows, and policies for all Moko Consulting repositories.
 
-## 2. Branching Model
-- `main`: Production stable branch.
-- `develop`: Aggregates work for the next minor release.
-- `feature/*`: New enhancements or changes.
-- `bugfix/*`: Hotfixes and corrections.
+## Branch Strategy
 
-Internal teams must coordinate with governance before creating major feature branches.
+| Branch | Purpose | Deploys To |
+|--------|---------|------------|
+| `main` | Bleeding edge — all development merges here | CI only |
+| `dev/XX.YY.ZZ` | Feature development | Dev server (version: "development") |
+| `version/XX.YY.ZZ` | Stable frozen snapshot | Demo + RS servers |
 
-## 3. Coding and Documentation Standards
-All code must:
-- Follow [MokoStandards](https://github.com/mokoconsulting-tech/MokoStandards) coding standards
-- Include the unified SPDX license header
-- Include a FILE INFORMATION metadata block
-- Avoid deprecated Joomla APIs
-- Preserve load order compatibility with other system plugins
+### Development Workflow
 
-Documentation must:
-- Include metadata
-- Maintain revision history
-- Use consistent formatting as defined by Moko documentation standards
+```
+1. Create branch:   git checkout -b dev/XX.YY.ZZ/my-feature
+2. Develop + test    (dev server auto-deploys on push)
+3. Open PR → main    (squash merge only)
+4. Auto-release      (version branch + tag + GitHub Release created automatically)
+```
 
-## 4. Testing Requirements
-Before submitting a PR, contributors must verify:
-- Plugin installs successfully in Joomla 5.x
-- No load errors appear in logs
-- Branding replacements appear as expected
-- Terminology strings are correct
-- No regressions in administrator UI
+### Branch Naming
 
-Automated testing coverage will expand as part of future roadmap enhancements.
+| Prefix | Use |
+|--------|-----|
+| `dev/XX.YY.ZZ` | Feature development (e.g., `dev/02.00.00/add-extrafields`) |
+| `version/XX.YY.ZZ` | Stable release (auto-created, never manually pushed) |
+| `chore/` | Automated sync branches (managed by MokoStandards) |
 
-## 5. Pull Request Requirements
-A PR must include:
-- Description of change
-- Screenshots for UI related updates
-- Version updates when appropriate
-- Notes for documentation changes
-- Reference to related issues or tasks
+> **Never use** `feature/`, `hotfix/`, or `release/` prefixes — they are not part of the MokoStandards branch strategy.
 
-PRs lacking required information may be flagged or delayed.
+## Commit Conventions
 
-## 6. Release Versioning
-Changes must follow semantic versioning:
-- MAJOR: Structural branding or architectural changes
-- MINOR: Feature updates or terminology expansion
-- PATCH: Bug fixes or language corrections
+Use [conventional commits](https://www.conventionalcommits.org/):
 
-Version updates must be reflected in:
-- Manifest files
-- PHP headers
-- Documentation metadata
+```
+feat(scope): add new extrafield for invoice tracking
+fix(sql): correct column type in llx_mytable
+docs(readme): update installation instructions
+chore(deps): bump enterprise library to 04.02.30
+```
 
-## 7. Code Review Standards
-Reviewers validate:
-- Code quality and clarity
-- Compliance with [MokoStandards](https://github.com/mokoconsulting-tech/MokoStandards) coding standards
-- Impact to templates and WaaS branding rules
-- Backwards compatibility expectations
+**Valid types:** `feat` | `fix` | `docs` | `chore` | `ci` | `refactor` | `style` | `test` | `perf` | `revert` | `build`
 
-## Revision History
-| Date | Author | Description |
-| ------ | -------- | ----------- |
-| 2025-12-11 | Jonathan Miller (@jmiller-moko) | Initial creation of contribution guidelines |
+## Pull Request Workflow
+
+1. **Branch** from `main` using `dev/XX.YY.ZZ/description` format
+2. **Bump** the patch version in `README.md` before opening the PR
+3. **Title** must be a valid conventional commit subject line
+4. **Target** `main` — squash merge only (merge commits are disabled)
+5. **CI checks** must pass before merge
+
+### What Happens on Merge
+
+When your PR is merged to `main`, these workflows run automatically:
+
+1. **sync-version-on-merge** — auto-bumps patch version, propagates to all file headers
+2. **auto-release** — creates `version/XX.YY.ZZ` branch, git tag, and GitHub Release
+3. **deploy-demo / deploy-rs** — deploys to demo and RS servers (if `src/**` changed)
+
+## Coding Standards
+
+All contributions must follow [MokoStandards](https://github.com/mokoconsulting-tech/MokoStandards):
+
+| Standard | Reference |
+|----------|-----------|
+| Coding Style | [coding-style-guide.md](https://github.com/mokoconsulting-tech/MokoStandards/blob/main/docs/policy/coding-style-guide.md) |
+| File Headers | [file-header-standards.md](https://github.com/mokoconsulting-tech/MokoStandards/blob/main/docs/policy/file-header-standards.md) |
+| Branching | [branch-release-strategy.md](https://github.com/mokoconsulting-tech/MokoStandards/blob/main/docs/policy/branch-release-strategy.md) |
+| Merge Strategy | [merge-strategy.md](https://github.com/mokoconsulting-tech/MokoStandards/blob/main/docs/policy/merge-strategy.md) |
+| Scripting | [scripting-standards.md](https://github.com/mokoconsulting-tech/MokoStandards/blob/main/docs/policy/scripting-standards.md) |
+| Build & Release | [build-release.md](https://github.com/mokoconsulting-tech/MokoStandards/blob/main/docs/workflows/build-release.md) |
+
+## PR Checklist
+
+- [ ] Branch named `dev/XX.YY.ZZ/description`
+- [ ] Patch version bumped in `README.md`
+- [ ] Conventional commit format for PR title
+- [ ] All new files have FILE INFORMATION headers
+- [ ] `declare(strict_types=1)` in all PHP files
+- [ ] PHPDoc on all public methods
+- [ ] Tests pass
+- [ ] CHANGELOG.md updated
+- [ ] No secrets, tokens, or credentials committed
+
+## Custom Workflows
+
+Place repo-specific workflows in `.github/workflows/custom/` — they are **never overwritten or deleted** by MokoStandards sync:
+
+```
+.github/workflows/
+├── deploy-dev.yml              ← Synced from MokoStandards
+├── auto-release.yml            ← Synced from MokoStandards
+└── custom/                     ← Your custom workflows (safe)
+    └── my-custom-ci.yml
+```
+
+## License
+
+By contributing, you agree that your contributions will be licensed under the [GPL-3.0-or-later](LICENSE) license.
+
+---
+
+*This file is synced from [MokoStandards](https://github.com/mokoconsulting-tech/MokoStandards). Do not edit directly — changes will be overwritten on the next sync.*
