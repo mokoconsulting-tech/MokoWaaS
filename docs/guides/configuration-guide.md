@@ -10,13 +10,13 @@
  DEFGROUP: Joomla.Plugin
  INGROUP: MokoWaaS.Guides
  REPO: https://github.com/mokoconsulting-tech/mokowaas
- VERSION: 01.04.00
+ VERSION: 02.00.00
  PATH: /docs/guides/configuration-guide.md
  BRIEF: Configuration guide for the MokoWaaS system plugin
  NOTE: Defines plugin parameters, expected behaviors, and recommended defaults
 -->
 
-# MokoWaaS Configuration Guide (VERSION: 01.04.00)
+# MokoWaaS Configuration Guide (VERSION: 02.00.00)
 
 ## 1. Objective
 
@@ -29,77 +29,155 @@ This guide outlines the configuration parameters available within the MokoWaaS s
 3. Search for **MokoWaaS**.
 4. Select the plugin name to open the configuration panel.
 
-## 3. Configuration Sections
+## 3. Plugin Parameters
 
-The plugin provides several configuration areas designed to control branding behavior.
+### 3.1 Enable Branding
 
-### 3.1 Brand Terminology Controls
+| Property | Value |
+| -------- | ----- |
+| Field name | `enable_branding` |
+| Type | Radio (Yes/No) |
+| Default | Yes |
 
-These toggles replace Joomla native labels with WaaS aligned naming conventions.
+Master switch for all branding overrides. When disabled, no language overrides are applied and the Joomla interface reverts to its default strings.
 
-Use cases include:
+### 3.2 Brand Name
 
-* Standardizing administrator UI language
-* Reinforcing WaaS platform identity across components
+| Property | Value |
+| -------- | ----- |
+| Field name | `brand_name` |
+| Type | Text |
+| Default | `MokoWaaS` |
 
-Recommended Default: **Enabled**
+The brand name that replaces "Joomla" throughout the interface. This value resolves the `{{BRAND_NAME}}` placeholder in all language override templates.
 
-### 3.2 Footer and Attribution Controls
+**Affected areas:**
+* Admin and site footer ("Powered by …")
+* Control panel greetings
+* Quick icon status messages
+* System info and version labels
+* Installer and update component text
+* Error pages and system messages
+* Privacy component headings
 
-Controls platform level branding elements including:
+### 3.3 Company Name
 
-* Footer identification
-* Powered By statements
-* Attribution placements
+| Property | Value |
+| -------- | ----- |
+| Field name | `company_name` |
+| Type | Text |
+| Default | `Moko Consulting` |
 
-Recommended Default: **Enabled**
+Your company name, used in support links and attribution. Resolves the `{{COMPANY_NAME}}` placeholder.
 
-### 3.3 Visibility Controls
+**Affected areas:**
+* Admin login support links (forum, documentation, news)
+* Frontend login support links
 
-Options for concealing or modifying native Joomla identifiers when appropriate.
+### 3.4 Support URL
 
-Examples include:
+| Property | Value |
+| -------- | ----- |
+| Field name | `support_url` |
+| Type | URL |
+| Default | `https://mokoconsulting.tech` |
 
-* Hiding Joomla version labels
-* Suppressing default metadata references
+URL for support and documentation links. Resolves the `{{SUPPORT_URL}}` placeholder.
 
-Recommended Default: **Enabled** for WaaS managed sites.
+**Affected areas:**
+* Dashboard welcome message links
+* Documentation and support links
 
-### 3.4 Rendering Enhancements
+## 4. How Overrides Work
 
-Controls adjustments to UI elements to ensure consistent presentation.
+MokoWaaS uses a two-layer override system:
 
-Examples:
+### 4.1 Runtime Resolution (Primary)
 
-* Header text alignment
-* Replacement of naming strings
+On every page load, the plugin reads override template files shipped with the plugin, resolves `{{BRAND_NAME}}`, `{{COMPANY_NAME}}`, and `{{SUPPORT_URL}}` from plugin params, and injects the resolved strings into Joomla's Language object.
 
-Recommended Default: **Enabled**
+**Effect:** Changing the brand name in plugin config takes effect on the next page load — no reinstall needed.
 
-## 4. Configuration Change Workflow
+### 4.2 Install-time Resolution (Fallback)
+
+During install/update, the install script resolves placeholders and writes the result into Joomla's global language override files inside a sentinel block:
+
+```ini
+; ===== BEGIN MokoWaaS Overrides (do not edit this block) =====
+; Auto-generated on 2026-03-31 12:00:00 — do not edit manually.
+TPL_ATUM_POWERED_BY="Powered by MokoWaaS"
+...
+; ===== END MokoWaaS Overrides =====
+```
+
+Existing overrides outside this block are never touched. On uninstall, only the MokoWaaS block (and any legacy stray keys) are removed.
+
+## 5. Override Coverage
+
+### 5.1 Admin Overrides (administrator/language/overrides/)
+
+| Section | Keys | Description |
+| ------- | ---- | ----------- |
+| Footer & template | 2 | Powered by text in Atum template |
+| Control panel | 5 | Welcome messages, beginners guide, stats |
+| Help/Docs | 2 | Help site labels |
+| Generic | 3 | Defaults, package type, library name |
+| System messages | 2 | Error and field labels |
+| Admin login | 4 | Login support links and page title |
+| Error messages | 1 | Generic error layout |
+| Admin branding | 4 | Control panel title, module/plugin headings |
+| Extensions | 2 | Installer type and success message |
+| Quick Icons | 3 | Update check status messages |
+| System Info | 3 | Version, help, compat plugin |
+| Installer | 5 | Upload, warnings, update notices |
+| Global Config | 1 | Meta version label |
+| Update component | 11 | Titles, descriptions, status messages |
+| Privacy | 1 | Core capabilities heading |
+| Library errors | 2 | Minimum version, XML setup file |
+| Version/About | 3 | Powered by, documentation, support |
+
+### 5.2 Site/Frontend Overrides (language/overrides/)
+
+| Section | Keys | Description |
+| ------- | ---- | ----------- |
+| Footer & template | 2 | Powered by text in Cassiopeia template |
+| Generic | 2 | Defaults, library name |
+| System messages | 2 | Error and field labels |
+| Error messages/pages | 4 | Error layout, 404, generic errors |
+| Installer/Sample data | 6 | Site name, sample data sets |
+| Login support | 3 | Forum, documentation, news links |
+| Site offline | 1 | Maintenance message |
+| Version/About | 1 | Powered by text |
+
+## 6. Configuration Change Workflow
 
 To ensure continuity across managed environments:
 
 1. Document the change request.
 2. Apply updates in a staging environment.
-3. Validate branding presentation.
+3. Validate branding presentation across admin and frontend.
 4. Promote changes to production following WaaS change controls.
 
-## 5. Troubleshooting Configuration Issues
+## 7. Troubleshooting Configuration Issues
 
 * If changes do not appear, clear Joomla and browser cache.
 * Confirm that no template override is superseding plugin outputs.
 * Review logs for load order conflicts.
 * Confirm that extension priority does not conflict with other system plugins.
+* If brand name change doesn't take effect, verify the plugin is enabled and the `enable_branding` param is set to Yes.
 
-## 6. Validation Checklist
+## 8. Validation Checklist
 
-* Branding reads consistently across administrator screens.
-* No Joomla specific identifiers remain where replacement is expected.
-* Frontend and backend output align with WaaS design expectations.
+* Brand name appears consistently across all administrator screens.
+* Company name appears in login support links.
+* Support URL points to correct destination.
+* No "Joomla" identifiers remain in overridden locations.
+* Frontend and backend output align with configured brand values.
+* Existing site language overrides (outside the MokoWaaS block) are preserved.
 
 ## Revision History
 
 | Version  | Date       | Author                          | Description                                    |
 | -------- | ---------- | ------------------------------- | ---------------------------------------------- |
 | 01.02.00 | 2025-12-11 | Jonathan Miller (@jmiller-moko) | Initial standalone configuration guide created |
+| 02.00.00 | 2026-03-31 | Jonathan Miller (@jmiller-moko) | Template-based overrides, configurable brand name/company/URL, expanded override coverage |
