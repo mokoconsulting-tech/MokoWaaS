@@ -25,6 +25,7 @@ namespace Moko\Plugin\System\MokoWaaS\Extension;
 
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
 use Joomla\CMS\Plugin\CMSPlugin;
 use Joomla\CMS\Language\Language;
 
@@ -71,8 +72,8 @@ class MokoWaaS extends CMSPlugin
 			return;
 		}
 
-		// Load language overrides
 		$this->loadLanguageOverrides();
+		$this->enforceLoginSupportUrls();
 	}
 
 	/**
@@ -172,6 +173,72 @@ class MokoWaaS extends CMSPlugin
 	}
 
 	/**
+	 * Enforce login support module URLs on admin requests.
+	 *
+	 * Checks the mod_loginsupport module params and corrects them if
+	 * they have been changed away from the expected values.  Runs only
+	 * on administrator requests to avoid unnecessary DB queries on the
+	 * frontend.
+	 *
+	 * @return  void
+	 *
+	 * @since   02.00.00
+	 */
+	protected function enforceLoginSupportUrls()
+	{
+		if (!$this->app->isClient('administrator'))
+		{
+			return;
+		}
+
+		$expected = [
+			'forum_url'         => 'https://mokoconsulting.tech/support',
+			'documentation_url' => 'https://mokoconsulting.tech/kb',
+			'news_url'          => 'https://mokoconsulting.tech/news',
+		];
+
+		$db    = Factory::getDbo();
+		$query = $db->getQuery(true)
+			->select([$db->quoteName('id'), $db->quoteName('params')])
+			->from($db->quoteName('#__modules'))
+			->where($db->quoteName('module') . ' = ' . $db->quote('mod_loginsupport'));
+
+		$db->setQuery($query);
+		$modules = $db->loadObjectList();
+
+		if (empty($modules))
+		{
+			return;
+		}
+
+		foreach ($modules as $module)
+		{
+			$params  = new \Joomla\Registry\Registry($module->params ?: '{}');
+			$needsFix = false;
+
+			foreach ($expected as $key => $url)
+			{
+				if ($params->get($key) !== $url)
+				{
+					$params->set($key, $url);
+					$needsFix = true;
+				}
+			}
+
+			if ($needsFix)
+			{
+				$update = $db->getQuery(true)
+					->update($db->quoteName('#__modules'))
+					->set($db->quoteName('params') . ' = ' . $db->quote($params->toString()))
+					->where($db->quoteName('id') . ' = ' . (int) $module->id);
+
+				$db->setQuery($update);
+				$db->execute();
+			}
+		}
+	}
+
+	/**
 	 * Event triggered after the route has been determined.
 	 *
 	 * @return  void
@@ -184,7 +251,5 @@ class MokoWaaS extends CMSPlugin
 		{
 			return;
 		}
-
-		// Apply additional branding logic if needed
 	}
 }
