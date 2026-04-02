@@ -36,7 +36,7 @@
 		</downloads>
 		<maintainer>Moko Consulting</maintainer>
 		<maintainerurl>https://mokoconsulting.tech</maintainerurl>
-		<targetplatform name="joomla" version="5\.[0-9]" />
+		<targetplatform name="joomla" version="[56]\.[0-9]" />
 		<category>MokoWaaS</category>
 	</update>
 </updates>
