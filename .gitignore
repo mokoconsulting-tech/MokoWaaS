@@ -917,5 +917,3 @@ htdocs/logs/
 # ============================================================
 !.gitkeep
 .claude/
-.claude/settings.local.json
-/.claude
