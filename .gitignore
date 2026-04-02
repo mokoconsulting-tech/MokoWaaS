@@ -916,4 +916,4 @@ htdocs/logs/
 # Keep-empty folders helper
 # ============================================================
 !.gitkeep
-.claude/
+.claude
