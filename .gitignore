@@ -911,9 +911,9 @@ htdocs/logs/
 /README.txt
 /robots.txt.dist
 /web.config.txt
+.claude
 
 # ============================================================
 # Keep-empty folders helper
 # ============================================================
 !.gitkeep
-.claude
