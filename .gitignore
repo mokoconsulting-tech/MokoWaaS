@@ -906,3 +906,6 @@ modulebuilder.txt
 
 # ── MokoStandards sync (auto-appended) ────────────────────────────────
 !src/media/vendor/
+
+# ── MokoStandards sync (auto-appended) ────────────────────────────────
+.claude/
