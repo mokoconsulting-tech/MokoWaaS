@@ -1,4 +1,9 @@
 # ============================================================
+# Local task tracking (not version controlled)
+# ============================================================
+TODO.md
+
+# ============================================================
 # Environment and secrets
 # ============================================================
 .env
@@ -23,10 +28,7 @@ secrets/
 *.log
 *.pid
 *.seed
-*.sql
-*.sql.gz
-*.sqlite
-*.sqlite3
+
 
 # ============================================================
 # OS / Editor / IDE cruft
@@ -43,6 +45,7 @@ System Volume Information/
 Icon?
 .idea/
 .settings/
+.claude/
 .vscode/*
 !.vscode/tasks.json
 !.vscode/settings.json.example
@@ -70,6 +73,17 @@ todo*
 # SFTP / sync tools
 # ============================================================
 sftp-config*.json
+sftp-config.json.template
+sftp-settings.json
+
+# ============================================================
+# Sublime SFTP / FTP sync
+# ============================================================
+*.sublime-project
+*.sublime-workspace
+*.sublime-settings
+.libsass.json
+*.ffs*
 
 # ============================================================
 # Replit / cloud IDE
@@ -138,6 +152,7 @@ package-lock.json
 # PHP / Composer tooling
 # ============================================================
 vendor/
+!src/media/vendor/
 composer.lock
 *.phar
 codeception.phar
@@ -185,31 +200,3 @@ venv/
 *.coverage
 hypothesis/
 
-# ============================================================
-# Dolibarr (base + runtime)
-# ============================================================
-documents/
-dolibarr_documents/
-custom/
-uploads/
-thumbs/
-data/
-cache/
-temp/
-tmp/
-logs/
-htdocs/documents/
-htdocs/custom/
-htdocs/cache/
-htdocs/tmp/
-htdocs/logs/
-
-# ============================================================
-# Claude Code
-# ============================================================
-.claude
-
-# ============================================================
-# Keep-empty folders helper
-# ============================================================
-!.gitkeep
