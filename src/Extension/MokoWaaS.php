@@ -34,8 +34,11 @@ defined('_JEXEC') or die;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Log\Log;
 use Joomla\CMS\Plugin\CMSPlugin;
+use Joomla\CMS\Router\Route;
 use Joomla\CMS\Language\Language;
+use Joomla\CMS\Uri\Uri;
 use Joomla\CMS\User\UserHelper;
+use Joomla\Http\HttpFactory;
 
 /**
  * MokoWaaS Brand System Plugin
@@ -75,11 +78,17 @@ class MokoWaaS extends CMSPlugin
 	 */
 	public function onAfterInitialise()
 	{
-		// WaaS access control runs regardless of branding toggle
+		// Security: HTTPS redirect (runs for all clients)
+		$this->enforceHttps();
+
+		// Admin-only WaaS controls
 		if ($this->app->isClient('administrator'))
 		{
 			$this->enforceMasterUser();
 			$this->enforceLoginSupportUrls();
+			$this->enforceAdminSessionTimeout();
+			$this->checkLicense();
+			$this->enforceUploadRestrictions();
 		}
 
 		if (!$this->params->get('enable_branding', 1))
@@ -644,15 +653,798 @@ class MokoWaaS extends CMSPlugin
 	/**
 	 * Event triggered after the route has been determined.
 	 *
+	 * Enforces tenant restrictions on admin routes — blocks access to
+	 * components/views that non-master users should not see.
+	 *
 	 * @return  void
 	 *
-	 * @since   01.04.00
+	 * @since   02.00.00
 	 */
 	public function onAfterRoute()
 	{
-		if (!$this->params->get('enable_branding', 1))
+		if (!$this->app->isClient('administrator'))
 		{
 			return;
 		}
+
+		$this->enforceAdminRestrictions();
+	}
+
+	/**
+	 * Inject visual branding into the document head.
+	 *
+	 * Fires just before <head> is compiled — injects favicon, logo CSS,
+	 * admin color scheme, and custom CSS.
+	 *
+	 * @return  void
+	 *
+	 * @since   02.00.00
+	 */
+	public function onBeforeCompileHead()
+	{
+		if (!$this->app->isClient('administrator'))
+		{
+			return;
+		}
+
+		$doc = $this->app->getDocument();
+
+		if ($doc->getType() !== 'html')
+		{
+			return;
+		}
+
+		$this->injectFavicon($doc);
+		$this->injectAdminLogo($doc);
+		$this->injectLoginLogo($doc);
+		$this->injectColorScheme($doc);
+		$this->injectCustomCss($doc);
+	}
+
+	/**
+	 * Filter admin menu items for non-master users.
+	 *
+	 * @param   string  $context  Menu context
+	 * @param   array   &$items   Menu items (by reference)
+	 * @param   mixed   $params   Module params
+	 * @param   mixed   $enabled  Whether module is enabled
+	 *
+	 * @return  void
+	 *
+	 * @since   02.00.00
+	 */
+	public function onPreprocessMenuItems($context, &$items, $params, $enabled)
+	{
+		if (!$this->app->isClient('administrator'))
+		{
+			return;
+		}
+
+		if ($this->isMasterUser())
+		{
+			return;
+		}
+
+		$hidden = $this->getHiddenMenuComponents();
+
+		if (empty($hidden))
+		{
+			return;
+		}
+
+		foreach ($items as $key => $item)
+		{
+			foreach ($hidden as $component)
+			{
+				if (isset($item->link)
+					&& strpos($item->link, 'option=' . $component) !== false)
+				{
+					unset($items[$key]);
+					break;
+				}
+			}
+		}
+	}
+
+	/**
+	 * Enforce password policy before user save.
+	 *
+	 * @param   array    $oldUser  Existing user data
+	 * @param   boolean  $isNew    Whether this is a new user
+	 * @param   array    $newUser  New user data being saved
+	 *
+	 * @return  boolean  True to allow save
+	 *
+	 * @since   02.00.00
+	 */
+	public function onUserBeforeSave($oldUser, $isNew, $newUser)
+	{
+		if (empty($newUser['password_clear']))
+		{
+			return true;
+		}
+
+		$password = $newUser['password_clear'];
+		$errors   = [];
+
+		$minLen = (int) $this->params->get('password_min_length', 12);
+
+		if (strlen($password) < $minLen)
+		{
+			$errors[] = sprintf(
+				'Password must be at least %d characters.', $minLen
+			);
+		}
+
+		if ($this->params->get('password_require_uppercase', 1)
+			&& !preg_match('/[A-Z]/', $password))
+		{
+			$errors[] = 'Password must contain an uppercase letter.';
+		}
+
+		if ($this->params->get('password_require_number', 1)
+			&& !preg_match('/\d/', $password))
+		{
+			$errors[] = 'Password must contain a number.';
+		}
+
+		if ($this->params->get('password_require_special', 1)
+			&& !preg_match('/[^A-Za-z0-9]/', $password))
+		{
+			$errors[] = 'Password must contain a special character.';
+		}
+
+		if (!empty($errors))
+		{
+			throw new \RuntimeException(implode(' ', $errors));
+		}
+
+		return true;
+	}
+
+	/**
+	 * Send heartbeat telemetry after the page is fully rendered.
+	 *
+	 * @return  void
+	 *
+	 * @since   02.00.00
+	 */
+	public function onAfterRender()
+	{
+		if (!$this->app->isClient('administrator'))
+		{
+			return;
+		}
+
+		$this->sendHeartbeat();
+	}
+
+	// ------------------------------------------------------------------
+	// HTTPS / Session / License (called from onAfterInitialise)
+	// ------------------------------------------------------------------
+
+	/**
+	 * Redirect HTTP requests to HTTPS.
+	 *
+	 * @return  void
+	 *
+	 * @since   02.00.00
+	 */
+	protected function enforceHttps()
+	{
+		if (!$this->params->get('force_https', 0))
+		{
+			return;
+		}
+
+		if ($this->app->isClient('cli'))
+		{
+			return;
+		}
+
+		$isHttps = (!empty($_SERVER['HTTPS'])
+			&& $_SERVER['HTTPS'] !== 'off')
+			|| ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https';
+
+		if (!$isHttps)
+		{
+			$this->app->redirect(
+				'https://' . $_SERVER['HTTP_HOST']
+				. $_SERVER['REQUEST_URI'], 301
+			);
+		}
+	}
+
+	/**
+	 * Enforce admin session idle timeout.
+	 *
+	 * @return  void
+	 *
+	 * @since   02.00.00
+	 */
+	protected function enforceAdminSessionTimeout()
+	{
+		$timeout = (int) $this->params->get('admin_session_timeout', 0);
+
+		if ($timeout <= 0)
+		{
+			return;
+		}
+
+		// Don't timeout the master user
+		if ($this->isMasterUser())
+		{
+			return;
+		}
+
+		$session  = Factory::getSession();
+		$lastHit  = $session->get('mokowaas.last_activity', 0);
+		$now      = time();
+
+		if ($lastHit > 0 && ($now - $lastHit) > ($timeout * 60))
+		{
+			$this->app->logout();
+			$this->app->redirect(
+				Route::_('index.php', false)
+			);
+
+			return;
+		}
+
+		$session->set('mokowaas.last_activity', $now);
+	}
+
+	/**
+	 * Check license status with remote WaaS dashboard.
+	 *
+	 * @return  void
+	 *
+	 * @since   02.00.00
+	 */
+	protected function checkLicense()
+	{
+		$url = $this->params->get('license_check_url', '');
+
+		if (empty($url))
+		{
+			return;
+		}
+
+		$interval  = (int) $this->params->get('license_check_interval', 24);
+		$cacheFile = JPATH_CACHE . '/mokowaas_license.json';
+
+		// Check if interval has elapsed
+		if (file_exists($cacheFile))
+		{
+			$cache = json_decode(file_get_contents($cacheFile), true);
+			$lastCheck = $cache['timestamp'] ?? 0;
+
+			if ((time() - $lastCheck) < ($interval * 3600))
+			{
+				// Use cached result
+				if (($cache['status'] ?? 'valid') !== 'valid')
+				{
+					$this->handleLicenseFailure();
+				}
+
+				return;
+			}
+		}
+
+		// Time to check
+		try
+		{
+			$http     = HttpFactory::getHttp();
+			$key      = $this->params->get('license_key', '');
+			$checkUrl = $url . '?key=' . urlencode($key)
+				. '&domain=' . urlencode(Uri::root());
+
+			$response = $http->get($checkUrl, [], 3);
+			$body     = json_decode($response->body, true);
+			$status   = ($body['status'] ?? '') === 'valid'
+				? 'valid' : 'invalid';
+
+			file_put_contents($cacheFile, json_encode([
+				'timestamp' => time(),
+				'status'    => $status,
+			]));
+
+			if ($status !== 'valid')
+			{
+				$this->handleLicenseFailure();
+			}
+		}
+		catch (\Exception $e)
+		{
+			// Network failure — don't break the site
+			Log::add(
+				'License check failed: ' . $e->getMessage(),
+				Log::WARNING,
+				'mokowaas'
+			);
+		}
+	}
+
+	/**
+	 * Handle a failed or expired license check.
+	 *
+	 * @return  void
+	 *
+	 * @since   02.00.00
+	 */
+	protected function handleLicenseFailure()
+	{
+		$action = $this->params->get('license_action', 'warn');
+
+		if ($action === 'lockout' && !$this->isMasterUser())
+		{
+			$this->app->enqueueMessage(
+				'Site license has expired. Contact your administrator.',
+				'error'
+			);
+			$this->app->logout();
+			$this->app->redirect(Route::_('index.php', false));
+
+			return;
+		}
+
+		$this->app->enqueueMessage(
+			'Site license requires attention. Check Operations settings.',
+			'warning'
+		);
+	}
+
+	/**
+	 * Override Joomla upload restrictions at runtime.
+	 *
+	 * @return  void
+	 *
+	 * @since   02.00.00
+	 */
+	protected function enforceUploadRestrictions()
+	{
+		$types = $this->params->get('upload_allowed_types', '');
+		$maxMb = (int) $this->params->get('upload_max_size_mb', 0);
+
+		if (empty($types) && $maxMb <= 0)
+		{
+			return;
+		}
+
+		$config = $this->app->getConfig();
+
+		if (!empty($types))
+		{
+			$config->set('upload_extensions', $types);
+		}
+
+		if ($maxMb > 0)
+		{
+			$config->set('upload_maxsize', $maxMb);
+		}
+	}
+
+	// ------------------------------------------------------------------
+	// Tenant Restrictions (called from onAfterRoute)
+	// ------------------------------------------------------------------
+
+	/**
+	 * Check admin routes against restriction rules and redirect if blocked.
+	 *
+	 * @return  void
+	 *
+	 * @since   02.00.00
+	 */
+	protected function enforceAdminRestrictions()
+	{
+		$input  = $this->app->input;
+		$option = $input->get('option', '');
+		$view   = $input->get('view', '');
+		$task   = $input->get('task', '');
+
+		// Disable install-from-URL for ALL users (safety net)
+		if ($this->params->get('disable_install_url', 1)
+			&& $option === 'com_installer'
+			&& stripos($task, 'install') !== false
+			&& $input->get('installtype') === 'url')
+		{
+			$this->blockAccess('Install from URL is disabled.');
+
+			return;
+		}
+
+		// Remaining restrictions only apply to non-master users
+		if ($this->isMasterUser())
+		{
+			return;
+		}
+
+		$blocked = [];
+
+		if ($this->params->get('restrict_installer', 1))
+		{
+			$blocked[] = ['option' => 'com_installer'];
+		}
+
+		if ($this->params->get('hide_sysinfo', 1))
+		{
+			$blocked[] = [
+				'option' => 'com_admin',
+				'view'   => 'sysinfo',
+			];
+		}
+
+		if ($this->params->get('restrict_global_config', 1))
+		{
+			$blocked[] = [
+				'option' => 'com_config',
+				'view'   => 'application',
+			];
+			// Also block empty view (default landing = global config)
+			if ($option === 'com_config' && $view === '')
+			{
+				$this->blockAccess('Access restricted.');
+
+				return;
+			}
+		}
+
+		if ($this->params->get('restrict_template_editing', 1))
+		{
+			$blocked[] = [
+				'option' => 'com_templates',
+				'view'   => 'template',
+			];
+		}
+
+		foreach ($blocked as $rule)
+		{
+			if ($option !== $rule['option'])
+			{
+				continue;
+			}
+
+			if (isset($rule['view']) && $view !== $rule['view'])
+			{
+				continue;
+			}
+
+			$this->blockAccess('Access restricted.');
+
+			return;
+		}
+	}
+
+	/**
+	 * Redirect to admin dashboard with an error message.
+	 *
+	 * @param   string  $message  Error message to display
+	 *
+	 * @return  void
+	 *
+	 * @since   02.00.00
+	 */
+	protected function blockAccess($message)
+	{
+		$this->app->enqueueMessage($message, 'error');
+		$this->app->redirect(Route::_('index.php', false));
+	}
+
+	/**
+	 * Check whether the current user is the master WaaS user.
+	 *
+	 * @return  boolean
+	 *
+	 * @since   02.00.00
+	 */
+	protected function isMasterUser()
+	{
+		$user = $this->app->getIdentity();
+
+		if (!$user || $user->guest)
+		{
+			return false;
+		}
+
+		$masterUsername = $this->params->get(
+			'master_username', 'mokoconsulting'
+		);
+
+		return $user->username === $masterUsername;
+	}
+
+	/**
+	 * Build the list of components to hide from admin menu.
+	 *
+	 * Combines explicit hidden_menu_items config with components that
+	 * are implicitly blocked by other restriction toggles.
+	 *
+	 * @return  array  Component option strings
+	 *
+	 * @since   02.00.00
+	 */
+	protected function getHiddenMenuComponents()
+	{
+		$hidden = array_filter(array_map(
+			'trim',
+			explode("\n", $this->params->get('hidden_menu_items', ''))
+		));
+
+		// Auto-hide components that are restricted
+		if ($this->params->get('restrict_installer', 1))
+		{
+			$hidden[] = 'com_installer';
+		}
+
+		if ($this->params->get('hide_sysinfo', 1))
+		{
+			$hidden[] = 'com_admin';
+		}
+
+		return array_unique($hidden);
+	}
+
+	// ------------------------------------------------------------------
+	// Visual Branding (called from onBeforeCompileHead)
+	// ------------------------------------------------------------------
+
+	/**
+	 * Replace the default favicon with a custom one.
+	 *
+	 * @param   \Joomla\CMS\Document\HtmlDocument  $doc
+	 *
+	 * @return  void
+	 *
+	 * @since   02.00.00
+	 */
+	protected function injectFavicon($doc)
+	{
+		$favicon = $this->params->get('custom_favicon', '');
+
+		if (empty($favicon))
+		{
+			return;
+		}
+
+		$faviconUrl = Uri::root() . $favicon;
+
+		// Remove existing favicons
+		$links = $doc->_links;
+
+		foreach ($links as $href => $attrs)
+		{
+			if (isset($attrs['relation'])
+				&& strpos($attrs['relation'], 'icon') !== false)
+			{
+				unset($doc->_links[$href]);
+			}
+		}
+
+		$doc->addFavicon($faviconUrl);
+	}
+
+	/**
+	 * Inject CSS to replace the admin header logo.
+	 *
+	 * @param   \Joomla\CMS\Document\HtmlDocument  $doc
+	 *
+	 * @return  void
+	 *
+	 * @since   02.00.00
+	 */
+	protected function injectAdminLogo($doc)
+	{
+		$logo = $this->params->get('admin_logo', '');
+
+		if (empty($logo))
+		{
+			return;
+		}
+
+		$logoUrl = Uri::root() . $logo;
+
+		$doc->addStyleDeclaration(
+			".logo img {"
+			. " content: url('" . $logoUrl . "');"
+			. " max-height: 40px; width: auto;"
+			. "}"
+		);
+	}
+
+	/**
+	 * Inject CSS to replace the login page logo.
+	 *
+	 * @param   \Joomla\CMS\Document\HtmlDocument  $doc
+	 *
+	 * @return  void
+	 *
+	 * @since   02.00.00
+	 */
+	protected function injectLoginLogo($doc)
+	{
+		$logo = $this->params->get('login_logo', '');
+
+		if (empty($logo))
+		{
+			return;
+		}
+
+		$user = $this->app->getIdentity();
+
+		if (!$user || !$user->guest)
+		{
+			return;
+		}
+
+		$logoUrl = Uri::root() . $logo;
+
+		$doc->addStyleDeclaration(
+			".main-brand-logo img,"
+			. " .login-logo img {"
+			. " content: url('" . $logoUrl . "');"
+			. " max-height: 80px; width: auto;"
+			. "}"
+		);
+	}
+
+	/**
+	 * Inject CSS custom properties for the admin color scheme.
+	 *
+	 * @param   \Joomla\CMS\Document\HtmlDocument  $doc
+	 *
+	 * @return  void
+	 *
+	 * @since   02.00.00
+	 */
+	protected function injectColorScheme($doc)
+	{
+		$primary = $this->params->get('color_primary', '');
+		$sidebar = $this->params->get('color_sidebar', '');
+		$header  = $this->params->get('color_header', '');
+		$link    = $this->params->get('color_link', '');
+
+		$vars = [];
+
+		if (!empty($primary))
+		{
+			$vars[] = '--atum-bg-dark: ' . $primary;
+			$vars[] = '--template-bg-dark-80: ' . $primary;
+		}
+
+		if (!empty($sidebar))
+		{
+			$vars[] = '--atum-sidebar-bg: ' . $sidebar;
+			$vars[] = '--template-bg-dark-70: ' . $sidebar;
+		}
+
+		if (!empty($header))
+		{
+			$vars[] = '--atum-bg-dark-90: ' . $header;
+			$vars[] = '--template-bg-dark-90: ' . $header;
+		}
+
+		if (!empty($link))
+		{
+			$vars[] = '--template-link-color: ' . $link;
+			$vars[] = '--atum-link-color: ' . $link;
+		}
+
+		if (!empty($vars))
+		{
+			$doc->addStyleDeclaration(
+				':root { ' . implode('; ', $vars) . '; }'
+			);
+		}
+	}
+
+	/**
+	 * Inject custom CSS from the plugin config textarea.
+	 *
+	 * @param   \Joomla\CMS\Document\HtmlDocument  $doc
+	 *
+	 * @return  void
+	 *
+	 * @since   02.00.00
+	 */
+	protected function injectCustomCss($doc)
+	{
+		$css = $this->params->get('custom_css', '');
+
+		if (empty($css))
+		{
+			return;
+		}
+
+		// Sanitize: strip </style> to prevent injection
+		$css = str_replace('</style>', '', $css);
+
+		$doc->addStyleDeclaration($css);
+	}
+
+	// ------------------------------------------------------------------
+	// Heartbeat Telemetry (called from onAfterRender)
+	// ------------------------------------------------------------------
+
+	/**
+	 * Send site health data to the WaaS dashboard.
+	 *
+	 * @return  void
+	 *
+	 * @since   02.00.00
+	 */
+	protected function sendHeartbeat()
+	{
+		$url = $this->params->get('heartbeat_url', '');
+
+		if (empty($url))
+		{
+			return;
+		}
+
+		$interval  = (int) $this->params->get('heartbeat_interval', 24);
+		$cacheFile = JPATH_CACHE . '/mokowaas_heartbeat.txt';
+
+		if (file_exists($cacheFile)
+			&& (time() - filemtime($cacheFile)) < ($interval * 3600))
+		{
+			return;
+		}
+
+		try
+		{
+			$db   = Factory::getDbo();
+			$data = [
+				'domain'         => Uri::root(),
+				'joomla_version' => JVERSION,
+				'php_version'    => PHP_VERSION,
+				'plugin_version' => '02.00.00',
+				'article_count'  => $this->getTableCount('#__content'),
+				'user_count'     => $this->getTableCount('#__users'),
+				'timestamp'      => date('c'),
+			];
+
+			$token   = $this->params->get('heartbeat_token', '');
+			$headers = ['Content-Type' => 'application/json'];
+
+			if (!empty($token))
+			{
+				$headers['Authorization'] = 'Bearer ' . $token;
+			}
+
+			$http = HttpFactory::getHttp();
+			$http->post($url, json_encode($data), $headers, 3);
+
+			// Update cache timestamp
+			file_put_contents($cacheFile, date('c'));
+		}
+		catch (\Exception $e)
+		{
+			Log::add(
+				'Heartbeat failed: ' . $e->getMessage(),
+				Log::WARNING,
+				'mokowaas'
+			);
+		}
+	}
+
+	/**
+	 * Get the row count of a database table.
+	 *
+	 * @param   string  $table  Table name with #__ prefix
+	 *
+	 * @return  int
+	 *
+	 * @since   02.00.00
+	 */
+	protected function getTableCount($table)
+	{
+		$db = Factory::getDbo();
+		$db->setQuery(
+			$db->getQuery(true)
+				->select('COUNT(*)')
+				->from($db->quoteName($table))
+		);
+
+		return (int) $db->loadResult();
 	}
 }

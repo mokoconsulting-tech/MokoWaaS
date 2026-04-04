@@ -174,6 +174,164 @@
 					<option value="0">JNO</option>
 				</field>
 			</fieldset>
+			<fieldset name="visual_branding"
+				label="PLG_SYSTEM_MOKOWAAS_FIELDSET_VISUAL_LABEL"
+				description="PLG_SYSTEM_MOKOWAAS_FIELDSET_VISUAL_DESC"
+				>
+				<field name="admin_logo" type="media"
+					label="PLG_SYSTEM_MOKOWAAS_ADMIN_LOGO_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_ADMIN_LOGO_DESC"
+					directory="images" />
+				<field name="login_logo" type="media"
+					label="PLG_SYSTEM_MOKOWAAS_LOGIN_LOGO_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_LOGIN_LOGO_DESC"
+					directory="images" />
+				<field name="custom_favicon" type="media"
+					label="PLG_SYSTEM_MOKOWAAS_FAVICON_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_FAVICON_DESC"
+					directory="images" />
+				<field name="color_primary" type="color"
+					label="PLG_SYSTEM_MOKOWAAS_COLOR_PRIMARY_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_COLOR_PRIMARY_DESC"
+					default="" />
+				<field name="color_sidebar" type="color"
+					label="PLG_SYSTEM_MOKOWAAS_COLOR_SIDEBAR_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_COLOR_SIDEBAR_DESC"
+					default="" />
+				<field name="color_header" type="color"
+					label="PLG_SYSTEM_MOKOWAAS_COLOR_HEADER_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_COLOR_HEADER_DESC"
+					default="" />
+				<field name="color_link" type="color"
+					label="PLG_SYSTEM_MOKOWAAS_COLOR_LINK_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_COLOR_LINK_DESC"
+					default="" />
+				<field name="custom_css" type="textarea"
+					label="PLG_SYSTEM_MOKOWAAS_CUSTOM_CSS_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_CUSTOM_CSS_DESC"
+					rows="10" filter="raw" />
+			</fieldset>
+			<fieldset name="tenant_restrictions"
+				label="PLG_SYSTEM_MOKOWAAS_FIELDSET_TENANT_LABEL"
+				description="PLG_SYSTEM_MOKOWAAS_FIELDSET_TENANT_DESC"
+				>
+				<field name="restrict_installer" type="radio" default="1"
+					label="PLG_SYSTEM_MOKOWAAS_RESTRICT_INSTALLER_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_RESTRICT_INSTALLER_DESC"
+					class="btn-group btn-group-yesno">
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+				<field name="hide_sysinfo" type="radio" default="1"
+					label="PLG_SYSTEM_MOKOWAAS_HIDE_SYSINFO_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_HIDE_SYSINFO_DESC"
+					class="btn-group btn-group-yesno">
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+				<field name="restrict_global_config" type="radio" default="1"
+					label="PLG_SYSTEM_MOKOWAAS_RESTRICT_CONFIG_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_RESTRICT_CONFIG_DESC"
+					class="btn-group btn-group-yesno">
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+				<field name="restrict_template_editing" type="radio" default="1"
+					label="PLG_SYSTEM_MOKOWAAS_RESTRICT_TEMPLATE_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_RESTRICT_TEMPLATE_DESC"
+					class="btn-group btn-group-yesno">
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+				<field name="disable_install_url" type="radio" default="1"
+					label="PLG_SYSTEM_MOKOWAAS_DISABLE_INSTALL_URL_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_DISABLE_INSTALL_URL_DESC"
+					class="btn-group btn-group-yesno">
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+				<field name="hidden_menu_items" type="textarea"
+					label="PLG_SYSTEM_MOKOWAAS_HIDDEN_MENUS_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_HIDDEN_MENUS_DESC"
+					rows="5" filter="raw" />
+			</fieldset>
+			<fieldset name="security"
+				label="PLG_SYSTEM_MOKOWAAS_FIELDSET_SECURITY_LABEL"
+				description="PLG_SYSTEM_MOKOWAAS_FIELDSET_SECURITY_DESC"
+				>
+				<field name="force_https" type="radio" default="0"
+					label="PLG_SYSTEM_MOKOWAAS_FORCE_HTTPS_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_FORCE_HTTPS_DESC"
+					class="btn-group btn-group-yesno">
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+				<field name="admin_session_timeout" type="number"
+					label="PLG_SYSTEM_MOKOWAAS_SESSION_TIMEOUT_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_SESSION_TIMEOUT_DESC"
+					default="0" hint="Minutes (0 = Joomla default)" />
+				<field name="password_min_length" type="number" default="12"
+					label="PLG_SYSTEM_MOKOWAAS_PASSWORD_LENGTH_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_PASSWORD_LENGTH_DESC" />
+				<field name="password_require_uppercase" type="radio" default="1"
+					label="PLG_SYSTEM_MOKOWAAS_PASSWORD_UPPER_LABEL"
+					class="btn-group btn-group-yesno">
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+				<field name="password_require_number" type="radio" default="1"
+					label="PLG_SYSTEM_MOKOWAAS_PASSWORD_NUMBER_LABEL"
+					class="btn-group btn-group-yesno">
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+				<field name="password_require_special" type="radio" default="1"
+					label="PLG_SYSTEM_MOKOWAAS_PASSWORD_SPECIAL_LABEL"
+					class="btn-group btn-group-yesno">
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+				<field name="upload_allowed_types" type="text"
+					label="PLG_SYSTEM_MOKOWAAS_UPLOAD_TYPES_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_UPLOAD_TYPES_DESC"
+					default="jpg,jpeg,png,gif,webp,svg,pdf,doc,docx,xls,xlsx" />
+				<field name="upload_max_size_mb" type="number"
+					label="PLG_SYSTEM_MOKOWAAS_UPLOAD_SIZE_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_UPLOAD_SIZE_DESC"
+					default="10" />
+			</fieldset>
+			<fieldset name="operational"
+				label="PLG_SYSTEM_MOKOWAAS_FIELDSET_OPS_LABEL"
+				description="PLG_SYSTEM_MOKOWAAS_FIELDSET_OPS_DESC"
+				>
+				<field name="heartbeat_url" type="url"
+					label="PLG_SYSTEM_MOKOWAAS_HEARTBEAT_URL_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_HEARTBEAT_URL_DESC"
+					default="" />
+				<field name="heartbeat_interval" type="number"
+					label="PLG_SYSTEM_MOKOWAAS_HEARTBEAT_INTERVAL_LABEL"
+					default="24" hint="Hours" />
+				<field name="heartbeat_token" type="text"
+					label="PLG_SYSTEM_MOKOWAAS_HEARTBEAT_TOKEN_LABEL"
+					default="" />
+				<field name="license_check_url" type="url"
+					label="PLG_SYSTEM_MOKOWAAS_LICENSE_URL_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_LICENSE_URL_DESC"
+					default="" />
+				<field name="license_key" type="text"
+					label="PLG_SYSTEM_MOKOWAAS_LICENSE_KEY_LABEL"
+					default="" />
+				<field name="license_check_interval" type="number"
+					label="PLG_SYSTEM_MOKOWAAS_LICENSE_INTERVAL_LABEL"
+					default="24" hint="Hours" />
+				<field name="license_action" type="list"
+					label="PLG_SYSTEM_MOKOWAAS_LICENSE_ACTION_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_LICENSE_ACTION_DESC"
+					default="warn">
+					<option value="warn">PLG_SYSTEM_MOKOWAAS_LICENSE_WARN</option>
+					<option value="lockout">PLG_SYSTEM_MOKOWAAS_LICENSE_LOCKOUT</option>
+				</field>
+			</fieldset>
 		</fields>
 	</config>
 </extension>
