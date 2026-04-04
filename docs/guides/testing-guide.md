@@ -183,6 +183,30 @@ Verify the following admin areas no longer show "Joomla":
 | 6 | Reinstall/update plugin | User key still preserved | [ ] |
 | 7 | Uninstall plugin | Only block keys removed, user key stays | [ ] |
 
+### 2.14 Maintenance Actions
+
+#### 2.14a Reset All Hits
+
+| # | Step | Expected Result | Pass |
+|---|------|-----------------|------|
+| 1 | Create articles, visit on frontend | Hits accumulate in #__content | [ ] |
+| 2 | Plugin config > Maintenance > Reset All Hits = Yes, save | "Reset hit counters on X articles." | [ ] |
+| 3 | Check #__content.hits | All values are 0 | [ ] |
+| 4 | Check Reset All Hits toggle | Auto-reset to No | [ ] |
+| 5 | Check mokowaas log | "All article hits reset" logged | [ ] |
+
+#### 2.14b Delete All Versions
+
+| # | Step | Expected Result | Pass |
+|---|------|-----------------|------|
+| 1 | Edit articles, save multiple times | Versions exist in #__history | [ ] |
+| 2 | Plugin config > Maintenance > Delete All Versions = Yes, save | "Deleted X version history records." | [ ] |
+| 3 | Check #__history table | Empty | [ ] |
+| 4 | Open article > Versions button | No versions shown | [ ] |
+| 5 | Check toggle | Auto-reset to No | [ ] |
+| 6 | Check mokowaas log | "All content versions purged" logged | [ ] |
+| 7 | Both toggles Yes at same time, save | Both actions execute | [ ] |
+
 ## 3. Edge Cases
 
 | # | Scenario | Expected Behavior |
@@ -221,4 +245,4 @@ grep -r 'Version:' src/**/*.ini | grep -v '02.00.00'
 | Version  | Date       | Author                          | Description                     |
 | -------- | ---------- | ------------------------------- | ------------------------------- |
 | 02.00.00 | 2026-03-31 | Jonathan Miller (@jmiller-moko) | Initial testing guide for v2.0  |
-| 02.00.00 | 2026-04-04 | Jonathan Miller (@jmiller-moko) | Added suites 2.11–2.13 (master user, emergency access, non-overwrite install), updated key coverage |
+| 02.00.00 | 2026-04-04 | Jonathan Miller (@jmiller-moko) | Added suites 2.11–2.14 (master user, emergency access, non-overwrite install, maintenance actions), updated key coverage |
