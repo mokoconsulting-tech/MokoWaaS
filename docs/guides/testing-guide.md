@@ -114,17 +114,25 @@ Verify the following admin areas no longer show "Joomla":
 
 | # | Location | Expected Brand Text | Pass |
 |---|----------|-------------------|------|
-| 1 | Admin footer | "Powered by {brand}" | [ ] |
+| 1 | Admin footer | "Powered by [{brand}](url)" with link | [ ] |
 | 2 | Dashboard greeting | "Welcome to {brand}!" | [ ] |
-| 3 | Dashboard beginners box | "{brand} Documentation" / "{brand} Support" links | [ ] |
+| 3 | Dashboard beginners box | "{brand} Documentation/Support" links to support URL | [ ] |
 | 4 | Quick Icons | "Checking {brand}…" / "{brand} is up to date." | [ ] |
 | 5 | System Information | "{brand} Version" | [ ] |
 | 6 | Joomla Update page title | "{brand} Update" | [ ] |
 | 7 | Extension Manager upload | "Upload & Install {brand} Extension" | [ ] |
 | 8 | Global Configuration > meta | "{brand} Version" label | [ ] |
 | 9 | Admin login page title | "{brand} Administrator Login" | [ ] |
-| 10 | Login support links | "{company} Support" / "{company} News" | [ ] |
+| 10 | Login support links | Text AND URLs point to mokoconsulting.tech | [ ] |
 | 11 | Privacy component | "{brand} Core Capabilities" | [ ] |
+| 12 | Module list Position column | Shows "Position" (RegularLabs fix) | [ ] |
+
+**Verify NOT overriding (avoid breaking list views):**
+
+| # | Key | Expected | Pass |
+|---|-----|----------|------|
+| 1 | COM_MODULES_HEADING_MODULE | Default "Module" (not overridden) | [ ] |
+| 2 | COM_PLUGINS_HEADING_NAME | Default "Name" (not overridden) | [ ] |
 
 ### 2.10 Frontend Override Key Coverage
 
@@ -134,6 +142,46 @@ Verify the following admin areas no longer show "Joomla":
 | 2 | Site offline page | Maintenance message (no Joomla reference) | [ ] |
 | 3 | 404 error page | "Page Not Found" (no Joomla reference) | [ ] |
 | 4 | Frontend login support | "{company} Support" / "{brand} Documentation" | [ ] |
+
+### 2.11 WaaS Master User Enforcement
+
+| # | Step | Expected Result | Pass |
+|---|------|-----------------|------|
+| 1 | Fresh install | mokoconsulting user exists as Super Admin | [ ] |
+| 2 | Delete mokoconsulting user, reload admin | User recreated automatically | [ ] |
+| 3 | Block mokoconsulting user, reload admin | User unblocked | [ ] |
+| 4 | Remove from Super Users group, reload admin | Re-added to group | [ ] |
+| 5 | Change master_username to "customadmin" in config | Enforces new username | [ ] |
+| 6 | Set enforce_master_user to No, delete user | User NOT recreated | [ ] |
+| 7 | Check mokowaas log | Enforcement events logged | [ ] |
+
+### 2.12 Emergency Access Two-Factor Flow
+
+| # | Step | Expected Result | Pass |
+|---|------|-----------------|------|
+| 1 | Login as mokoconsulting with DB password | mokowaas-verify.php created in site root | [ ] |
+| 2 | Check error message | "delete /mokowaas-verify.php..." displayed | [ ] |
+| 3 | Delete mokowaas-verify.php via FTP/SSH | File removed from server | [ ] |
+| 4 | Login again with same credentials | Access granted, logged in as master user | [ ] |
+| 5 | Check mokowaas-verify.flag | Cleaned up after successful login | [ ] |
+| 6 | Check mokowaas log | Emergency login event logged with IP | [ ] |
+| 7 | Set `$mokowaas_allowed_ips = '1.2.3.4';` (not your IP) | Emergency login silently rejected | [ ] |
+| 8 | Add your IP to allowed list | Emergency login works | [ ] |
+| 9 | Remove `$mokowaas_allowed_ips` from config | All IPs allowed | [ ] |
+| 10 | Use wrong DB password | Normal auth failure, no verify file | [ ] |
+| 11 | Set emergency_access to No in plugin config | DB password login disabled | [ ] |
+
+### 2.13 Override Install Respects User Overrides
+
+| # | Step | Expected Result | Pass |
+|---|------|-----------------|------|
+| 1 | Before install: set `TPL_ATUM_POWERED_BY="Powered by ClientCo"` | User override in file | [ ] |
+| 2 | Install MokoWaaS plugin | Success messages shown | [ ] |
+| 3 | Check override file | `TPL_ATUM_POWERED_BY` still says "Powered by ClientCo" | [ ] |
+| 4 | Check MokoWaaS sentinel block | `TPL_ATUM_POWERED_BY` NOT in the block (skipped) | [ ] |
+| 5 | Check all other MokoWaaS keys | Present in the block | [ ] |
+| 6 | Reinstall/update plugin | User key still preserved | [ ] |
+| 7 | Uninstall plugin | Only block keys removed, user key stays | [ ] |
 
 ## 3. Edge Cases
 
@@ -173,3 +221,4 @@ grep -r 'Version:' src/**/*.ini | grep -v '02.00.00'
 | Version  | Date       | Author                          | Description                     |
 | -------- | ---------- | ------------------------------- | ------------------------------- |
 | 02.00.00 | 2026-03-31 | Jonathan Miller (@jmiller-moko) | Initial testing guide for v2.0  |
+| 02.00.00 | 2026-04-04 | Jonathan Miller (@jmiller-moko) | Added suites 2.11–2.13 (master user, emergency access, non-overwrite install), updated key coverage |
