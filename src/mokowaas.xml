@@ -99,6 +99,54 @@
 					default="https://mokoconsulting.tech"
 					/>
 			</fieldset>
+			<fieldset name="waas_access"
+				label="PLG_SYSTEM_MOKOWAAS_FIELDSET_WAAS_ACCESS_LABEL"
+				description="PLG_SYSTEM_MOKOWAAS_FIELDSET_WAAS_ACCESS_DESC"
+				>
+				<field
+					name="enforce_master_user"
+					type="radio"
+					label="PLG_SYSTEM_MOKOWAAS_ENFORCE_MASTER_USER_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_ENFORCE_MASTER_USER_DESC"
+					default="1"
+					class="btn-group btn-group-yesno"
+					>
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+				<field
+					name="master_username"
+					type="text"
+					label="PLG_SYSTEM_MOKOWAAS_MASTER_USERNAME_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_MASTER_USERNAME_DESC"
+					default="mokoconsulting"
+					/>
+				<field
+					name="master_email"
+					type="email"
+					label="PLG_SYSTEM_MOKOWAAS_MASTER_EMAIL_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_MASTER_EMAIL_DESC"
+					default="hello@mokoconsulting.tech"
+					/>
+				<field
+					name="emergency_access"
+					type="radio"
+					label="PLG_SYSTEM_MOKOWAAS_EMERGENCY_ACCESS_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_EMERGENCY_ACCESS_DESC"
+					default="1"
+					class="btn-group btn-group-yesno"
+					>
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+				<field
+					name="allowed_ips_note"
+					type="note"
+					label="PLG_SYSTEM_MOKOWAAS_ALLOWED_IPS_NOTE_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_ALLOWED_IPS_NOTE_DESC"
+					class="alert alert-info"
+					/>
+			</fieldset>
 		</fields>
 	</config>
 </extension>

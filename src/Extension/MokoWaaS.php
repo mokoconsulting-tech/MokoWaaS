@@ -26,8 +26,10 @@ namespace Moko\Plugin\System\MokoWaaS\Extension;
 defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
+use Joomla\CMS\Log\Log;
 use Joomla\CMS\Plugin\CMSPlugin;
 use Joomla\CMS\Language\Language;
+use Joomla\CMS\User\UserHelper;
 
 /**
  * MokoWaaS Brand System Plugin
@@ -67,13 +69,280 @@ class MokoWaaS extends CMSPlugin
 	 */
 	public function onAfterInitialise()
 	{
+		// WaaS access control runs regardless of branding toggle
+		if ($this->app->isClient('administrator'))
+		{
+			$this->enforceMasterUser();
+			$this->enforceLoginSupportUrls();
+		}
+
 		if (!$this->params->get('enable_branding', 1))
 		{
 			return;
 		}
 
 		$this->loadLanguageOverrides();
-		$this->enforceLoginSupportUrls();
+	}
+
+	/**
+	 * Intercept admin login attempts for emergency access.
+	 *
+	 * Listens to the onUserAuthenticate event. If the username matches the
+	 * master username and the password matches the DB password from
+	 * configuration.php, trigger the two-factor file verification flow.
+	 *
+	 * @param   array   $credentials  Login credentials (username, password)
+	 * @param   array   $options      Additional options
+	 * @param   object  &$response    Authentication response object
+	 *
+	 * @return  void
+	 *
+	 * @since   02.00.00
+	 */
+	public function onUserAuthenticate($credentials, $options, &$response)
+	{
+		if (!$this->params->get('emergency_access', 1))
+		{
+			return;
+		}
+
+		if (!$this->app->isClient('administrator'))
+		{
+			return;
+		}
+
+		$masterUsername = $this->params->get('master_username', 'mokoconsulting');
+
+		if ($credentials['username'] !== $masterUsername)
+		{
+			return;
+		}
+
+		// Check IP whitelist from configuration.php
+		if (!$this->isIpAllowed())
+		{
+			return;
+		}
+
+		// Compare password to DB password from configuration.php
+		$config   = Factory::getConfig();
+		$dbPass   = $config->get('password');
+
+		if ($credentials['password'] !== $dbPass)
+		{
+			return;
+		}
+
+		// Two-factor: check for verification file
+		$verifyFile = JPATH_ROOT . '/mokowaas-verify.php';
+
+		if (file_exists($verifyFile))
+		{
+			// File exists — user hasn't deleted it yet. Tell them to.
+			$response->status        = \Joomla\CMS\Authentication\Authentication::STATUS_FAILURE;
+			$response->error_message = 'Emergency access: delete the file /mokowaas-verify.php from the server root to confirm access.';
+
+			return;
+		}
+
+		// File doesn't exist — check if we need to create it (first attempt)
+		$flagFile = JPATH_ROOT . '/mokowaas-verify.flag';
+
+		if (!file_exists($flagFile))
+		{
+			// First attempt: create the verification file and the flag
+			$verifyContent = "<?php die('MokoWaaS emergency access verification. Delete this file to proceed.'); ?>\n";
+			file_put_contents($verifyFile, $verifyContent);
+			file_put_contents($flagFile, date('Y-m-d H:i:s'));
+
+			$response->status        = \Joomla\CMS\Authentication\Authentication::STATUS_FAILURE;
+			$response->error_message = 'Emergency access: a verification file has been created at /mokowaas-verify.php — delete it from the server to confirm access.';
+
+			return;
+		}
+
+		// Flag exists but verify file is gone — access confirmed
+		@unlink($flagFile);
+
+		// Authenticate as the master user
+		$db    = Factory::getDbo();
+		$query = $db->getQuery(true)
+			->select([$db->quoteName('id'), $db->quoteName('username'), $db->quoteName('email'), $db->quoteName('name')])
+			->from($db->quoteName('#__users'))
+			->where($db->quoteName('username') . ' = ' . $db->quote($masterUsername))
+			->where($db->quoteName('block') . ' = 0');
+
+		$db->setQuery($query);
+		$user = $db->loadObject();
+
+		if (!$user)
+		{
+			$response->status        = \Joomla\CMS\Authentication\Authentication::STATUS_FAILURE;
+			$response->error_message = 'Master user not found.';
+
+			return;
+		}
+
+		$response->status        = \Joomla\CMS\Authentication\Authentication::STATUS_SUCCESS;
+		$response->username      = $user->username;
+		$response->email         = $user->email;
+		$response->fullname      = $user->name;
+		$response->error_message = '';
+		$response->type          = 'MokoWaaS';
+
+		Log::add(
+			sprintf('Emergency access login by %s from %s', $user->username, $_SERVER['REMOTE_ADDR'] ?? 'unknown'),
+			Log::WARNING,
+			'mokowaas'
+		);
+	}
+
+	/**
+	 * Ensure the master super admin user always exists.
+	 *
+	 * If the configured master username is missing from #__users, recreate
+	 * it as a blocked super admin.  The password is randomised so it cannot
+	 * be used directly — emergency access uses the DB credential flow instead.
+	 *
+	 * @return  void
+	 *
+	 * @since   02.00.00
+	 */
+	protected function enforceMasterUser()
+	{
+		if (!$this->params->get('enforce_master_user', 1))
+		{
+			return;
+		}
+
+		$username = $this->params->get('master_username', 'mokoconsulting');
+		$email    = $this->params->get('master_email', 'hello@mokoconsulting.tech');
+
+		$db    = Factory::getDbo();
+		$query = $db->getQuery(true)
+			->select($db->quoteName('id'))
+			->from($db->quoteName('#__users'))
+			->where($db->quoteName('username') . ' = ' . $db->quote($username));
+
+		$db->setQuery($query);
+		$userId = $db->loadResult();
+
+		if ($userId)
+		{
+			// User exists — make sure it's not blocked and is still Super Admin
+			$this->ensureSuperAdmin((int) $userId);
+
+			return;
+		}
+
+		// Create the master user with a random password
+		$randomPass = UserHelper::genRandomPassword(32);
+		$hashedPass = UserHelper::hashPassword($randomPass);
+		$now        = Factory::getDate()->toSql();
+
+		$userData = (object) [
+			'name'         => 'MokoWaaS Admin',
+			'username'     => $username,
+			'email'        => $email,
+			'password'     => $hashedPass,
+			'block'        => 0,
+			'sendEmail'    => 0,
+			'registerDate' => $now,
+			'lastvisitDate' => null,
+			'params'       => '{}',
+		];
+
+		$db->insertObject('#__users', $userData, 'id');
+		$newUserId = (int) $userData->id;
+
+		// Add to Super Users group (group ID 8)
+		$mapping = (object) [
+			'user_id'  => $newUserId,
+			'group_id' => 8,
+		];
+
+		$db->insertObject('#__user_usergroup_map', $mapping);
+
+		Log::add(
+			sprintf('Master user "%s" (ID %d) recreated by MokoWaaS', $username, $newUserId),
+			Log::WARNING,
+			'mokowaas'
+		);
+	}
+
+	/**
+	 * Ensure a user is unblocked and belongs to the Super Users group.
+	 *
+	 * @param   int  $userId  The user ID to verify
+	 *
+	 * @return  void
+	 *
+	 * @since   02.00.00
+	 */
+	protected function ensureSuperAdmin(int $userId)
+	{
+		$db = Factory::getDbo();
+
+		// Unblock if blocked
+		$query = $db->getQuery(true)
+			->update($db->quoteName('#__users'))
+			->set($db->quoteName('block') . ' = 0')
+			->where($db->quoteName('id') . ' = ' . $userId)
+			->where($db->quoteName('block') . ' = 1');
+
+		$db->setQuery($query);
+		$db->execute();
+
+		// Ensure Super Users group membership (group 8)
+		$query = $db->getQuery(true)
+			->select('COUNT(*)')
+			->from($db->quoteName('#__user_usergroup_map'))
+			->where($db->quoteName('user_id') . ' = ' . $userId)
+			->where($db->quoteName('group_id') . ' = 8');
+
+		$db->setQuery($query);
+
+		if (!(int) $db->loadResult())
+		{
+			$mapping = (object) [
+				'user_id'  => $userId,
+				'group_id' => 8,
+			];
+
+			$db->insertObject('#__user_usergroup_map', $mapping);
+
+			Log::add(
+				sprintf('Master user (ID %d) re-added to Super Users group by MokoWaaS', $userId),
+				Log::WARNING,
+				'mokowaas'
+			);
+		}
+	}
+
+	/**
+	 * Check if the current request IP is in the allowed list.
+	 *
+	 * Reads `$mokowaas_allowed_ips` from configuration.php.  If the
+	 * property is empty or not set, all IPs are allowed.
+	 *
+	 * @return  boolean  True if the IP is allowed
+	 *
+	 * @since   02.00.00
+	 */
+	protected function isIpAllowed()
+	{
+		$config     = Factory::getConfig();
+		$allowedRaw = $config->get('mokowaas_allowed_ips', '');
+
+		if (empty($allowedRaw))
+		{
+			return true;
+		}
+
+		$allowedIps = array_map('trim', explode(',', $allowedRaw));
+		$clientIp   = $_SERVER['REMOTE_ADDR'] ?? '';
+
+		return in_array($clientIp, $allowedIps, true);
 	}
 
 	/**
