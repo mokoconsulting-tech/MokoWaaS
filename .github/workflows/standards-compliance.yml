@@ -2532,8 +2532,8 @@ jobs:
           echo ""
           echo "✅ SUCCESS: Repository is fully MokoStandards compliant"
 
-      - name: Create tracking issue for standards violations
-        if: failure() && github.event_name == 'push'
+      - name: Create or reopen tracking issue for standards violations
+        if: failure()
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN || github.token }}
         run: |
