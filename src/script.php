@@ -419,8 +419,9 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 	 * The method:
 	 *  1. Reads the destination file (if it exists) and preserves every line.
 	 *  2. Strips any previous MokoWaaS block so it can be rewritten cleanly.
-	 *  3. Removes duplicate keys that now live inside the MokoWaaS block.
-	 *  4. Appends a new MokoWaaS block at the end of the file.
+	 *  3. Collects keys that exist outside the block (user-set overrides).
+	 *  4. Appends a MokoWaaS block containing only keys NOT already
+	 *     defined by the user — existing customisations are never touched.
 	 *
 	 * @param   string  $dest       Absolute path to the Joomla override file
 	 * @param   array   $overrides  Key/value pairs to inject
@@ -441,9 +442,8 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 		// Strip any previous MokoWaaS block
 		$existingLines = $this->stripMokoWaaSBlock($existingLines);
 
-		// Remove any keys outside the block that we are about to inject
-		$overrideKeys = array_map('strtoupper', array_keys($overrides));
-		$cleanedLines = [];
+		// Collect keys already defined outside the block (user overrides)
+		$userKeys = [];
 
 		foreach ($existingLines as $line)
 		{
@@ -453,38 +453,37 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 			{
 				if (preg_match('/^([A-Z0-9_]+)\s*=/i', $trimmed, $m))
 				{
-					if (in_array(strtoupper($m[1]), $overrideKeys, true))
-					{
-						// Skip - this key will be in the MokoWaaS block
-						continue;
-					}
+					$userKeys[] = strtoupper($m[1]);
 				}
 			}
-
-			$cleanedLines[] = $line;
 		}
 
 		// Remove trailing blank lines so the block starts cleanly
-		while (!empty($cleanedLines) && trim(end($cleanedLines)) === '')
+		while (!empty($existingLines)
+			&& trim(end($existingLines)) === '')
 		{
-			array_pop($cleanedLines);
+			array_pop($existingLines);
 		}
 
-		// Build the MokoWaaS block
+		// Build the MokoWaaS block — skip keys the user already set
 		$block   = [];
 		$block[] = '';
 		$block[] = self::BLOCK_START;
-		$block[] = '; Auto-generated on ' . date('Y-m-d H:i:s') . ' — do not edit manually.';
+		$block[] = '; Auto-generated on '
+			. date('Y-m-d H:i:s') . ' — do not edit manually.';
 
 		foreach ($overrides as $key => $value)
 		{
-			$block[] = strtoupper($key) . '="' . $value . '"';
+			if (!in_array(strtoupper($key), $userKeys, true))
+			{
+				$block[] = strtoupper($key) . '="' . $value . '"';
+			}
 		}
 
 		$block[] = self::BLOCK_END;
 		$block[] = '';
 
-		$content = implode("\n", array_merge($cleanedLines, $block));
+		$content = implode("\n", array_merge($existingLines, $block));
 
 		return File::write($dest, $content);
 	}
