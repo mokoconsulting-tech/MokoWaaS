@@ -10,13 +10,13 @@
  DEFGROUP: Joomla.Plugin
  INGROUP: MokoWaaS.Guides
  REPO: https://github.com/mokoconsulting-tech/mokowaas
- VERSION: 01.04.00
+ VERSION: 02.00.00
  PATH: /docs/guides/installation-guide.md
  BRIEF: Installation guide for the MokoWaaS system plugin
  NOTE: First document in the guide set
 -->
 
-# MokoWaaS Installation Guide (VERSION: 01.04.00)
+# MokoWaaS Installation Guide (VERSION: 02.00.00)
 
 ## Introduction
 

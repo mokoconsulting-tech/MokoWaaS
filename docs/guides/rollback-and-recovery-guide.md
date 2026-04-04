@@ -10,13 +10,13 @@
  DEFGROUP: Joomla.Plugin
  INGROUP: MokoWaaS.Guides
  REPO: https://github.com/mokoconsulting-tech/mokowaas
- VERSION: 01.04.00
+ VERSION: 02.00.00
  PATH: /docs/guides/rollback-and-recovery-guide.md
  BRIEF: Rollback and recovery guide for restoring stable operation after plugin related incidents
  NOTE: Completes the core guide set for WaaS plugin governance
 -->
 
-# MokoWaaS Rollback and Recovery Guide (VERSION: 01.04.00)
+# MokoWaaS Rollback and Recovery Guide (VERSION: 02.00.00)
 
 ## Introduction
 

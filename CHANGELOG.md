@@ -14,7 +14,7 @@
  INGROUP: MokoWaaS.Documentation
  REPO: https://github.com/mokoconsulting-tech/mokowaas
  PATH: ./CHANGELOG.md
- VERSION: 01.04.00
+ VERSION: 02.00.00
  BRIEF: Version history using `Keep a Changelog`
 -->
 

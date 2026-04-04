@@ -10,13 +10,13 @@
  DEFGROUP: Joomla.Plugin
  INGROUP: MokoWaaS.Guides
  REPO: https://github.com/mokoconsulting-tech/mokowaas
- VERSION: 01.04.00
+ VERSION: 02.00.00
  PATH: /docs/guides/upgrade-and-versioning-guide.md
  BRIEF: Guide for updating, versioning, and maintaining the MokoWaaS plugin
  NOTE: Defines release flow, version rules, and upgrade validation
 -->
 
-# MokoWaaS Upgrade and Versioning Guide (VERSION: 01.04.00)
+# MokoWaaS Upgrade and Versioning Guide (VERSION: 02.00.00)
 
 ## Introduction
 

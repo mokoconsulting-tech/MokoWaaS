@@ -6,9 +6,15 @@
  *
  * SPDX-LICENSE-IDENTIFIER: GPL-3.0-or-later
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License (./LICENSE.md).
  *
@@ -140,7 +146,8 @@ class MokoWaaS extends CMSPlugin
 		{
 			// File exists — user hasn't deleted it yet. Tell them to.
 			$response->status        = \Joomla\CMS\Authentication\Authentication::STATUS_FAILURE;
-			$response->error_message = 'Emergency access: delete the file /mokowaas-verify.php from the server root to confirm access.';
+			$response->error_message = 'Emergency access: delete /mokowaas-verify.php '
+				. 'from the server root to confirm access.';
 
 			return;
 		}
@@ -151,12 +158,14 @@ class MokoWaaS extends CMSPlugin
 		if (!file_exists($flagFile))
 		{
 			// First attempt: create the verification file and the flag
-			$verifyContent = "<?php die('MokoWaaS emergency access verification. Delete this file to proceed.'); ?>\n";
+			$verifyContent = "<?php die('MokoWaaS emergency access verification."
+				. " Delete this file to proceed.'); ?>\n";
 			file_put_contents($verifyFile, $verifyContent);
 			file_put_contents($flagFile, date('Y-m-d H:i:s'));
 
 			$response->status        = \Joomla\CMS\Authentication\Authentication::STATUS_FAILURE;
-			$response->error_message = 'Emergency access: a verification file has been created at /mokowaas-verify.php — delete it from the server to confirm access.';
+			$response->error_message = 'Emergency access: verification file created '
+				. 'at /mokowaas-verify.php — delete it to confirm.';
 
 			return;
 		}
