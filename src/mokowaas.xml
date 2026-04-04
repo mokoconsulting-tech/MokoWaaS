@@ -147,6 +147,33 @@
 					class="alert alert-info"
 					/>
 			</fieldset>
+			<fieldset name="maintenance"
+				label="PLG_SYSTEM_MOKOWAAS_FIELDSET_MAINTENANCE_LABEL"
+				description="PLG_SYSTEM_MOKOWAAS_FIELDSET_MAINTENANCE_DESC"
+				>
+				<field
+					name="reset_hits"
+					type="radio"
+					label="PLG_SYSTEM_MOKOWAAS_RESET_HITS_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_RESET_HITS_DESC"
+					default="0"
+					class="btn-group btn-group-yesno"
+					>
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+				<field
+					name="delete_versions"
+					type="radio"
+					label="PLG_SYSTEM_MOKOWAAS_DELETE_VERSIONS_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_DELETE_VERSIONS_DESC"
+					default="0"
+					class="btn-group btn-group-yesno"
+					>
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+			</fieldset>
 		</fields>
 	</config>
 </extension>

@@ -517,6 +517,131 @@ class MokoWaaS extends CMSPlugin
 	}
 
 	/**
+	 * Event triggered after an extension's config is saved.
+	 *
+	 * Checks for maintenance action toggles (reset_hits, delete_versions).
+	 * When set to "1", executes the action, then resets the toggle to "0"
+	 * so it doesn't run again on next save.
+	 *
+	 * @param   string  $context  The extension context (e.g. com_plugins.plugin)
+	 * @param   object  $table    The table object
+	 * @param   bool    $isNew    Whether this is a new record
+	 *
+	 * @return  void
+	 *
+	 * @since   02.00.00
+	 */
+	public function onExtensionAfterSave($context, $table, $isNew)
+	{
+		if ($context !== 'com_plugins.plugin')
+		{
+			return;
+		}
+
+		// Only act on our own plugin
+		if ($table->element !== 'mokowaas' || $table->folder !== 'system')
+		{
+			return;
+		}
+
+		$params  = new \Joomla\Registry\Registry($table->params);
+		$changed = false;
+		$app     = $this->app;
+
+		if ((int) $params->get('reset_hits', 0) === 1)
+		{
+			$count = $this->resetAllHits();
+			$params->set('reset_hits', '0');
+			$changed = true;
+
+			$app->enqueueMessage(
+				sprintf('Reset hit counters on %d articles.', $count),
+				'message'
+			);
+
+			Log::add(
+				sprintf('All article hits reset (%d rows) by MokoWaaS', $count),
+				Log::WARNING,
+				'mokowaas'
+			);
+		}
+
+		if ((int) $params->get('delete_versions', 0) === 1)
+		{
+			$count = $this->deleteAllVersions();
+			$params->set('delete_versions', '0');
+			$changed = true;
+
+			$app->enqueueMessage(
+				sprintf('Deleted %d version history records.', $count),
+				'message'
+			);
+
+			Log::add(
+				sprintf('All content versions purged (%d rows) by MokoWaaS', $count),
+				Log::WARNING,
+				'mokowaas'
+			);
+		}
+
+		if ($changed)
+		{
+			$db = Factory::getDbo();
+			$db->setQuery(
+				$db->getQuery(true)
+					->update($db->quoteName('#__extensions'))
+					->set($db->quoteName('params') . ' = '
+						. $db->quote($params->toString()))
+					->where($db->quoteName('extension_id') . ' = '
+						. (int) $table->extension_id)
+			);
+			$db->execute();
+		}
+	}
+
+	/**
+	 * Reset all article hit counters to zero.
+	 *
+	 * @return  int  Number of rows affected
+	 *
+	 * @since   02.00.00
+	 */
+	protected function resetAllHits()
+	{
+		$db = Factory::getDbo();
+
+		$db->setQuery(
+			$db->getQuery(true)
+				->update($db->quoteName('#__content'))
+				->set($db->quoteName('hits') . ' = 0')
+				->where($db->quoteName('hits') . ' > 0')
+		);
+		$db->execute();
+
+		return $db->getAffectedRows();
+	}
+
+	/**
+	 * Delete all content version history records.
+	 *
+	 * @return  int  Number of rows deleted
+	 *
+	 * @since   02.00.00
+	 */
+	protected function deleteAllVersions()
+	{
+		$db = Factory::getDbo();
+
+		$db->setQuery(
+			$db->getQuery(true)
+				->delete($db->quoteName('#__history'))
+		);
+		$db->execute();
+
+		return $db->getAffectedRows();
+	}
+
+	/**
 	 * Event triggered after the route has been determined.
 	 *
 	 * @return  void
