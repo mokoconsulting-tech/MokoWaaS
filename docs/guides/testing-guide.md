@@ -207,6 +207,64 @@ Verify the following admin areas no longer show "Joomla":
 | 6 | Check mokowaas log | "All content versions purged" logged | [ ] |
 | 7 | Both toggles Yes at same time, save | Both actions execute | [ ] |
 
+### 2.15 Visual Branding
+
+| # | Step | Expected Result | Pass |
+|---|------|-----------------|------|
+| 1 | Upload admin logo via Visual Branding tab | Admin header shows custom logo | [ ] |
+| 2 | Upload login logo, log out | Login page shows custom logo | [ ] |
+| 3 | Upload favicon (.ico/.png) | Browser tab shows custom icon | [ ] |
+| 4 | Set Primary Color | Admin accent color changes | [ ] |
+| 5 | Set Sidebar Color | Sidebar background changes | [ ] |
+| 6 | Set Header Color | Top bar color changes | [ ] |
+| 7 | Set Link Color | Admin hyperlinks change color | [ ] |
+| 8 | Add custom CSS | Styles applied to admin pages | [ ] |
+| 9 | Put `</style>` in CSS textarea | Stripped, no XSS | [ ] |
+| 10 | Clear all visual settings | Defaults restored | [ ] |
+
+### 2.16 Tenant Restrictions
+
+| # | Step | Expected Result | Pass |
+|---|------|-----------------|------|
+| 1 | Non-master: Extensions > Install | Redirected with error | [ ] |
+| 2 | Non-master: System > System Information | Redirected | [ ] |
+| 3 | Non-master: System > Global Configuration | Redirected | [ ] |
+| 4 | Non-master: component config (Articles > Options) | Accessible | [ ] |
+| 5 | Non-master: template code editor | Redirected | [ ] |
+| 6 | Non-master: template styles manager | Accessible | [ ] |
+| 7 | Master user: all restricted areas | Full access | [ ] |
+| 8 | Install from URL (any user) | Blocked | [ ] |
+| 9 | Hidden menu items: admin menu | Components hidden for non-master | [ ] |
+| 10 | Toggle restrictions off | Non-master regains access | [ ] |
+
+### 2.17 Security Hardening
+
+| # | Step | Expected Result | Pass |
+|---|------|-----------------|------|
+| 1 | Force HTTPS on, visit via http:// | 301 redirect to https:// | [ ] |
+| 2 | Session timeout = 2 min, idle 3 min | Session expires, redirected | [ ] |
+| 3 | Master user idle beyond timeout | Session NOT expired (exempt) | [ ] |
+| 4 | Password < min length | Rejected on save | [ ] |
+| 5 | Password missing uppercase | Rejected | [ ] |
+| 6 | Password missing number | Rejected | [ ] |
+| 7 | Password missing special char | Rejected | [ ] |
+| 8 | Valid password | Accepted | [ ] |
+| 9 | Upload disallowed file type | Rejected by media manager | [ ] |
+| 10 | Upload oversized file | Rejected | [ ] |
+
+### 2.18 Operations
+
+| # | Step | Expected Result | Pass |
+|---|------|-----------------|------|
+| 1 | Set heartbeat URL, load admin page | POST sent with site data | [ ] |
+| 2 | Load again within interval | No duplicate POST | [ ] |
+| 3 | Verify heartbeat payload | domain, versions, counts present | [ ] |
+| 4 | License URL returns `{"status":"valid"}` | No warnings | [ ] |
+| 5 | License returns `{"status":"expired"}`, action=warn | Warning shown | [ ] |
+| 6 | License expired, action=lockout, non-master | Locked out | [ ] |
+| 7 | License expired, action=lockout, master user | Still has access | [ ] |
+| 8 | License URL unreachable | Site works, warning logged | [ ] |
+
 ## 3. Edge Cases
 
 | # | Scenario | Expected Behavior |
