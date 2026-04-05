@@ -300,38 +300,6 @@
 					description="PLG_SYSTEM_MOKOWAAS_UPLOAD_SIZE_DESC"
 					default="10" />
 			</fieldset>
-			<fieldset name="operational"
-				label="PLG_SYSTEM_MOKOWAAS_FIELDSET_OPS_LABEL"
-				description="PLG_SYSTEM_MOKOWAAS_FIELDSET_OPS_DESC"
-				>
-				<field name="heartbeat_url" type="url"
-					label="PLG_SYSTEM_MOKOWAAS_HEARTBEAT_URL_LABEL"
-					description="PLG_SYSTEM_MOKOWAAS_HEARTBEAT_URL_DESC"
-					default="" />
-				<field name="heartbeat_interval" type="number"
-					label="PLG_SYSTEM_MOKOWAAS_HEARTBEAT_INTERVAL_LABEL"
-					default="24" hint="Hours" />
-				<field name="heartbeat_token" type="text"
-					label="PLG_SYSTEM_MOKOWAAS_HEARTBEAT_TOKEN_LABEL"
-					default="" />
-				<field name="license_check_url" type="url"
-					label="PLG_SYSTEM_MOKOWAAS_LICENSE_URL_LABEL"
-					description="PLG_SYSTEM_MOKOWAAS_LICENSE_URL_DESC"
-					default="" />
-				<field name="license_key" type="text"
-					label="PLG_SYSTEM_MOKOWAAS_LICENSE_KEY_LABEL"
-					default="" />
-				<field name="license_check_interval" type="number"
-					label="PLG_SYSTEM_MOKOWAAS_LICENSE_INTERVAL_LABEL"
-					default="24" hint="Hours" />
-				<field name="license_action" type="list"
-					label="PLG_SYSTEM_MOKOWAAS_LICENSE_ACTION_LABEL"
-					description="PLG_SYSTEM_MOKOWAAS_LICENSE_ACTION_DESC"
-					default="warn">
-					<option value="warn">PLG_SYSTEM_MOKOWAAS_LICENSE_WARN</option>
-					<option value="lockout">PLG_SYSTEM_MOKOWAAS_LICENSE_LOCKOUT</option>
-				</field>
-			</fieldset>
 		</fields>
 	</config>
 </extension>

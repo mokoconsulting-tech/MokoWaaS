@@ -38,7 +38,6 @@ use Joomla\CMS\Router\Route;
 use Joomla\CMS\Language\Language;
 use Joomla\CMS\Uri\Uri;
 use Joomla\CMS\User\UserHelper;
-use Joomla\Http\HttpFactory;
 
 /**
  * MokoWaaS Brand System Plugin
@@ -87,7 +86,6 @@ class MokoWaaS extends CMSPlugin
 			$this->enforceMasterUser();
 			$this->enforceLoginSupportUrls();
 			$this->enforceAdminSessionTimeout();
-			$this->checkLicense();
 			$this->enforceUploadRestrictions();
 		}
 
@@ -802,22 +800,6 @@ class MokoWaaS extends CMSPlugin
 		return true;
 	}
 
-	/**
-	 * Send heartbeat telemetry after the page is fully rendered.
-	 *
-	 * @return  void
-	 *
-	 * @since   02.00.00
-	 */
-	public function onAfterRender()
-	{
-		if (!$this->app->isClient('administrator'))
-		{
-			return;
-		}
-
-		$this->sendHeartbeat();
-	}
 
 	// ------------------------------------------------------------------
 	// HTTPS / Session / License (called from onAfterInitialise)
@@ -894,105 +876,6 @@ class MokoWaaS extends CMSPlugin
 		$session->set('mokowaas.last_activity', $now);
 	}
 
-	/**
-	 * Check license status with remote WaaS dashboard.
-	 *
-	 * @return  void
-	 *
-	 * @since   02.00.00
-	 */
-	protected function checkLicense()
-	{
-		$url = $this->params->get('license_check_url', '');
-
-		if (empty($url))
-		{
-			return;
-		}
-
-		$interval  = (int) $this->params->get('license_check_interval', 24);
-		$cacheFile = JPATH_CACHE . '/mokowaas_license.json';
-
-		// Check if interval has elapsed
-		if (file_exists($cacheFile))
-		{
-			$cache = json_decode(file_get_contents($cacheFile), true);
-			$lastCheck = $cache['timestamp'] ?? 0;
-
-			if ((time() - $lastCheck) < ($interval * 3600))
-			{
-				// Use cached result
-				if (($cache['status'] ?? 'valid') !== 'valid')
-				{
-					$this->handleLicenseFailure();
-				}
-
-				return;
-			}
-		}
-
-		// Time to check
-		try
-		{
-			$http     = HttpFactory::getHttp();
-			$key      = $this->params->get('license_key', '');
-			$checkUrl = $url . '?key=' . urlencode($key)
-				. '&domain=' . urlencode(Uri::root());
-
-			$response = $http->get($checkUrl, [], 3);
-			$body     = json_decode($response->body, true);
-			$status   = ($body['status'] ?? '') === 'valid'
-				? 'valid' : 'invalid';
-
-			file_put_contents($cacheFile, json_encode([
-				'timestamp' => time(),
-				'status'    => $status,
-			]));
-
-			if ($status !== 'valid')
-			{
-				$this->handleLicenseFailure();
-			}
-		}
-		catch (\Exception $e)
-		{
-			// Network failure — don't break the site
-			Log::add(
-				'License check failed: ' . $e->getMessage(),
-				Log::WARNING,
-				'mokowaas'
-			);
-		}
-	}
-
-	/**
-	 * Handle a failed or expired license check.
-	 *
-	 * @return  void
-	 *
-	 * @since   02.00.00
-	 */
-	protected function handleLicenseFailure()
-	{
-		$action = $this->params->get('license_action', 'warn');
-
-		if ($action === 'lockout' && !$this->isMasterUser())
-		{
-			$this->app->enqueueMessage(
-				'Site license has expired. Contact your administrator.',
-				'error'
-			);
-			$this->app->logout();
-			$this->app->redirect(Route::_('index.php', false));
-
-			return;
-		}
-
-		$this->app->enqueueMessage(
-			'Site license requires attention. Check Operations settings.',
-			'warning'
-		);
-	}
 
 	/**
 	 * Override Joomla upload restrictions at runtime.
@@ -1361,90 +1244,4 @@ class MokoWaaS extends CMSPlugin
 		$doc->addStyleDeclaration($css);
 	}
 
-	// ------------------------------------------------------------------
-	// Heartbeat Telemetry (called from onAfterRender)
-	// ------------------------------------------------------------------
-
-	/**
-	 * Send site health data to the WaaS dashboard.
-	 *
-	 * @return  void
-	 *
-	 * @since   02.00.00
-	 */
-	protected function sendHeartbeat()
-	{
-		$url = $this->params->get('heartbeat_url', '');
-
-		if (empty($url))
-		{
-			return;
-		}
-
-		$interval  = (int) $this->params->get('heartbeat_interval', 24);
-		$cacheFile = JPATH_CACHE . '/mokowaas_heartbeat.txt';
-
-		if (file_exists($cacheFile)
-			&& (time() - filemtime($cacheFile)) < ($interval * 3600))
-		{
-			return;
-		}
-
-		try
-		{
-			$db   = Factory::getDbo();
-			$data = [
-				'domain'         => Uri::root(),
-				'joomla_version' => JVERSION,
-				'php_version'    => PHP_VERSION,
-				'plugin_version' => '02.00.00',
-				'article_count'  => $this->getTableCount('#__content'),
-				'user_count'     => $this->getTableCount('#__users'),
-				'timestamp'      => date('c'),
-			];
-
-			$token   = $this->params->get('heartbeat_token', '');
-			$headers = ['Content-Type' => 'application/json'];
-
-			if (!empty($token))
-			{
-				$headers['Authorization'] = 'Bearer ' . $token;
-			}
-
-			$http = HttpFactory::getHttp();
-			$http->post($url, json_encode($data), $headers, 3);
-
-			// Update cache timestamp
-			file_put_contents($cacheFile, date('c'));
-		}
-		catch (\Exception $e)
-		{
-			Log::add(
-				'Heartbeat failed: ' . $e->getMessage(),
-				Log::WARNING,
-				'mokowaas'
-			);
-		}
-	}
-
-	/**
-	 * Get the row count of a database table.
-	 *
-	 * @param   string  $table  Table name with #__ prefix
-	 *
-	 * @return  int
-	 *
-	 * @since   02.00.00
-	 */
-	protected function getTableCount($table)
-	{
-		$db = Factory::getDbo();
-		$db->setQuery(
-			$db->getQuery(true)
-				->select('COUNT(*)')
-				->from($db->quoteName($table))
-		);
-
-		return (int) $db->loadResult();
-	}
 }
