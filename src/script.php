@@ -123,7 +123,6 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 		if ($type === 'install' || $type === 'update')
 		{
 			$this->installLanguageOverrides();
-			$this->updateLoginSupportUrls();
 		}
 
 		return true;
@@ -310,61 +309,6 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 				}
 			}
 		}
-	}
-
-	/**
-	 * Update the mod_loginsupport module params to point to Moko Consulting URLs.
-	 *
-	 * Joomla's login support module stores forum, documentation, and news URLs
-	 * as module parameters in the database.  Language overrides can change the
-	 * link text but not the href — this method rewrites the module params so
-	 * the actual links point to mokoconsulting.tech.
-	 *
-	 * @return  void
-	 *
-	 * @since   02.00.00
-	 */
-	private function updateLoginSupportUrls()
-	{
-		$db    = Factory::getDbo();
-		$query = $db->getQuery(true)
-			->select([$db->quoteName('id'), $db->quoteName('params')])
-			->from($db->quoteName('#__modules'))
-			->where($db->quoteName('module') . ' = ' . $db->quote('mod_loginsupport'));
-
-		$db->setQuery($query);
-		$modules = $db->loadObjectList();
-
-		if (empty($modules))
-		{
-			return;
-		}
-
-		$supportUrls = [
-			'forum_url'         => 'https://mokoconsulting.tech/support',
-			'documentation_url' => 'https://mokoconsulting.tech/kb',
-			'news_url'          => 'https://mokoconsulting.tech/news',
-		];
-
-		foreach ($modules as $module)
-		{
-			$params = new \Joomla\Registry\Registry($module->params ?: '{}');
-
-			foreach ($supportUrls as $key => $url)
-			{
-				$params->set($key, $url);
-			}
-
-			$update = $db->getQuery(true)
-				->update($db->quoteName('#__modules'))
-				->set($db->quoteName('params') . ' = ' . $db->quote($params->toString()))
-				->where($db->quoteName('id') . ' = ' . (int) $module->id);
-
-			$db->setQuery($update);
-			$db->execute();
-		}
-
-		Factory::getApplication()->enqueueMessage('Updated login support URLs to Moko Consulting.', 'message');
 	}
 
 	/**
