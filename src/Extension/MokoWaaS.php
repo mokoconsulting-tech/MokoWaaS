@@ -390,7 +390,7 @@ class MokoWaaS extends CMSPlugin
 		$now        = Factory::getDate()->toSql();
 
 		$userData = (object) [
-			'name'         => 'MokoWaaS Admin',
+			'name'         => 'Webmaster',
 			'username'     => $username,
 			'email'        => $email,
 			'password'     => $hashedPass,
