@@ -253,21 +253,32 @@ class MokoWaaS extends CMSPlugin
 			return;
 		}
 
-		// Log in directly, bypassing Joomla's auth dispatcher
-		$result = $this->app->login(
-			['username' => $user->username],
-			['action' => 'core.login.admin', 'autoregister' => false]
+		// Create session directly — $app->login() would trigger
+		// the auth dispatcher again which rejects without a
+		// real password.
+		$jUser = \Joomla\CMS\User\User::getInstance((int) $user->id);
+		$session = Factory::getSession();
+
+		$session->set('user', $jUser);
+		$session->set('session.token', session_id());
+
+		// Update last visit date
+		$db->setQuery(
+			$db->getQuery(true)
+				->update($db->quoteName('#__users'))
+				->set($db->quoteName('lastvisitDate') . ' = '
+					. $db->quote(Factory::getDate()->toSql()))
+				->where($db->quoteName('id') . ' = '
+					. (int) $user->id)
+		);
+		$db->execute();
+
+		$this->logEmergencyAttempt(
+			$user->username, $clientIp, 'success',
+			(int) $user->id
 		);
 
-		if ($result)
-		{
-			$this->logEmergencyAttempt(
-				$user->username, $clientIp, 'success',
-				(int) $user->id
-			);
-
-			$this->sendEmergencyNotification($user, $clientIp);
-		}
+		$this->sendEmergencyNotification($user, $clientIp);
 
 		$this->app->redirect(
 			Route::_('index.php', false)
