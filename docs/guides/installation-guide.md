@@ -8,19 +8,19 @@
 
  # FILE INFORMATION
  DEFGROUP: Joomla.Plugin
- INGROUP: MokoWaaS-Brand.Guides
- REPO: https://github.com/mokoconsulting-tech/mokowaasbrand
- VERSION: 01.04.00
+ INGROUP: MokoWaaS.Guides
+ REPO: https://github.com/mokoconsulting-tech/mokowaas
+ VERSION: 02.00.01
  PATH: /docs/guides/installation-guide.md
- BRIEF: Installation guide for the MokoWaaS-Brand system plugin
+ BRIEF: Installation guide for the MokoWaaS system plugin
  NOTE: First document in the guide set
 -->
 
-# MokoWaaS-Brand Installation Guide (VERSION: 01.04.00)
+# MokoWaaS Installation Guide (VERSION: 02.00.01)
 
 ## Introduction
 
-The MokoWaaS-Brand Installation Guide provides the authoritative process for deploying the system plugin within WaaS-managed Joomla environments. The installation ensures consistent application of MokoWaaS branding policy, identity governance, and terminology alignment across all administrative interfaces.
+The MokoWaaS Installation Guide provides the authoritative process for deploying the system plugin within WaaS-managed Joomla environments. The installation ensures consistent application of MokoWaaS branding policy, identity governance, and terminology alignment across all administrative interfaces.
 
 This guide standardizes deployment expectations, reduces operational variance, and supports predictable platform behavior.
 
@@ -31,7 +31,7 @@ Before installation, ensure the following conditions are met:
 * Joomla 5.x operational environment
 * PHP 8.1 or higher
 * Administrative access credentials
-* Validated MokoWaaS-Brand plugin package from an approved release channel
+* Validated MokoWaaS plugin package from an approved release channel
 * Recommended: environment snapshot or backup prior to installation
 
 ## Obtaining the Package
@@ -49,7 +49,7 @@ Follow these steps to install the plugin:
 1. Log in to the Joomla Administrator dashboard.
 2. Navigate to **System > Extensions > Install**.
 3. Choose **Upload Package File**.
-4. Upload the MokoWaaS-Brand plugin package.
+4. Upload the MokoWaaS plugin package.
 5. Confirm successful installation in the extension status message.
 
 ## Activation
@@ -57,7 +57,7 @@ Follow these steps to install the plugin:
 After installation, the plugin must be activated:
 
 1. Navigate to **System > Plugins**.
-2. Search for **MokoWaaS-Brand**.
+2. Search for **MokoWaaS**.
 3. Confirm the plugin type is **System**.
 4. Set status to **Enabled**.
 5. Save and close.

@@ -13,22 +13,22 @@
 
  # FILE INFORMATION
  DEFGROUP: Joomla.Plugin
- INGROUP: MokoWaaS-Brand
- REPO: https://github.com/mokoconsulting-tech/mokowaasbrand
- VERSION: 01.04.05
+ INGROUP: MokoWaaS
+ REPO: https://github.com/mokoconsulting-tech/mokowaas
+ VERSION: 02.00.01
  PATH: /README.md
  BRIEF: Rebranding plugin for MokoWaaS platform
  NOTE: Internal WaaS identity abstraction layer
 -->
 
-# MokoWaaS-Brand Plugin
+# MokoWaaS Plugin
 
-[![Version](https://img.shields.io/badge/version-01.04.00-blue.svg)](https://github.com/mokoconsulting-tech/mokowaasbrand)
+[![Version](https://img.shields.io/badge/version-02.00.01-blue.svg)](https://github.com/mokoconsulting-tech/mokowaas)
 [![License](https://img.shields.io/badge/license-GPL--3.0--or--later-green.svg)](LICENSE.md)
-[![Joomla](https://img.shields.io/badge/Joomla-5.x-orange.svg)](https://www.joomla.org)
+[![Joomla](https://img.shields.io/badge/Joomla-5.x%20%7C%206.x-orange.svg)](https://www.joomla.org)
 [![PHP](https://img.shields.io/badge/PHP-8.1%2B-blue.svg)](https://www.php.net)
 
-MokoWaaS-Brand is a Joomla 5.x system plugin that provides a comprehensive identity override layer for the MokoWaaS platform. It ensures consistent branding, terminology, and user experience across all Joomla administrative and frontend interfaces.
+MokoWaaS is a Joomla 5.x / 6.x system plugin that provides a configurable white-label identity layer for the MokoWaaS platform. It replaces all visible Joomla branding with your own brand name, company name, and support URLs — configurable from the plugin admin without code changes.
 
 ## Table of Contents
 
@@ -36,6 +36,7 @@ MokoWaaS-Brand is a Joomla 5.x system plugin that provides a comprehensive ident
 - [Features](#features)
 - [System Requirements](#system-requirements)
 - [Installation](#installation)
+- [Usage](#usage)
 - [Configuration](#configuration)
 - [Technical Implementation](#technical-implementation)
 - [Repository Structure](#repository-structure)
@@ -47,22 +48,23 @@ MokoWaaS-Brand is a Joomla 5.x system plugin that provides a comprehensive ident
 
 ## Overview
 
-The MokoWaaS-Brand plugin operationalizes a unified naming convention, brand-controlled visuals, and enforced terminology across all tenant sites. This ensures consistent service delivery within the WaaS (Website as a Service) framework by abstracting all upstream Joomla identifiers behind MokoWaaS-compliant terminology.
+The MokoWaaS plugin operationalizes a unified naming convention, brand-controlled visuals, and enforced terminology across all tenant sites. This ensures consistent service delivery within the WaaS (Website as a Service) framework by abstracting all upstream Joomla identifiers behind MokoWaaS-compliant terminology.
 
 ## Features
 
-- **Comprehensive Language Overrides**: 57+ language strings replacing Joomla branding with MokoWaaS terminology
-- **Administrator & Frontend Coverage**: Applies branding across both Joomla backend and frontend
-- **Joomla 5.x Compatible**: Built using modern Joomla 5.x architecture with dependency injection
-- **Event-Driven Architecture**: Utilizes Joomla system events for optimal integration
-- **Configurable**: Enable/disable branding functionality through plugin parameters
-- **Multi-Language Support**: Currently supports en-GB and en-US locales
+- **Template-Based Overrides**: 50+ language keys with `{{BRAND_NAME}}`, `{{COMPANY_NAME}}`, `{{SUPPORT_URL}}` placeholders
+- **Configurable Brand**: Change brand name, company, and support URL from plugin config — takes effect immediately
+- **Safe Override Merging**: Sentinel-block pattern preserves existing site overrides during install/update
+- **Clean Uninstall**: Only MokoWaaS keys are removed; all other overrides are preserved
+- **Joomla 5.x / 6.x Compatible**: Built using modern Joomla plugin architecture with dependency injection
+- **Multi-Language Support**: en-GB and en-US locales
+- **Admin & Frontend Coverage**: Dashboard, footer, login, installer, system info, update component, error pages, and more
 - **Governance Compliant**: Aligned with [MokoStandards](https://github.com/mokoconsulting-tech/MokoStandards)
 
 ## System Requirements
 
-- **Joomla**: 5.x or higher
-- **PHP**: 8.1 or higher
+- **Joomla**: 5.0+ or 6.x
+- **PHP**: 8.1 or higher (8.3+ for Joomla 6)
 - **Extensions**: Standard Joomla PHP extensions
 - **Permissions**: Write access to language override directories
 
@@ -100,29 +102,57 @@ After installation, verify the branding is active:
 This plugin supports Joomla's automatic update system. Once installed:
 
 1. Navigate to **System → Update → Extensions**
-2. The plugin will automatically check for updates from the MokoWaaS-Brand update server
+2. The plugin will automatically check for updates from the MokoWaaS update server
 3. When a new version is available, it will appear in the update list
 4. Click **Update** to install the latest version
 
 The update server URL is configured in the plugin manifest and points to:
 ```
-https://raw.githubusercontent.com/mokoconsulting-tech/MokoWaaSBrand/main/updates.xml
+https://raw.githubusercontent.com/mokoconsulting-tech/MokoWaaS/main/updates.xml
 ```
 
 Updates are published automatically when new releases are created through the GitHub release workflow.
 
+## Usage
+
+Once installed and enabled, the plugin automatically replaces Joomla branding with your configured values. No code changes needed.
+
+### Changing the Brand Name
+
+1. Navigate to **System → Plugins → System - MokoWaaS**
+2. Set **Brand Name** to your desired name (e.g., "MyPlatform")
+3. Set **Company Name** to your company (e.g., "My Company Inc.")
+4. Set **Support URL** to your support site (e.g., "https://support.mycompany.com")
+5. Click **Save & Close**
+6. The new branding appears immediately across admin and frontend
+
+### What Gets Rebranded
+
+| Area | Example |
+| ---- | ------- |
+| Admin footer | "Powered by [YourBrand](https://your-url)" |
+| Dashboard | "Welcome to YourBrand!" |
+| Quick Icons | "YourBrand is up to date." |
+| System Info | "YourBrand Version" |
+| Login page | "YourBrand Administrator Login" |
+| Update component | "YourBrand Update" |
+| Frontend footer | "Powered by [YourBrand](https://your-url)" |
+| Error pages | No Joomla references |
+
 ## Configuration
 
-The plugin provides the following configuration options accessible through **System → Plugins → System - MokoWaaS Brand**:
+The plugin provides the following configuration options accessible through **System → Plugins → System - MokoWaaS**:
 
 ### Parameters
 
-- **Enable Branding** (Yes/No)
-  - Default: Yes
-  - Description: Master toggle for all branding functionality
-  - When disabled, all branding overrides are bypassed
+| Parameter | Type | Default | Description |
+| --------- | ---- | ------- | ----------- |
+| Enable Branding | Yes/No | Yes | Master toggle for all branding overrides |
+| Brand Name | Text | MokoWaaS | Replaces "Joomla" throughout the interface |
+| Company Name | Text | Moko Consulting | Used in support/attribution links |
+| Support URL | URL | https://mokoconsulting.tech | Destination for help and documentation links |
 
-Configuration options are intentionally limited to preserve WaaS brand integrity and prevent tenant-level deviation from platform standards.
+See the [Configuration Guide](docs/guides/configuration-guide.md) for detailed documentation on how overrides work.
 
 ## Technical Implementation
 
@@ -131,7 +161,7 @@ Configuration options are intentionally limited to preserve WaaS brand integrity
 The plugin follows Joomla 5.x system plugin architecture:
 
 ```
-PlgSystemMokoWaaSBrand
+PlgSystemMokoWaaS
 ├── Event Handlers
 │   ├── onAfterInitialise  - Framework initialization hook
 │   └── onAfterRoute       - Route determination hook
@@ -143,12 +173,12 @@ PlgSystemMokoWaaSBrand
 
 ### Core Components
 
-1. **mokowaasbrand.php**
+1. **mokowaas.php**
    - Main plugin class extending `CMSPlugin`
    - Implements system event handlers
-   - Namespace: `Moko\Plugin\System\MokoWaaSBrand`
+   - Namespace: `Moko\Plugin\System\MokoWaaS`
 
-2. **mokowaasbrand.xml**
+2. **mokowaas.xml**
    - Plugin manifest defining metadata and structure
    - Joomla 5.x namespace configuration
    - File and folder definitions
@@ -182,10 +212,10 @@ Joomla automatically loads these overrides during initialization, ensuring optim
 ## Repository Structure
 
 ```
-mokowaasbrand/
+mokowaas/
 ├── src/                              # Plugin source files
-│   ├── mokowaasbrand.php            # Main plugin class
-│   ├── mokowaasbrand.xml            # Plugin manifest
+│   ├── mokowaas.php            # Main plugin class
+│   ├── mokowaas.xml            # Plugin manifest
 │   ├── services/
 │   │   └── provider.php             # DI service provider
 │   ├── language/
@@ -223,7 +253,7 @@ Build the installable plugin package from source:
 
 ```bash
 cd src
-zip -r ../mokowaasbrand_v01.04.00.zip . -x "*.git*"
+zip -r ../mokowaas_v01.04.00.zip . -x "*.git*"
 ```
 
 ### Running Validation Scripts

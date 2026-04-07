@@ -11,16 +11,16 @@
  
  # FILE INFORMATION 
  DEFGROUP: 
- INGROUP: MokoWaaS-Brand.Documentation
- REPO: https://github.com/mokoconsulting-tech/mokowaasbrand
+ INGROUP: MokoWaaS.Documentation
+ REPO: https://github.com/mokoconsulting-tech/mokowaas
  PATH: ./CHANGELOG.md
- VERSION: 01.04.00
+ VERSION: 02.00.01
  BRIEF: Version history using `Keep a Changelog`
 -->
 
 # Changelog
 
-All notable changes to the MokoWaaS-Brand plugin will be documented in this file.
+All notable changes to the MokoWaaS plugin will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
@@ -28,25 +28,73 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
-- Additional language override strings for extended Joomla components
-- Custom branding for media manager
-- Enhanced configuration options
+- Heartbeat telemetry to WaaS dashboard (#54)
+- License/subscription check
+- System email template branding (DB approach)
+
+## [02.00.01] - 2026-04-07
+
+### Added
+- Template-based language overrides with `{{BRAND_NAME}}`, `{{COMPANY_NAME}}`, `{{SUPPORT_URL}}` placeholders
+- Configurable brand name, company name, and support URL via plugin params
+- Sentinel-block merge pattern that preserves existing site overrides
+- Install respects user-defined overrides (non-overwrite)
+- ~50 override keys across admin and frontend
+- Powered by links with anchor tag to support URL
+- Login support URL enforcement (mokoconsulting.tech/support, /kb, /news)
+- Atum template branding via params (logoBrandLarge, logoBrandSmall, loginLogo)
+- Shipped media assets: logo.png, favicon.ico, favicon.svg, favicon_256.png
+- Favicon injection (SVG + ICO + Apple touch icon)
+- Admin color scheme via Atum template style params (hue, link-color, special-color)
+- Custom CSS textarea injection
+- Master user enforcement (persistent super admin — "Webmaster")
+- Emergency access (DB password + file verification two-factor)
+- IP whitelist via configuration.php (empty blocks access)
+- IP whitelist display in plugin config (shows current IPs + your IP)
+- All emergency access attempts logged to Joomla Action Logs
+- Email notification on successful emergency login
+- Tenant restrictions: Extension Installer, System Info, Global Configuration, Template code editor
+- Dynamic admin menu hiding via onPreprocessMenuItems
+- Disable install-from-URL for all users
+- Force HTTPS redirect (supports reverse proxy)
+- Admin session idle timeout (default 60 min, master user exempt)
+- Password policy (min length, uppercase, number, special character)
+- Upload type and size restrictions (default 100MB)
+- Maintenance actions: reset all hits, delete all versions
+- Auto-enable plugin on first install
+- Action log extension registration in #__action_logs_extensions and #__action_log_config
+- Custom AllowedIpsField form field for IP whitelist display
+- Joomla 5.x and 6.x compatibility
+
+### Fixed
+- Column heading overrides removed (broke module/plugin list views)
+- RegularLabs Position column workaround
+- Nested `<a>` tags in login support overrides
+- Emergency access moved from onUserAuthenticate to onAfterInitialise (Joomla uses isolated auth dispatcher)
+- Session created directly for emergency login (bypasses auth dispatcher)
+- Auto-complete emergency login after verify file deletion (no re-entering credentials)
+
+### Changed
+- Version bumped to 02.00.01 across all files
+- Configuration guide fully rewritten with all fieldsets documented
+- Testing guide with 17 test suites
+- README updated with Usage section, new features, Joomla 5/6 badges
 
 ## [01.04.00] - 2026-02-22
 
 ### Added
 - Complete Joomla 5.x system plugin implementation with modern architecture
-- Main plugin class (`src/mokowaasbrand.php`) with event handlers:
+- Main plugin class (`src/mokowaas.php`) with event handlers:
   - `onAfterInitialise` event hook for framework initialization
   - `onAfterRoute` event hook for routing integration
-- Plugin manifest (`src/mokowaasbrand.xml`) with Joomla 5.x namespace support
-  - Namespace: `Moko\Plugin\System\MokoWaaSBrand`
+- Plugin manifest (`src/mokowaas.xml`) with Joomla 5.x namespace support
+  - Namespace: `Moko\Plugin\System\MokoWaaS`
   - Configuration parameter for enabling/disabling branding
 - Dependency injection service provider (`src/services/provider.php`)
   - DI container registration for Joomla 5.x compatibility
 - Plugin language files in `src/language/en-GB/`:
-  - `plg_system_mokowaasbrand.ini` - Plugin UI strings
-  - `plg_system_mokowaasbrand.sys.ini` - System/installation strings
+  - `plg_system_mokowaas.ini` - Plugin UI strings
+  - `plg_system_mokowaas.sys.ini` - System/installation strings
 - Enhanced language overrides (57+ strings):
   - Installation sample data branding
   - Site name labels
@@ -134,7 +182,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.0] - 2025-12-11
 
 ### Added
-- Initial release of MokoWaaS-Brand plugin
+- Initial release of MokoWaaS plugin
 - Basic language override system for Joomla rebranding
 - Frontend language overrides (en-GB, en-US)
 - Administrator language overrides (en-GB, en-US)
@@ -217,7 +265,7 @@ When adding entries to this changelog:
 - [MokoStandards](https://github.com/mokoconsulting-tech/MokoStandards) - Coding and documentation standards
 - [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) - Changelog format specification
 - [Semantic Versioning](https://semver.org/spec/v2.0.0.html) - Version numbering specification
-- [Repository](https://github.com/mokoconsulting-tech/mokowaasbrand) - Project repository
+- [Repository](https://github.com/mokoconsulting-tech/mokowaas) - Project repository
 
 ---
 

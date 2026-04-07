@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright (C) 2025 Moko Consulting <hello@mokoconsulting.tech>
+
+ This file is part of a Moko Consulting project.
+
+ SPDX-LICENSE-IDENTIFIER: GPL-3.0-or-later
+
+ This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License (./LICENSE.md).
+
+ # FILE INFORMATION
+ DEFGROUP: Joomla.Plugin
+ INGROUP: MokoWaaS
+ REPO: https://github.com/mokoconsulting-tech/mokowaas
+ VERSION: 02.00.01
+ PATH: /src/mokowaas.xml
+ BRIEF: Plugin manifest for MokoWaaS system plugin
+ NOTE: Defines installation metadata, files, and configuration for Joomla
+-->
+<extension type="plugin" group="system" method="upgrade">
+	<name>System - MokoWaaS</name>
+	<author>Moko Consulting</author>
+	<creationDate>2026-04-07</creationDate>
+	<copyright>Copyright (C) 2025 Moko Consulting. All rights reserved.</copyright>
+	<license>GNU General Public License version 3 or later; see LICENSE.md</license>
+	<authorEmail>hello@mokoconsulting.tech</authorEmail>
+	<authorUrl>https://mokoconsulting.tech</authorUrl>
+	<version>02.00.01</version>
+	<description>This plugin rebrands the Joomla system interface with MokoWaaS identity. It applies language overrides and ensures consistent branding across the platform.</description>
+	<namespace path=".">Moko\Plugin\System\MokoWaaS</namespace>
+	<scriptfile>script.php</scriptfile>
+
+	<!-- Update server configuration -->
+	<updateservers>
+		<server type="extension" priority="1" name="MokoWaaS Update Server">https://raw.githubusercontent.com/mokoconsulting-tech/MokoWaaS/main/updates.xml</server>
+	</updateservers>
+
+	<files>
+		<filename plugin="mokowaas">script.php</filename>
+		<folder>Extension</folder>
+		<folder>Field</folder>
+		<folder>services</folder>
+		<folder>language</folder>
+		<folder>administrator</folder>
+	</files>
+
+	<media destination="plg_system_mokowaas" folder="media">
+		<filename>index.html</filename>
+		<filename>favicon.ico</filename>
+		<filename>favicon.svg</filename>
+		<filename>favicon_256.png</filename>
+		<filename>logo.png</filename>
+	</media>
+
+	<languages folder="language">
+		<language tag="en-GB">en-GB/plg_system_mokowaas.ini</language>
+		<language tag="en-US">en-US/plg_system_mokowaas.ini</language>
+	</languages>
+
+	<languages folder="administrator/language">
+		<language tag="en-GB">en-GB/plg_system_mokowaas.sys.ini</language>
+		<language tag="en-US">en-US/plg_system_mokowaas.sys.ini</language>
+	</languages>
+
+	<administration>
+		<files folder="administrator">
+			<folder>language</folder>
+		</files>
+	</administration>
+
+	<config>
+		<fields name="params">
+			<fieldset name="basic">
+				<field
+					name="enable_branding"
+					type="radio"
+					label="PLG_SYSTEM_MOKOWAAS_ENABLE_BRANDING_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_ENABLE_BRANDING_DESC"
+					default="1"
+					class="btn-group btn-group-yesno"
+					>
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+				<field
+					name="brand_name"
+					type="text"
+					label="PLG_SYSTEM_MOKOWAAS_BRAND_NAME_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_BRAND_NAME_DESC"
+					default="MokoWaaS"
+					/>
+				<field
+					name="company_name"
+					type="text"
+					label="PLG_SYSTEM_MOKOWAAS_COMPANY_NAME_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_COMPANY_NAME_DESC"
+					default="Moko Consulting"
+					/>
+				<field
+					name="support_url"
+					type="url"
+					label="PLG_SYSTEM_MOKOWAAS_SUPPORT_URL_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_SUPPORT_URL_DESC"
+					default="https://mokoconsulting.tech"
+					/>
+			</fieldset>
+			<fieldset name="waas_access"
+				label="PLG_SYSTEM_MOKOWAAS_FIELDSET_WAAS_ACCESS_LABEL"
+				description="PLG_SYSTEM_MOKOWAAS_FIELDSET_WAAS_ACCESS_DESC"
+				addfieldprefix="Moko\Plugin\System\MokoWaaS\Field"
+				>
+				<field
+					name="enforce_master_user"
+					type="radio"
+					label="PLG_SYSTEM_MOKOWAAS_ENFORCE_MASTER_USER_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_ENFORCE_MASTER_USER_DESC"
+					default="1"
+					class="btn-group btn-group-yesno"
+					>
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+				<field
+					name="master_username"
+					type="text"
+					label="PLG_SYSTEM_MOKOWAAS_MASTER_USERNAME_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_MASTER_USERNAME_DESC"
+					default="mokoconsulting"
+					/>
+				<field
+					name="master_email"
+					type="email"
+					label="PLG_SYSTEM_MOKOWAAS_MASTER_EMAIL_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_MASTER_EMAIL_DESC"
+					default="webmaster@mokoconsulting.tech"
+					/>
+				<field
+					name="emergency_access"
+					type="radio"
+					label="PLG_SYSTEM_MOKOWAAS_EMERGENCY_ACCESS_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_EMERGENCY_ACCESS_DESC"
+					default="1"
+					class="btn-group btn-group-yesno"
+					>
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+				<field
+					name="allowed_ips_display"
+					type="AllowedIps"
+					label=""
+					/>
+			</fieldset>
+			<fieldset name="maintenance"
+				label="PLG_SYSTEM_MOKOWAAS_FIELDSET_MAINTENANCE_LABEL"
+				description="PLG_SYSTEM_MOKOWAAS_FIELDSET_MAINTENANCE_DESC"
+				>
+				<field
+					name="reset_hits"
+					type="radio"
+					label="PLG_SYSTEM_MOKOWAAS_RESET_HITS_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_RESET_HITS_DESC"
+					default="0"
+					class="btn-group btn-group-yesno"
+					>
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+				<field
+					name="delete_versions"
+					type="radio"
+					label="PLG_SYSTEM_MOKOWAAS_DELETE_VERSIONS_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_DELETE_VERSIONS_DESC"
+					default="0"
+					class="btn-group btn-group-yesno"
+					>
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+			</fieldset>
+			<fieldset name="visual_branding"
+				label="PLG_SYSTEM_MOKOWAAS_FIELDSET_VISUAL_LABEL"
+				description="PLG_SYSTEM_MOKOWAAS_FIELDSET_VISUAL_DESC"
+				>
+				<field name="branding_note" type="note"
+					label="PLG_SYSTEM_MOKOWAAS_BRANDING_NOTE_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_BRANDING_NOTE_DESC"
+					class="alert alert-info" />
+				<field name="color_primary" type="color"
+					label="PLG_SYSTEM_MOKOWAAS_COLOR_PRIMARY_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_COLOR_PRIMARY_DESC"
+					default="#1a2744" />
+				<field name="color_sidebar" type="color"
+					label="PLG_SYSTEM_MOKOWAAS_COLOR_SIDEBAR_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_COLOR_SIDEBAR_DESC"
+					default="#0f1b2d" />
+				<field name="color_header" type="color"
+					label="PLG_SYSTEM_MOKOWAAS_COLOR_HEADER_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_COLOR_HEADER_DESC"
+					default="#1a2744" />
+				<field name="color_link" type="color"
+					label="PLG_SYSTEM_MOKOWAAS_COLOR_LINK_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_COLOR_LINK_DESC"
+					default="#0051ad" />
+				<field name="custom_css" type="textarea"
+					label="PLG_SYSTEM_MOKOWAAS_CUSTOM_CSS_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_CUSTOM_CSS_DESC"
+					rows="10" filter="raw" />
+			</fieldset>
+			<fieldset name="tenant_restrictions"
+				label="PLG_SYSTEM_MOKOWAAS_FIELDSET_TENANT_LABEL"
+				description="PLG_SYSTEM_MOKOWAAS_FIELDSET_TENANT_DESC"
+				>
+				<field name="restrict_installer" type="radio" default="1"
+					label="PLG_SYSTEM_MOKOWAAS_RESTRICT_INSTALLER_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_RESTRICT_INSTALLER_DESC"
+					class="btn-group btn-group-yesno">
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+				<field name="hide_sysinfo" type="radio" default="1"
+					label="PLG_SYSTEM_MOKOWAAS_HIDE_SYSINFO_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_HIDE_SYSINFO_DESC"
+					class="btn-group btn-group-yesno">
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+				<field name="restrict_global_config" type="radio" default="1"
+					label="PLG_SYSTEM_MOKOWAAS_RESTRICT_CONFIG_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_RESTRICT_CONFIG_DESC"
+					class="btn-group btn-group-yesno">
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+				<field name="restrict_template_editing" type="radio" default="1"
+					label="PLG_SYSTEM_MOKOWAAS_RESTRICT_TEMPLATE_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_RESTRICT_TEMPLATE_DESC"
+					class="btn-group btn-group-yesno">
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+				<field name="disable_install_url" type="radio" default="1"
+					label="PLG_SYSTEM_MOKOWAAS_DISABLE_INSTALL_URL_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_DISABLE_INSTALL_URL_DESC"
+					class="btn-group btn-group-yesno">
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+				<field name="hidden_menu_items" type="textarea"
+					label="PLG_SYSTEM_MOKOWAAS_HIDDEN_MENUS_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_HIDDEN_MENUS_DESC"
+					rows="5" filter="raw" />
+			</fieldset>
+			<fieldset name="security"
+				label="PLG_SYSTEM_MOKOWAAS_FIELDSET_SECURITY_LABEL"
+				description="PLG_SYSTEM_MOKOWAAS_FIELDSET_SECURITY_DESC"
+				>
+				<field name="force_https" type="radio" default="1"
+					label="PLG_SYSTEM_MOKOWAAS_FORCE_HTTPS_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_FORCE_HTTPS_DESC"
+					class="btn-group btn-group-yesno">
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+				<field name="admin_session_timeout" type="number"
+					label="PLG_SYSTEM_MOKOWAAS_SESSION_TIMEOUT_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_SESSION_TIMEOUT_DESC"
+					default="60" hint="Minutes (0 = Joomla default)" />
+				<field name="password_min_length" type="number" default="12"
+					label="PLG_SYSTEM_MOKOWAAS_PASSWORD_LENGTH_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_PASSWORD_LENGTH_DESC" />
+				<field name="password_require_uppercase" type="radio" default="1"
+					label="PLG_SYSTEM_MOKOWAAS_PASSWORD_UPPER_LABEL"
+					class="btn-group btn-group-yesno">
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+				<field name="password_require_number" type="radio" default="1"
+					label="PLG_SYSTEM_MOKOWAAS_PASSWORD_NUMBER_LABEL"
+					class="btn-group btn-group-yesno">
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+				<field name="password_require_special" type="radio" default="1"
+					label="PLG_SYSTEM_MOKOWAAS_PASSWORD_SPECIAL_LABEL"
+					class="btn-group btn-group-yesno">
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+				<field name="upload_allowed_types" type="text"
+					label="PLG_SYSTEM_MOKOWAAS_UPLOAD_TYPES_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_UPLOAD_TYPES_DESC"
+					default="jpg,jpeg,png,gif,webp,svg,pdf,doc,docx,xls,xlsx" />
+				<field name="upload_max_size_mb" type="number"
+					label="PLG_SYSTEM_MOKOWAAS_UPLOAD_SIZE_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_UPLOAD_SIZE_DESC"
+					default="100" />
+			</fieldset>
+		</fields>
+	</config>
+</extension>

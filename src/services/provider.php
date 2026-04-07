@@ -6,17 +6,23 @@
  *
  * SPDX-LICENSE-IDENTIFIER: GPL-3.0-or-later
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License (./LICENSE.md).
  *
  * FILE INFORMATION
  * DEFGROUP: Joomla.Plugin
- * INGROUP: MokoWaaS-Brand
- * REPO: https://github.com/mokoconsulting-tech/mokowaasbrand
- * VERSION: 01.06.00
+ * INGROUP: MokoWaaS
+ * REPO: https://github.com/mokoconsulting-tech/mokowaas
+ * VERSION: 02.00.01
  * PATH: /src/services/provider.php
  * BRIEF: Service provider for dependency injection in Joomla 5.x
  * NOTE: Registers the plugin with Joomla's DI container
@@ -30,7 +36,7 @@ use Joomla\CMS\Plugin\PluginHelper;
 use Joomla\DI\Container;
 use Joomla\DI\ServiceProviderInterface;
 use Joomla\Event\DispatcherInterface;
-use Moko\Plugin\System\MokoWaaSBrand\Extension\MokoWaaSBrand;
+use Moko\Plugin\System\MokoWaaS\Extension\MokoWaaS;
 
 return new class () implements ServiceProviderInterface {
 	/**
@@ -47,9 +53,9 @@ return new class () implements ServiceProviderInterface {
 		$container->set(
 			PluginInterface::class,
 			function (Container $container) {
-				$plugin = new MokoWaaSBrand(
+				$plugin = new MokoWaaS(
 					$container->get(DispatcherInterface::class),
-					(array) PluginHelper::getPlugin('system', 'mokowaasbrand')
+					(array) PluginHelper::getPlugin('system', 'mokowaas')
 				);
 				$plugin->setApplication(Factory::getApplication());
 
