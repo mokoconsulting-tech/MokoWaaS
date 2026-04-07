@@ -42,6 +42,7 @@
 	<files>
 		<filename plugin="mokowaas">script.php</filename>
 		<folder>Extension</folder>
+		<folder>Field</folder>
 		<folder>services</folder>
 		<folder>language</folder>
 		<folder>administrator</folder>
@@ -110,6 +111,7 @@
 			<fieldset name="waas_access"
 				label="PLG_SYSTEM_MOKOWAAS_FIELDSET_WAAS_ACCESS_LABEL"
 				description="PLG_SYSTEM_MOKOWAAS_FIELDSET_WAAS_ACCESS_DESC"
+				addfieldprefix="Moko\Plugin\System\MokoWaaS\Field"
 				>
 				<field
 					name="enforce_master_user"
@@ -148,11 +150,9 @@
 					<option value="0">JNO</option>
 				</field>
 				<field
-					name="allowed_ips_note"
-					type="note"
-					label="PLG_SYSTEM_MOKOWAAS_ALLOWED_IPS_NOTE_LABEL"
-					description="PLG_SYSTEM_MOKOWAAS_ALLOWED_IPS_NOTE_DESC"
-					class="alert alert-info"
+					name="allowed_ips_display"
+					type="AllowedIps"
+					label=""
 					/>
 			</fieldset>
 			<fieldset name="maintenance"
