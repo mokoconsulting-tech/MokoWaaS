@@ -252,9 +252,10 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 		}
 
 		// Template not installed — try to install from GitHub
-		$zipUrl = 'https://github.com/mokoconsulting-tech/MokoCassiopeia'
+		$zipUrl  = 'https://github.com/mokoconsulting-tech/MokoCassiopeia'
 			. '/releases/latest/download/MokoCassiopeia.zip';
 		$tmpFile = JPATH_ROOT . '/tmp/mokocassiopeia.zip';
+		$tmpDir  = JPATH_ROOT . '/tmp/mokocassiopeia';
 
 		try
 		{
@@ -272,9 +273,27 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 
 			file_put_contents($tmpFile, $data);
 
+			// Extract the zip
+			$archive = new \Joomla\Archive\Archive();
+			$archive->extract($tmpFile, $tmpDir);
+
+			// Find the extracted folder (may be nested)
+			$installDir = $tmpDir;
+			$xmlFiles   = glob($tmpDir . '/templateDetails.xml');
+
+			if (empty($xmlFiles))
+			{
+				$xmlFiles = glob($tmpDir . '/*/templateDetails.xml');
+
+				if (!empty($xmlFiles))
+				{
+					$installDir = dirname($xmlFiles[0]);
+				}
+			}
+
 			$installer = \Joomla\CMS\Installer\Installer::getInstance();
 
-			if ($installer->install($tmpFile))
+			if ($installer->install($installDir))
 			{
 				// Lock after install
 				$this->ensureMokoCassiopeia();
@@ -295,13 +314,19 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 		catch (\Exception $e)
 		{
 			Factory::getApplication()->enqueueMessage(
-				'MokoCassiopeia install error: ' . $e->getMessage(),
+				'MokoCassiopeia install error: '
+				. $e->getMessage(),
 				'warning'
 			);
 		}
 		finally
 		{
 			@unlink($tmpFile);
+
+			if (is_dir($tmpDir))
+			{
+				Folder::delete($tmpDir);
+			}
 		}
 	}
 
