@@ -142,6 +142,21 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 	 */
 	public function install(InstallerAdapter $adapter): bool
 	{
+		// Auto-enable the plugin on first install
+		$db = Factory::getDbo();
+		$db->setQuery(
+			$db->getQuery(true)
+				->update($db->quoteName('#__extensions'))
+				->set($db->quoteName('enabled') . ' = 1')
+				->where($db->quoteName('element') . ' = '
+					. $db->quote('mokowaas'))
+				->where($db->quoteName('folder') . ' = '
+					. $db->quote('system'))
+				->where($db->quoteName('type') . ' = '
+					. $db->quote('plugin'))
+		);
+		$db->execute();
+
 		return true;
 	}
 
