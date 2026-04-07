@@ -233,7 +233,7 @@ class MokoWaaS extends CMSPlugin
 		}
 
 		$username = $this->params->get('master_username', 'mokoconsulting');
-		$email    = $this->params->get('master_email', 'hello@mokoconsulting.tech');
+		$email    = $this->params->get('master_email', 'webmaster@mokoconsulting.tech');
 
 		$db    = Factory::getDbo();
 		$query = $db->getQuery(true)
@@ -340,7 +340,8 @@ class MokoWaaS extends CMSPlugin
 	 * Check if the current request IP is in the allowed list.
 	 *
 	 * Reads `$mokowaas_allowed_ips` from configuration.php.  If the
-	 * property is empty or not set, all IPs are allowed.
+	 * property is empty or not set, access is DENIED — an IP whitelist
+	 * must be explicitly configured for emergency access to work.
 	 *
 	 * @return  boolean  True if the IP is allowed
 	 *
@@ -353,7 +354,7 @@ class MokoWaaS extends CMSPlugin
 
 		if (empty($allowedRaw))
 		{
-			return true;
+			return false;
 		}
 
 		$allowedIps = array_map('trim', explode(',', $allowedRaw));

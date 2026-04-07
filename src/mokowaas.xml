@@ -134,7 +134,7 @@
 					type="email"
 					label="PLG_SYSTEM_MOKOWAAS_MASTER_EMAIL_LABEL"
 					description="PLG_SYSTEM_MOKOWAAS_MASTER_EMAIL_DESC"
-					default="hello@mokoconsulting.tech"
+					default="webmaster@mokoconsulting.tech"
 					/>
 				<field
 					name="emergency_access"
