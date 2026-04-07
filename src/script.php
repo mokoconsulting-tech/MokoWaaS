@@ -123,6 +123,7 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 		if ($type === 'install' || $type === 'update')
 		{
 			$this->enableAndLockPlugin();
+			$this->ensureMokoCassiopeia();
 			$this->installLanguageOverrides();
 			$this->updateLoginSupportUrls();
 			$this->updateAtumBranding();
@@ -204,6 +205,101 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 					. $db->quote('plugin'))
 		);
 		$db->execute();
+	}
+
+	/**
+	 * Ensure mokocassiopeia template is installed and locked.
+	 *
+	 * If the template exists in #__extensions, lock and protect it.
+	 * If not found, attempt to install from the update server.
+	 *
+	 * @return  void
+	 *
+	 * @since   02.00.03
+	 */
+	private function ensureMokoCassiopeia()
+	{
+		$db    = Factory::getDbo();
+		$query = $db->getQuery(true)
+			->select([$db->quoteName('extension_id'), $db->quoteName('enabled')])
+			->from($db->quoteName('#__extensions'))
+			->where($db->quoteName('element') . ' = '
+				. $db->quote('mokocassiopeia'))
+			->where($db->quoteName('type') . ' = '
+				. $db->quote('template'));
+
+		$db->setQuery($query);
+		$template = $db->loadObject();
+
+		if ($template)
+		{
+			// Lock and protect
+			$db->setQuery(
+				$db->getQuery(true)
+					->update($db->quoteName('#__extensions'))
+					->set($db->quoteName('enabled') . ' = 1')
+					->set($db->quoteName('locked') . ' = 1')
+					->set($db->quoteName('protected') . ' = 1')
+					->where($db->quoteName('extension_id') . ' = '
+						. (int) $template->extension_id)
+			);
+			$db->execute();
+
+			return;
+		}
+
+		// Template not installed — try to install from GitHub
+		$zipUrl = 'https://github.com/mokoconsulting-tech/MokoCassiopeia'
+			. '/releases/latest/download/MokoCassiopeia.zip';
+		$tmpFile = JPATH_ROOT . '/tmp/mokocassiopeia.zip';
+
+		try
+		{
+			$data = @file_get_contents($zipUrl);
+
+			if ($data === false)
+			{
+				Factory::getApplication()->enqueueMessage(
+					'MokoCassiopeia not found and download failed.',
+					'warning'
+				);
+
+				return;
+			}
+
+			file_put_contents($tmpFile, $data);
+
+			$installer = \Joomla\CMS\Installer\Installer::getInstance();
+
+			if ($installer->install($tmpFile))
+			{
+				// Lock after install
+				$this->ensureMokoCassiopeia();
+
+				Factory::getApplication()->enqueueMessage(
+					'MokoCassiopeia template installed and locked.',
+					'message'
+				);
+			}
+			else
+			{
+				Factory::getApplication()->enqueueMessage(
+					'MokoCassiopeia installation failed.',
+					'warning'
+				);
+			}
+		}
+		catch (\Exception $e)
+		{
+			Factory::getApplication()->enqueueMessage(
+				'MokoCassiopeia install error: ' . $e->getMessage(),
+				'warning'
+			);
+		}
+		finally
+		{
+			@unlink($tmpFile);
+		}
 	}
 
 	private const BLOCK_START = '; ===== BEGIN MokoWaaS Overrides (do not edit this block) =====';
