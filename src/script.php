@@ -262,7 +262,8 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 		if (empty($zipUrl))
 		{
 			Factory::getApplication()->enqueueMessage(
-				'MokoCassiopeia: could not resolve download URL.',
+				'MokoCassiopeia: could not resolve download URL '
+				. 'from updates.xml.',
 				'warning'
 			);
 
@@ -279,7 +280,7 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 			if ($data === false)
 			{
 				Factory::getApplication()->enqueueMessage(
-					'MokoCassiopeia not found and download failed.',
+					'MokoCassiopeia download failed: ' . $zipUrl,
 					'warning'
 				);
 
@@ -288,15 +289,15 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 
 			file_put_contents($tmpFile, $data);
 
-			// Extract the zip
+			// Extract the release zip
 			$archive = new \Joomla\Archive\Archive();
 			$archive->extract($tmpFile, $tmpDir);
 
-			// Find the extracted folder (may be nested)
+			// Release zips should have templateDetails.xml at root
+			// or one level deep
 			$installDir = $tmpDir;
-			$xmlFiles   = glob($tmpDir . '/templateDetails.xml');
 
-			if (empty($xmlFiles))
+			if (!file_exists($tmpDir . '/templateDetails.xml'))
 			{
 				$xmlFiles = glob($tmpDir . '/*/templateDetails.xml');
 
@@ -304,17 +305,26 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 				{
 					$installDir = dirname($xmlFiles[0]);
 				}
+				else
+				{
+					Factory::getApplication()->enqueueMessage(
+						'MokoCassiopeia: templateDetails.xml not '
+						. 'found in archive.',
+						'warning'
+					);
+
+					return;
+				}
 			}
 
 			$installer = \Joomla\CMS\Installer\Installer::getInstance();
 
 			if ($installer->install($installDir))
 			{
-				// Lock after install
 				$this->ensureMokoCassiopeia();
 
 				Factory::getApplication()->enqueueMessage(
-					'MokoCassiopeia template installed and locked.',
+					'MokoCassiopeia installed and locked.',
 					'message'
 				);
 			}
@@ -329,8 +339,7 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 		catch (\Exception $e)
 		{
 			Factory::getApplication()->enqueueMessage(
-				'MokoCassiopeia install error: '
-				. $e->getMessage(),
+				'MokoCassiopeia error: ' . $e->getMessage(),
 				'warning'
 			);
 		}
