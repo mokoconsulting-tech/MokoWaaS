@@ -173,6 +173,7 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 	 */
 	public function uninstall(InstallerAdapter $adapter): bool
 	{
+		$this->sendInstallNotification('uninstall');
 		$this->uninstallLanguageOverrides();
 		$this->unregisterActionLogExtension();
 
