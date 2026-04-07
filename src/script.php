@@ -251,9 +251,22 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 			return;
 		}
 
-		// Template not installed — try to install from GitHub
-		$zipUrl  = 'https://github.com/mokoconsulting-tech/MokoCassiopeia'
-			. '/releases/latest/download/MokoCassiopeia.zip';
+		// Template not installed — get download URL from updates.xml
+		$updatesUrl = 'https://raw.githubusercontent.com'
+			. '/mokoconsulting-tech/MokoCassiopeia/main/updates.xml';
+
+		$zipUrl = $this->getDownloadUrlFromUpdates($updatesUrl);
+
+		if (empty($zipUrl))
+		{
+			Factory::getApplication()->enqueueMessage(
+				'MokoCassiopeia: could not resolve download URL.',
+				'warning'
+			);
+
+			return;
+		}
+
 		$tmpFile = JPATH_ROOT . '/tmp/mokocassiopeia.zip';
 		$tmpDir  = JPATH_ROOT . '/tmp/mokocassiopeia';
 
@@ -364,6 +377,41 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 				->where($db->quoteName('client_id') . ' = ' . $clientId)
 		);
 		$db->execute();
+	}
+
+	/**
+	 * Parse an updates.xml and return the download URL.
+	 *
+	 * @param   string  $updatesUrl  URL to the updates.xml file
+	 *
+	 * @return  string|null  Download URL or null on failure
+	 *
+	 * @since   02.01.01
+	 */
+	private function getDownloadUrlFromUpdates($updatesUrl)
+	{
+		try
+		{
+			$xml = @file_get_contents($updatesUrl);
+
+			if ($xml === false)
+			{
+				return null;
+			}
+
+			$updates = new \SimpleXMLElement($xml);
+
+			if (isset($updates->update->downloads->downloadurl))
+			{
+				return (string) $updates->update->downloads->downloadurl;
+			}
+		}
+		catch (\Exception $e)
+		{
+			return null;
+		}
+
+		return null;
 	}
 
 	private const BLOCK_START = '; ===== BEGIN MokoWaaS Overrides (do not edit this block) =====';
