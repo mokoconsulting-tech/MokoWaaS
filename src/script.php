@@ -125,6 +125,7 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 			$this->installLanguageOverrides();
 			$this->updateLoginSupportUrls();
 			$this->updateAtumBranding();
+			$this->registerActionLogExtension();
 		}
 
 		return true;
@@ -169,8 +170,8 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 	 */
 	public function uninstall(InstallerAdapter $adapter): bool
 	{
-		// Remove language overrides on uninstall
 		$this->uninstallLanguageOverrides();
+		$this->unregisterActionLogExtension();
 
 		return true;
 	}
@@ -435,6 +436,57 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 		Factory::getApplication()->enqueueMessage(
 			'Updated Atum template branding.', 'message'
 		);
+	}
+
+	/**
+	 * Register the plugin in #__action_logs_extensions so it appears
+	 * as a filterable extension in System > Action Logs.
+	 *
+	 * @return  void
+	 *
+	 * @since   02.00.00
+	 */
+	private function registerActionLogExtension()
+	{
+		$db    = Factory::getDbo();
+		$query = $db->getQuery(true)
+			->select('COUNT(*)')
+			->from($db->quoteName('#__action_logs_extensions'))
+			->where($db->quoteName('extension') . ' = '
+				. $db->quote('plg_system_mokowaas'));
+
+		$db->setQuery($query);
+
+		if ((int) $db->loadResult() > 0)
+		{
+			return;
+		}
+
+		$row = (object) ['extension' => 'plg_system_mokowaas'];
+		$db->insertObject('#__action_logs_extensions', $row);
+
+		Factory::getApplication()->enqueueMessage(
+			'Registered MokoWaaS in Action Logs.', 'message'
+		);
+	}
+
+	/**
+	 * Remove the plugin from #__action_logs_extensions on uninstall.
+	 *
+	 * @return  void
+	 *
+	 * @since   02.00.00
+	 */
+	private function unregisterActionLogExtension()
+	{
+		$db = Factory::getDbo();
+		$db->setQuery(
+			$db->getQuery(true)
+				->delete($db->quoteName('#__action_logs_extensions'))
+				->where($db->quoteName('extension') . ' = '
+					. $db->quote('plg_system_mokowaas'))
+		);
+		$db->execute();
 	}
 
 	/**

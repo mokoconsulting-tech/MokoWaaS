@@ -193,19 +193,19 @@
 				<field name="color_primary" type="color"
 					label="PLG_SYSTEM_MOKOWAAS_COLOR_PRIMARY_LABEL"
 					description="PLG_SYSTEM_MOKOWAAS_COLOR_PRIMARY_DESC"
-					default="" />
+					default="#1a2744" />
 				<field name="color_sidebar" type="color"
 					label="PLG_SYSTEM_MOKOWAAS_COLOR_SIDEBAR_LABEL"
 					description="PLG_SYSTEM_MOKOWAAS_COLOR_SIDEBAR_DESC"
-					default="" />
+					default="#0f1b2d" />
 				<field name="color_header" type="color"
 					label="PLG_SYSTEM_MOKOWAAS_COLOR_HEADER_LABEL"
 					description="PLG_SYSTEM_MOKOWAAS_COLOR_HEADER_DESC"
-					default="" />
+					default="#1a2744" />
 				<field name="color_link" type="color"
 					label="PLG_SYSTEM_MOKOWAAS_COLOR_LINK_LABEL"
 					description="PLG_SYSTEM_MOKOWAAS_COLOR_LINK_DESC"
-					default="" />
+					default="#2ecc71" />
 				<field name="custom_css" type="textarea"
 					label="PLG_SYSTEM_MOKOWAAS_CUSTOM_CSS_LABEL"
 					description="PLG_SYSTEM_MOKOWAAS_CUSTOM_CSS_DESC"
@@ -259,7 +259,7 @@
 				label="PLG_SYSTEM_MOKOWAAS_FIELDSET_SECURITY_LABEL"
 				description="PLG_SYSTEM_MOKOWAAS_FIELDSET_SECURITY_DESC"
 				>
-				<field name="force_https" type="radio" default="0"
+				<field name="force_https" type="radio" default="1"
 					label="PLG_SYSTEM_MOKOWAAS_FORCE_HTTPS_LABEL"
 					description="PLG_SYSTEM_MOKOWAAS_FORCE_HTTPS_DESC"
 					class="btn-group btn-group-yesno">
@@ -269,7 +269,7 @@
 				<field name="admin_session_timeout" type="number"
 					label="PLG_SYSTEM_MOKOWAAS_SESSION_TIMEOUT_LABEL"
 					description="PLG_SYSTEM_MOKOWAAS_SESSION_TIMEOUT_DESC"
-					default="0" hint="Minutes (0 = Joomla default)" />
+					default="60" hint="Minutes (0 = Joomla default)" />
 				<field name="password_min_length" type="number" default="12"
 					label="PLG_SYSTEM_MOKOWAAS_PASSWORD_LENGTH_LABEL"
 					description="PLG_SYSTEM_MOKOWAAS_PASSWORD_LENGTH_DESC" />
