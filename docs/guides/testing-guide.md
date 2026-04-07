@@ -164,12 +164,16 @@ Verify the following admin areas no longer show "Joomla":
 | 3 | Delete mokowaas-verify.php via FTP/SSH | File removed from server | [ ] |
 | 4 | Login again with same credentials | Access granted, logged in as master user | [ ] |
 | 5 | Check mokowaas-verify.flag | Cleaned up after successful login | [ ] |
-| 6 | Check mokowaas log | Emergency login event logged with IP | [ ] |
-| 7 | Set `$mokowaas_allowed_ips = '1.2.3.4';` (not your IP) | Emergency login silently rejected | [ ] |
-| 8 | Add your IP to allowed list | Emergency login works | [ ] |
-| 9 | Remove `$mokowaas_allowed_ips` from config | All IPs allowed | [ ] |
-| 10 | Use wrong DB password | Normal auth failure, no verify file | [ ] |
-| 11 | Set emergency_access to No in plugin config | DB password login disabled | [ ] |
+| 6 | Check System > Action Logs | "Emergency access LOGIN" entry with IP | [ ] |
+| 7 | Check master email inbox | Notification email received with site, user, IP, time | [ ] |
+| 8 | Set `$mokowaas_allowed_ips = '1.2.3.4';` (not your IP) | Emergency login blocked | [ ] |
+| 9 | Check Action Logs | "Emergency access BLOCKED (unauthorized IP)" entry | [ ] |
+| 10 | Add your IP to allowed list | Emergency login works | [ ] |
+| 11 | Remove `$mokowaas_allowed_ips` entirely | Emergency access BLOCKED (empty = denied) | [ ] |
+| 12 | Use wrong DB password | Normal auth failure | [ ] |
+| 13 | Check Action Logs | "Emergency access FAILED (wrong password)" entry | [ ] |
+| 14 | Set emergency_access to No in plugin config | DB password login disabled | [ ] |
+| 15 | Plugin config > WaaS Access tab | IP whitelist panel shows current IPs, your IP, status | [ ] |
 
 ### 2.13 Override Install Respects User Overrides
 
@@ -211,16 +215,21 @@ Verify the following admin areas no longer show "Joomla":
 
 | # | Step | Expected Result | Pass |
 |---|------|-----------------|------|
-| 1 | Upload admin logo via Visual Branding tab | Admin header shows custom logo | [ ] |
-| 2 | Upload login logo, log out | Login page shows custom logo | [ ] |
-| 3 | Upload favicon (.ico/.png) | Browser tab shows custom icon | [ ] |
-| 4 | Set Primary Color | Admin accent color changes | [ ] |
-| 5 | Set Sidebar Color | Sidebar background changes | [ ] |
-| 6 | Set Header Color | Top bar color changes | [ ] |
-| 7 | Set Link Color | Admin hyperlinks change color | [ ] |
-| 8 | Add custom CSS | Styles applied to admin pages | [ ] |
-| 9 | Put `</style>` in CSS textarea | Stripped, no XSS | [ ] |
-| 10 | Clear all visual settings | Defaults restored | [ ] |
+| 1 | Install plugin | Atum sidebar (expanded) shows logo.png | [ ] |
+| 2 | Collapse sidebar | Shows favicon_256.png | [ ] |
+| 3 | Log out | Login page shows logo.png | [ ] |
+| 4 | Check browser tab | favicon.svg displayed (modern) or favicon.ico (legacy) | [ ] |
+| 5 | Check /media/plg_system_mokowaas/ | All 4 image files present | [ ] |
+| 6 | Manually change Atum logo in template styles | Reload admin → enforced back to plugin logo | [ ] |
+| 7 | Check Atum style params in DB | logoBrandLarge, logoBrandSmall, loginLogo set, alt text empty | [ ] |
+| 8 | Set Primary Color | Admin accent color changes | [ ] |
+| 9 | Set Sidebar Color | Sidebar background changes | [ ] |
+| 10 | Set Header Color | Top bar color changes | [ ] |
+| 11 | Set Link Color | Admin hyperlinks change color | [ ] |
+| 12 | Add custom CSS | Styles applied to admin pages | [ ] |
+| 13 | Put `</style>` in CSS textarea | Stripped, no XSS | [ ] |
+| 14 | Clear all color/CSS settings | Defaults restored | [ ] |
+| 15 | Replace logo.png in media folder, clear cache | New logo appears | [ ] |
 
 ### 2.16 Tenant Restrictions
 
@@ -251,19 +260,6 @@ Verify the following admin areas no longer show "Joomla":
 | 8 | Valid password | Accepted | [ ] |
 | 9 | Upload disallowed file type | Rejected by media manager | [ ] |
 | 10 | Upload oversized file | Rejected | [ ] |
-
-### 2.18 Operations
-
-| # | Step | Expected Result | Pass |
-|---|------|-----------------|------|
-| 1 | Set heartbeat URL, load admin page | POST sent with site data | [ ] |
-| 2 | Load again within interval | No duplicate POST | [ ] |
-| 3 | Verify heartbeat payload | domain, versions, counts present | [ ] |
-| 4 | License URL returns `{"status":"valid"}` | No warnings | [ ] |
-| 5 | License returns `{"status":"expired"}`, action=warn | Warning shown | [ ] |
-| 6 | License expired, action=lockout, non-master | Locked out | [ ] |
-| 7 | License expired, action=lockout, master user | Still has access | [ ] |
-| 8 | License URL unreachable | Site works, warning logged | [ ] |
 
 ## 3. Edge Cases
 
@@ -303,4 +299,5 @@ grep -r 'Version:' src/**/*.ini | grep -v '02.00.00'
 | Version  | Date       | Author                          | Description                     |
 | -------- | ---------- | ------------------------------- | ------------------------------- |
 | 02.00.00 | 2026-03-31 | Jonathan Miller (@jmiller-moko) | Initial testing guide for v2.0  |
-| 02.00.00 | 2026-04-04 | Jonathan Miller (@jmiller-moko) | Added suites 2.11–2.14 (master user, emergency access, non-overwrite install, maintenance actions), updated key coverage |
+| 02.00.00 | 2026-04-04 | Jonathan Miller (@jmiller-moko) | Added suites 2.11–2.14 |
+| 02.00.00 | 2026-04-07 | Jonathan Miller (@jmiller-moko) | Updated 2.12 (action logs, email, IP display), 2.15 (Atum params), removed 2.18 (deferred) |
