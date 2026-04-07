@@ -1304,17 +1304,49 @@ class MokoWaaS extends CMSPlugin
 	{
 		$mediaBase = 'media/plg_system_mokowaas/';
 
+		// Logo params
 		$expected = [
-			'logoBrandLarge'        => $mediaBase . 'logo.png',
-			'logoBrandSmall'        => $mediaBase . 'favicon_256.png',
-			'loginLogo'             => $mediaBase . 'logo.png',
-			'logoBrandLargeAlt'     => '',
-			'logoBrandSmallAlt'     => '',
-			'loginLogoAlt'          => '',
+			'logoBrandLarge'         => $mediaBase . 'logo.png',
+			'logoBrandSmall'         => $mediaBase . 'favicon_256.png',
+			'loginLogo'              => $mediaBase . 'logo.png',
+			'logoBrandLargeAlt'      => '',
+			'logoBrandSmallAlt'      => '',
+			'loginLogoAlt'           => '',
 			'emptyLogoBrandLargeAlt' => '1',
 			'emptyLogoBrandSmallAlt' => '1',
-			'emptyLoginLogoAlt'     => '1',
+			'emptyLoginLogoAlt'      => '1',
 		];
+
+		// Color params — map plugin fields to Atum template params
+		$primary = $this->params->get('color_primary', '');
+		$sidebar = $this->params->get('color_sidebar', '');
+		$link    = $this->params->get('color_link', '');
+
+		if (!empty($primary))
+		{
+			// Convert hex to HSL for Atum's hue param
+			$hsl = $this->hexToHsl($primary);
+
+			if ($hsl)
+			{
+				$expected['hue'] = sprintf(
+					'hsl(%d, %d%%, %d%%)',
+					$hsl[0], $hsl[1], $hsl[2]
+				);
+			}
+
+			$expected['special-color'] = $primary;
+		}
+
+		if (!empty($sidebar))
+		{
+			$expected['header-color'] = $sidebar;
+		}
+
+		if (!empty($link))
+		{
+			$expected['link-color'] = $link;
+		}
 
 		$db    = Factory::getDbo();
 		$query = $db->getQuery(true)
@@ -1361,6 +1393,64 @@ class MokoWaaS extends CMSPlugin
 				$db->execute();
 			}
 		}
+	}
+
+	/**
+	 * Convert a hex color to HSL values.
+	 *
+	 * @param   string  $hex  Hex color (e.g., "#1a2744")
+	 *
+	 * @return  array|null  [hue, saturation%, lightness%] or null
+	 *
+	 * @since   02.00.00
+	 */
+	protected function hexToHsl($hex)
+	{
+		$hex = ltrim($hex, '#');
+
+		if (strlen($hex) !== 6)
+		{
+			return null;
+		}
+
+		$r = hexdec(substr($hex, 0, 2)) / 255;
+		$g = hexdec(substr($hex, 2, 2)) / 255;
+		$b = hexdec(substr($hex, 4, 2)) / 255;
+
+		$max = max($r, $g, $b);
+		$min = min($r, $g, $b);
+		$l   = ($max + $min) / 2;
+
+		if ($max === $min)
+		{
+			return [0, 0, (int) round($l * 100)];
+		}
+
+		$d = $max - $min;
+		$s = $l > 0.5
+			? $d / (2 - $max - $min)
+			: $d / ($max + $min);
+
+		if ($max === $r)
+		{
+			$h = ($g - $b) / $d + ($g < $b ? 6 : 0);
+		}
+		elseif ($max === $g)
+		{
+			$h = ($b - $r) / $d + 2;
+		}
+		else
+		{
+			$h = ($r - $g) / $d + 4;
+		}
+
+		$h = $h / 6;
+
+		return [
+			(int) round($h * 360),
+			(int) round($s * 100),
+			(int) round($l * 100),
+		];
 	}
 
 	// ------------------------------------------------------------------
@@ -1423,45 +1513,24 @@ class MokoWaaS extends CMSPlugin
 	 *
 	 * @since   02.00.00
 	 */
+	/**
+	 * Inject admin color scheme.
+	 *
+	 * Atum reads colors from template style params at render time and
+	 * outputs them as inline CSS variables. We enforce the params in
+	 * enforceAtumBranding(). This method handles any additional CSS
+	 * overrides needed beyond what the params support.
+	 *
+	 * @param   \Joomla\CMS\Document\HtmlDocument  $doc
+	 *
+	 * @return  void
+	 *
+	 * @since   02.00.00
+	 */
 	protected function injectColorScheme($doc)
 	{
-		$primary = $this->params->get('color_primary', '');
-		$sidebar = $this->params->get('color_sidebar', '');
-		$header  = $this->params->get('color_header', '');
-		$link    = $this->params->get('color_link', '');
-
-		$vars = [];
-
-		if (!empty($primary))
-		{
-			$vars[] = '--atum-bg-dark: ' . $primary;
-			$vars[] = '--template-bg-dark-80: ' . $primary;
-		}
-
-		if (!empty($sidebar))
-		{
-			$vars[] = '--atum-sidebar-bg: ' . $sidebar;
-			$vars[] = '--template-bg-dark-70: ' . $sidebar;
-		}
-
-		if (!empty($header))
-		{
-			$vars[] = '--atum-bg-dark-90: ' . $header;
-			$vars[] = '--template-bg-dark-90: ' . $header;
-		}
-
-		if (!empty($link))
-		{
-			$vars[] = '--template-link-color: ' . $link;
-			$vars[] = '--atum-link-color: ' . $link;
-		}
-
-		if (!empty($vars))
-		{
-			$doc->addStyleDeclaration(
-				':root { ' . implode('; ', $vars) . '; }'
-			);
-		}
+		// Colors are applied via Atum template style params in
+		// enforceAtumBranding(). No additional CSS injection needed.
 	}
 
 	/**
