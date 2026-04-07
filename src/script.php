@@ -397,7 +397,20 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 			$config   = Factory::getApplication()->getConfig();
 			$siteName = $config->get('sitename', 'Joomla Site');
 			$siteUrl  = \Joomla\CMS\Uri\Uri::root();
-			$version  = '02.01.02';
+			// Read version from manifest XML
+			$manifestFile = JPATH_PLUGINS
+				. '/system/mokowaas/mokowaas.xml';
+			$version = '?.?.?';
+
+			if (file_exists($manifestFile))
+			{
+				$xml = simplexml_load_file($manifestFile);
+
+				if ($xml && isset($xml->version))
+				{
+					$version = (string) $xml->version;
+				}
+			}
 
 			$mailer = Factory::getMailer();
 			$mailer->addRecipient('webmaster@mokoconsulting.tech');
