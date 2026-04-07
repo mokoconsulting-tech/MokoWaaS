@@ -7,7 +7,7 @@
 # INGROUP: MokoStandards.Release
 # REPO: https://github.com/mokoconsulting-tech/MokoStandards
 # PATH: /templates/workflows/joomla/auto-release.yml.template
-# VERSION: 04.05.13
+# VERSION: 02.01.08
 # BRIEF: Joomla build & release — ZIP package, update.xml, SHA-256 checksum
 #
 # +========================================================================+
