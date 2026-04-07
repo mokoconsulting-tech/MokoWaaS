@@ -10,13 +10,13 @@
  DEFGROUP: Joomla.Plugin
  INGROUP: MokoWaaS.Guides
  REPO: https://github.com/mokoconsulting-tech/mokowaas
- VERSION: 02.00.01
+ VERSION: 02.01.08
  PATH: /docs/guides/operations-guide.md
  BRIEF: Operational guide for administering and managing the MokoWaaS system plugin
  NOTE: Defines lifecycle, responsibilities, and operational behaviors
 -->
 
-# MokoWaaS Operations Guide (VERSION: 02.00.01)
+# MokoWaaS Operations Guide (VERSION: 02.01.08)
 
 ## Introduction
 
