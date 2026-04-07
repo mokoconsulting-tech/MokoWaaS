@@ -104,7 +104,7 @@ During install/update, the install script resolves placeholders and writes the r
 
 ```ini
 ; ===== BEGIN MokoWaaS Overrides (do not edit this block) =====
-; Auto-generated on 2026-03-31 12:00:00 — do not edit manually.
+; Auto-generated on 2026-04-07 — do not edit manually.
 TPL_ATUM_POWERED_BY="Powered by MokoWaaS"
 ...
 ; ===== END MokoWaaS Overrides =====
@@ -266,5 +266,4 @@ Restricted components are automatically hidden from the admin menu via `onPrepro
 | Version  | Date       | Author                          | Description                                    |
 | -------- | ---------- | ------------------------------- | ---------------------------------------------- |
 | 01.02.00 | 2025-12-11 | Jonathan Miller (@jmiller-moko) | Initial standalone configuration guide created |
-| 02.00.00 | 2026-03-31 | Jonathan Miller (@jmiller-moko) | Template-based overrides, configurable brand name/company/URL |
 | 02.00.00 | 2026-04-07 | Jonathan Miller (@jmiller-moko) | Full rewrite: WaaS access, visual branding, tenant restrictions, security, maintenance, action logs |

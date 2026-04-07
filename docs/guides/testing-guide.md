@@ -298,6 +298,4 @@ grep -r 'Version:' src/**/*.ini | grep -v '02.00.00'
 
 | Version  | Date       | Author                          | Description                     |
 | -------- | ---------- | ------------------------------- | ------------------------------- |
-| 02.00.00 | 2026-03-31 | Jonathan Miller (@jmiller-moko) | Initial testing guide for v2.0  |
-| 02.00.00 | 2026-04-04 | Jonathan Miller (@jmiller-moko) | Added suites 2.11–2.14 |
-| 02.00.00 | 2026-04-07 | Jonathan Miller (@jmiller-moko) | Updated 2.12 (action logs, email, IP display), 2.15 (Atum params), removed 2.18 (deferred) |
+| 02.00.00 | 2026-04-07 | Jonathan Miller (@jmiller-moko) | Full testing guide: 17 suites covering install, branding, access, visual, security, maintenance, edge cases |

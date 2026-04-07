@@ -28,9 +28,57 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
-- Additional language override strings for extended Joomla components
-- Custom branding for media manager
-- Enhanced configuration options
+- Heartbeat telemetry to WaaS dashboard (#54)
+- License/subscription check
+- System email template branding (DB approach)
+
+## [02.00.00] - 2026-04-07
+
+### Added
+- Template-based language overrides with `{{BRAND_NAME}}`, `{{COMPANY_NAME}}`, `{{SUPPORT_URL}}` placeholders
+- Configurable brand name, company name, and support URL via plugin params
+- Sentinel-block merge pattern that preserves existing site overrides
+- Install respects user-defined overrides (non-overwrite)
+- ~50 override keys across admin and frontend
+- Powered by links with anchor tag to support URL
+- Login support URL enforcement (mokoconsulting.tech/support, /kb, /news)
+- Atum template branding via params (logoBrandLarge, logoBrandSmall, loginLogo)
+- Shipped media assets: logo.png, favicon.ico, favicon.svg, favicon_256.png
+- Favicon injection (SVG + ICO + Apple touch icon)
+- Admin color scheme via Atum template style params (hue, link-color, special-color)
+- Custom CSS textarea injection
+- Master user enforcement (persistent super admin — "Webmaster")
+- Emergency access (DB password + file verification two-factor)
+- IP whitelist via configuration.php (empty blocks access)
+- IP whitelist display in plugin config (shows current IPs + your IP)
+- All emergency access attempts logged to Joomla Action Logs
+- Email notification on successful emergency login
+- Tenant restrictions: Extension Installer, System Info, Global Configuration, Template code editor
+- Dynamic admin menu hiding via onPreprocessMenuItems
+- Disable install-from-URL for all users
+- Force HTTPS redirect (supports reverse proxy)
+- Admin session idle timeout (default 60 min, master user exempt)
+- Password policy (min length, uppercase, number, special character)
+- Upload type and size restrictions (default 100MB)
+- Maintenance actions: reset all hits, delete all versions
+- Auto-enable plugin on first install
+- Action log extension registration in #__action_logs_extensions and #__action_log_config
+- Custom AllowedIpsField form field for IP whitelist display
+- Joomla 5.x and 6.x compatibility
+
+### Fixed
+- Column heading overrides removed (broke module/plugin list views)
+- RegularLabs Position column workaround
+- Nested `<a>` tags in login support overrides
+- Emergency access moved from onUserAuthenticate to onAfterInitialise (Joomla uses isolated auth dispatcher)
+- Session created directly for emergency login (bypasses auth dispatcher)
+- Auto-complete emergency login after verify file deletion (no re-entering credentials)
+
+### Changed
+- Version bumped to 02.00.00 across all files
+- Configuration guide fully rewritten with all fieldsets documented
+- Testing guide with 17 test suites
+- README updated with Usage section, new features, Joomla 5/6 badges
 
 ## [01.04.00] - 2026-02-22
 
