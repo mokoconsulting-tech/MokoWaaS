@@ -15,7 +15,7 @@
  DEFGROUP: Joomla.Plugin
  INGROUP: MokoWaaS
  REPO: https://github.com/mokoconsulting-tech/mokowaas
- VERSION: 02.01.01
+ VERSION: 02.01.04
  PATH: /README.md
  BRIEF: Rebranding plugin for MokoWaaS platform
  NOTE: Internal WaaS identity abstraction layer
@@ -23,7 +23,7 @@
 
 # MokoWaaS Plugin
 
-[![Version](https://img.shields.io/badge/version-02.01.01-blue.svg)](https://github.com/mokoconsulting-tech/mokowaas)
+[![Version](https://img.shields.io/badge/version-02.01.04-blue.svg)](https://github.com/mokoconsulting-tech/mokowaas)
 [![License](https://img.shields.io/badge/license-GPL--3.0--or--later-green.svg)](LICENSE.md)
 [![Joomla](https://img.shields.io/badge/Joomla-5.x%20%7C%206.x-orange.svg)](https://www.joomla.org)
 [![PHP](https://img.shields.io/badge/PHP-8.1%2B-blue.svg)](https://www.php.net)
