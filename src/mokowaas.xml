@@ -49,6 +49,10 @@
 
 	<media destination="plg_system_mokowaas" folder="media">
 		<filename>index.html</filename>
+		<filename>favicon.ico</filename>
+		<filename>favicon.svg</filename>
+		<filename>favicon_256.png</filename>
+		<filename>logo.png</filename>
 	</media>
 
 	<languages folder="language">
@@ -182,18 +186,10 @@
 				label="PLG_SYSTEM_MOKOWAAS_FIELDSET_VISUAL_LABEL"
 				description="PLG_SYSTEM_MOKOWAAS_FIELDSET_VISUAL_DESC"
 				>
-				<field name="admin_logo" type="media"
-					label="PLG_SYSTEM_MOKOWAAS_ADMIN_LOGO_LABEL"
-					description="PLG_SYSTEM_MOKOWAAS_ADMIN_LOGO_DESC"
-					directory="images" />
-				<field name="login_logo" type="media"
-					label="PLG_SYSTEM_MOKOWAAS_LOGIN_LOGO_LABEL"
-					description="PLG_SYSTEM_MOKOWAAS_LOGIN_LOGO_DESC"
-					directory="images" />
-				<field name="custom_favicon" type="media"
-					label="PLG_SYSTEM_MOKOWAAS_FAVICON_LABEL"
-					description="PLG_SYSTEM_MOKOWAAS_FAVICON_DESC"
-					directory="images" />
+				<field name="branding_note" type="note"
+					label="PLG_SYSTEM_MOKOWAAS_BRANDING_NOTE_LABEL"
+					description="PLG_SYSTEM_MOKOWAAS_BRANDING_NOTE_DESC"
+					class="alert alert-info" />
 				<field name="color_primary" type="color"
 					label="PLG_SYSTEM_MOKOWAAS_COLOR_PRIMARY_LABEL"
 					description="PLG_SYSTEM_MOKOWAAS_COLOR_PRIMARY_DESC"

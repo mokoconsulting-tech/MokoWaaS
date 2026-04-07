@@ -124,6 +124,7 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 		{
 			$this->installLanguageOverrides();
 			$this->updateLoginSupportUrls();
+			$this->updateAtumBranding();
 		}
 
 		return true;
@@ -367,6 +368,72 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 
 		Factory::getApplication()->enqueueMessage(
 			'Updated login support URLs.', 'message'
+		);
+	}
+
+	/**
+	 * Set Atum admin template branding params at install time.
+	 *
+	 * @return  void
+	 *
+	 * @since   02.00.00
+	 */
+	private function updateAtumBranding()
+	{
+		$mediaBase = 'media/plg_system_mokowaas/';
+
+		$expected = [
+			'logoBrandLarge'         => $mediaBase . 'logo.png',
+			'logoBrandSmall'         => $mediaBase . 'favicon_256.png',
+			'loginLogo'              => $mediaBase . 'logo.png',
+			'logoBrandLargeAlt'      => '',
+			'logoBrandSmallAlt'      => '',
+			'loginLogoAlt'           => '',
+			'emptyLogoBrandLargeAlt' => '1',
+			'emptyLogoBrandSmallAlt' => '1',
+			'emptyLoginLogoAlt'      => '1',
+		];
+
+		$db    = Factory::getDbo();
+		$query = $db->getQuery(true)
+			->select([$db->quoteName('id'), $db->quoteName('params')])
+			->from($db->quoteName('#__template_styles'))
+			->where($db->quoteName('template') . ' = '
+				. $db->quote('atum'))
+			->where($db->quoteName('client_id') . ' = 1');
+
+		$db->setQuery($query);
+		$styles = $db->loadObjectList();
+
+		if (empty($styles))
+		{
+			return;
+		}
+
+		foreach ($styles as $style)
+		{
+			$params = new \Joomla\Registry\Registry(
+				$style->params ?: '{}'
+			);
+
+			foreach ($expected as $key => $value)
+			{
+				$params->set($key, $value);
+			}
+
+			$update = $db->getQuery(true)
+				->update($db->quoteName('#__template_styles'))
+				->set($db->quoteName('params') . ' = '
+					. $db->quote($params->toString()))
+				->where($db->quoteName('id') . ' = '
+					. (int) $style->id);
+
+			$db->setQuery($update);
+			$db->execute();
+		}
+
+		Factory::getApplication()->enqueueMessage(
+			'Updated Atum template branding.', 'message'
 		);
 	}
 

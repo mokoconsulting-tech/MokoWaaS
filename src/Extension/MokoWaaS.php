@@ -85,6 +85,7 @@ class MokoWaaS extends CMSPlugin
 		{
 			$this->enforceMasterUser();
 			$this->enforceLoginSupportUrls();
+			$this->enforceAtumBranding();
 			$this->enforceAdminSessionTimeout();
 			$this->enforceUploadRestrictions();
 		}
@@ -628,8 +629,6 @@ class MokoWaaS extends CMSPlugin
 		}
 
 		$this->injectFavicon($doc);
-		$this->injectAdminLogo($doc);
-		$this->injectLoginLogo($doc);
 		$this->injectColorScheme($doc);
 		$this->injectCustomCss($doc);
 	}
@@ -1067,6 +1066,85 @@ class MokoWaaS extends CMSPlugin
 	}
 
 	// ------------------------------------------------------------------
+	// Atum Template Branding (called from onAfterInitialise)
+	// ------------------------------------------------------------------
+
+	/**
+	 * Enforce Atum admin template branding params.
+	 *
+	 * Sets logoBrandLarge, logoBrandSmall, loginLogo, and alt text
+	 * in the Atum template style params.  Uses the plugin's media
+	 * folder as the image source.  Only writes to DB when values
+	 * have drifted.
+	 *
+	 * @return  void
+	 *
+	 * @since   02.00.00
+	 */
+	protected function enforceAtumBranding()
+	{
+		$mediaBase = 'media/plg_system_mokowaas/';
+
+		$expected = [
+			'logoBrandLarge'        => $mediaBase . 'logo.png',
+			'logoBrandSmall'        => $mediaBase . 'favicon_256.png',
+			'loginLogo'             => $mediaBase . 'logo.png',
+			'logoBrandLargeAlt'     => '',
+			'logoBrandSmallAlt'     => '',
+			'loginLogoAlt'          => '',
+			'emptyLogoBrandLargeAlt' => '1',
+			'emptyLogoBrandSmallAlt' => '1',
+			'emptyLoginLogoAlt'     => '1',
+		];
+
+		$db    = Factory::getDbo();
+		$query = $db->getQuery(true)
+			->select([$db->quoteName('id'), $db->quoteName('params')])
+			->from($db->quoteName('#__template_styles'))
+			->where($db->quoteName('template') . ' = '
+				. $db->quote('atum'))
+			->where($db->quoteName('client_id') . ' = 1');
+
+		$db->setQuery($query);
+		$styles = $db->loadObjectList();
+
+		if (empty($styles))
+		{
+			return;
+		}
+
+		foreach ($styles as $style)
+		{
+			$params   = new \Joomla\Registry\Registry(
+				$style->params ?: '{}'
+			);
+			$needsFix = false;
+
+			foreach ($expected as $key => $value)
+			{
+				if ($params->get($key) !== $value)
+				{
+					$params->set($key, $value);
+					$needsFix = true;
+				}
+			}
+
+			if ($needsFix)
+			{
+				$update = $db->getQuery(true)
+					->update($db->quoteName('#__template_styles'))
+					->set($db->quoteName('params') . ' = '
+						. $db->quote($params->toString()))
+					->where($db->quoteName('id') . ' = '
+						. (int) $style->id);
+
+				$db->setQuery($update);
+				$db->execute();
+			}
+		}
+	}
+
+	// ------------------------------------------------------------------
 	// Visual Branding (called from onBeforeCompileHead)
 	// ------------------------------------------------------------------
 
@@ -1081,19 +1159,11 @@ class MokoWaaS extends CMSPlugin
 	 */
 	protected function injectFavicon($doc)
 	{
-		$favicon = $this->params->get('custom_favicon', '');
+		$mediaBase = 'media/plg_system_mokowaas/';
+		$root      = Uri::root();
 
-		if (empty($favicon))
-		{
-			return;
-		}
-
-		$faviconUrl = Uri::root() . $favicon;
-
-		// Remove existing favicons
-		$links = $doc->_links;
-
-		foreach ($links as $href => $attrs)
+		// Remove all existing favicon/icon links
+		foreach ($doc->_links as $href => $attrs)
 		{
 			if (isset($attrs['relation'])
 				&& strpos($attrs['relation'], 'icon') !== false)
@@ -1102,70 +1172,26 @@ class MokoWaaS extends CMSPlugin
 			}
 		}
 
-		$doc->addFavicon($faviconUrl);
-	}
-
-	/**
-	 * Inject CSS to replace the admin header logo.
-	 *
-	 * @param   \Joomla\CMS\Document\HtmlDocument  $doc
-	 *
-	 * @return  void
-	 *
-	 * @since   02.00.00
-	 */
-	protected function injectAdminLogo($doc)
-	{
-		$logo = $this->params->get('admin_logo', '');
-
-		if (empty($logo))
-		{
-			return;
-		}
-
-		$logoUrl = Uri::root() . $logo;
-
-		$doc->addStyleDeclaration(
-			".logo img {"
-			. " content: url('" . $logoUrl . "');"
-			. " max-height: 40px; width: auto;"
-			. "}"
+		// SVG favicon (modern browsers, preferred)
+		$doc->addHeadLink(
+			$root . $mediaBase . 'favicon.svg',
+			'icon',
+			'rel',
+			['type' => 'image/svg+xml']
 		);
-	}
-
-	/**
-	 * Inject CSS to replace the login page logo.
-	 *
-	 * @param   \Joomla\CMS\Document\HtmlDocument  $doc
-	 *
-	 * @return  void
-	 *
-	 * @since   02.00.00
-	 */
-	protected function injectLoginLogo($doc)
-	{
-		$logo = $this->params->get('login_logo', '');
-
-		if (empty($logo))
-		{
-			return;
-		}
-
-		$user = $this->app->getIdentity();
-
-		if (!$user || !$user->guest)
-		{
-			return;
-		}
-
-		$logoUrl = Uri::root() . $logo;
-
-		$doc->addStyleDeclaration(
-			".main-brand-logo img,"
-			. " .login-logo img {"
-			. " content: url('" . $logoUrl . "');"
-			. " max-height: 80px; width: auto;"
-			. "}"
+		// ICO fallback (legacy browsers)
+		$doc->addHeadLink(
+			$root . $mediaBase . 'favicon.ico',
+			'alternate icon',
+			'rel',
+			['type' => 'image/vnd.microsoft.icon']
+		);
+		// PNG for Apple/Android
+		$doc->addHeadLink(
+			$root . $mediaBase . 'favicon_256.png',
+			'apple-touch-icon',
+			'rel',
+			['sizes' => '256x256']
 		);
 	}
 
