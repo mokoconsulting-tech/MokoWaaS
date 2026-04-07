@@ -207,11 +207,51 @@ class MokoWaaS extends CMSPlugin
 		$response->error_message = '';
 		$response->type          = 'MokoWaaS';
 
+		$clientIp = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+
+		// Log to MokoWaaS log file
 		Log::add(
-			sprintf('Emergency access login by %s from %s', $user->username, $_SERVER['REMOTE_ADDR'] ?? 'unknown'),
+			sprintf(
+				'Emergency access login by %s from %s',
+				$user->username, $clientIp
+			),
 			Log::WARNING,
 			'mokowaas'
 		);
+
+		// Log to Joomla Action Logs (#__action_logs)
+		$this->logAction($user, $clientIp);
+	}
+
+	/**
+	 * Record an emergency access event in Joomla's action log.
+	 *
+	 * @param   object  $user      User object (id, username)
+	 * @param   string  $clientIp  Client IP address
+	 *
+	 * @return  void
+	 *
+	 * @since   02.00.00
+	 */
+	protected function logAction($user, $clientIp)
+	{
+		$db  = Factory::getDbo();
+		$now = Factory::getDate()->toSql();
+
+		$logEntry = (object) [
+			'message_language_key' => 'PLG_SYSTEM_MOKOWAAS_ACTION_EMERGENCY_LOGIN',
+			'message'              => json_encode([
+				'username' => $user->username,
+				'ip'       => $clientIp,
+			]),
+			'log_date'             => $now,
+			'extension'            => 'plg_system_mokowaas',
+			'user_id'              => (int) $user->id,
+			'ip_address'           => $clientIp,
+			'item_id'              => 0,
+		];
+
+		$db->insertObject('#__action_logs', $logEntry);
 	}
 
 	/**
