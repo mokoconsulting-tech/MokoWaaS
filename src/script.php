@@ -233,7 +233,7 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 
 		if ($template)
 		{
-			// Lock and protect
+			// Lock, protect, and set as default
 			$db->setQuery(
 				$db->getQuery(true)
 					->update($db->quoteName('#__extensions'))
@@ -244,6 +244,9 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 						. (int) $template->extension_id)
 			);
 			$db->execute();
+
+			// Set as default site template
+			$this->setDefaultTemplate('mokocassiopeia', 0);
 
 			return;
 		}
@@ -300,6 +303,42 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 		{
 			@unlink($tmpFile);
 		}
+	}
+
+	/**
+	 * Set a template as the default for a given client.
+	 *
+	 * @param   string  $template  Template element name
+	 * @param   int     $clientId  0 = site, 1 = admin
+	 *
+	 * @return  void
+	 *
+	 * @since   02.01.01
+	 */
+	private function setDefaultTemplate($template, $clientId)
+	{
+		$db = Factory::getDbo();
+
+		// Unset all other defaults for this client
+		$db->setQuery(
+			$db->getQuery(true)
+				->update($db->quoteName('#__template_styles'))
+				->set($db->quoteName('home') . ' = 0')
+				->where($db->quoteName('client_id') . ' = ' . $clientId)
+				->where($db->quoteName('home') . ' = 1')
+		);
+		$db->execute();
+
+		// Set our template as default
+		$db->setQuery(
+			$db->getQuery(true)
+				->update($db->quoteName('#__template_styles'))
+				->set($db->quoteName('home') . ' = 1')
+				->where($db->quoteName('template') . ' = '
+					. $db->quote($template))
+				->where($db->quoteName('client_id') . ' = ' . $clientId)
+		);
+		$db->execute();
 	}
 
 	private const BLOCK_START = '; ===== BEGIN MokoWaaS Overrides (do not edit this block) =====';
