@@ -468,6 +468,29 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 		Factory::getApplication()->enqueueMessage(
 			'Registered MokoWaaS in Action Logs.', 'message'
 		);
+
+		// Register content type config for display formatting
+		$configQuery = $db->getQuery(true)
+			->select('COUNT(*)')
+			->from($db->quoteName('#__action_log_config'))
+			->where($db->quoteName('type_alias') . ' = '
+				. $db->quote('plg_system_mokowaas'));
+
+		$db->setQuery($configQuery);
+
+		if ((int) $db->loadResult() === 0)
+		{
+			$config = (object) [
+				'type_title'          => 'MokoWaaS',
+				'type_alias'          => 'plg_system_mokowaas',
+				'id_holder'           => '',
+				'title_holder'        => '',
+				'table_name'          => '',
+				'text_prefix'         => 'PLG_SYSTEM_MOKOWAAS',
+			];
+
+			$db->insertObject('#__action_log_config', $config);
+		}
 	}
 
 	/**
@@ -480,10 +503,19 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 	private function unregisterActionLogExtension()
 	{
 		$db = Factory::getDbo();
+
 		$db->setQuery(
 			$db->getQuery(true)
 				->delete($db->quoteName('#__action_logs_extensions'))
 				->where($db->quoteName('extension') . ' = '
+					. $db->quote('plg_system_mokowaas'))
+		);
+		$db->execute();
+
+		$db->setQuery(
+			$db->getQuery(true)
+				->delete($db->quoteName('#__action_log_config'))
+				->where($db->quoteName('type_alias') . ' = '
 					. $db->quote('plg_system_mokowaas'))
 		);
 		$db->execute();
