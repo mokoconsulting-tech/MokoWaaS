@@ -16,7 +16,7 @@
  DEFGROUP: Joomla.UpdateServer
  INGROUP: MokoWaaS
  REPO: https://github.com/mokoconsulting-tech/mokowaas
- VERSION: 02.01.05
+ VERSION: 02.01.06
  PATH: /updates.xml
  BRIEF: Joomla update server XML feed for automatic plugin updates
  NOTE: This file is automatically updated by GitHub Actions on each release
@@ -29,10 +29,10 @@
 		<type>plugin</type>
 		<folder>system</folder>
 		<client>site</client>
-		<version>02.01.05</version>
+		<version>02.01.06</version>
 		<infourl title="MokoWaaS">https://github.com/mokoconsulting-tech/mokowaas</infourl>
 		<downloads>
-			<downloadurl type="full" format="zip">https://github.com/mokoconsulting-tech/MokoWaaS/releases/download/02.01.05/MokoWaaS-02.01.05.zip</downloadurl>
+			<downloadurl type="full" format="zip">https://github.com/mokoconsulting-tech/MokoWaaS/releases/download/02.01.06/MokoWaaS-02.01.06.zip</downloadurl>
 		</downloads>
 		<maintainer>Moko Consulting</maintainer>
 		<maintainerurl>https://mokoconsulting.tech</maintainerurl>

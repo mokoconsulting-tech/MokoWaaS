@@ -2,7 +2,7 @@
     "name": "mokoconsulting-tech/mokowaas",
     "description": "MokoWaaS Joomla component by Moko Consulting",
     "type": "joomla-component",
-    "version": "02.01.05",
+    "version": "02.01.06",
     "license": "GPL-3.0-or-later",
     "authors": [
         {
