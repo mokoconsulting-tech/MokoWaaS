@@ -47,6 +47,10 @@
 		<folder>administrator</folder>
 	</files>
 
+	<media destination="plg_system_mokowaas" folder="media">
+		<filename>index.html</filename>
+	</media>
+
 	<languages folder="language">
 		<language tag="en-GB">en-GB/plg_system_mokowaas.ini</language>
 		<language tag="en-US">en-US/plg_system_mokowaas.ini</language>
