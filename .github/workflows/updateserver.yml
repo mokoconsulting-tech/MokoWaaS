@@ -19,13 +19,13 @@ permissions:
   issues: write
 
 env:
-  EXT_NAME: "MokoWaaS"
-  EXT_ELEMENT: "mokowaas"
+  EXT_NAME: "MokoWaaS-Brand"
+  EXT_ELEMENT: "mokowaasbrand"
   EXT_TYPE: "plugin"
   EXT_FOLDER: "system"
   EXT_CLIENT: "site"
-  EXT_INFOURL: "https://github.com/mokoconsulting-tech/mokowaas"
-  EXT_CATEGORY: "MokoWaaS"
+  EXT_INFOURL: "https://github.com/mokoconsulting-tech/mokowaasbrand"
+  EXT_CATEGORY: "MokoWaaS-Brand"
 
 jobs:
   update-server:

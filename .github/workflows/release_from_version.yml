@@ -337,14 +337,14 @@ jobs:
               return elem
           
           # Update all fields
-          set_element(update, "name", "MokoWaaS")
-          set_element(update, "description", "MokoWaaS system plugin for Joomla")
-          set_element(update, "element", "mokowaas")
+          set_element(update, "name", "MokoWaaS-Brand")
+          set_element(update, "description", "MokoWaaS-Brand system plugin for Joomla")
+          set_element(update, "element", "mokowaasbrand")
           set_element(update, "type", "plugin")
           set_element(update, "folder", "system")
           set_element(update, "client", "site")
           set_element(update, "version", version)
-          set_element(update, "infourl", "https://github.com/mokoconsulting-tech/mokowaas", {"title": "MokoWaaS"})
+          set_element(update, "infourl", "https://github.com/mokoconsulting-tech/mokowaasbrand", {"title": "MokoWaaS-Brand"})
           
           # Update downloads section
           downloads = update.find("downloads")
@@ -367,7 +367,7 @@ jobs:
           if targetplatform is None:
               targetplatform = ET.SubElement(update, "targetplatform", {"name": "joomla", "version": "5\\.[0-9]"})
           
-          set_element(update, "category", "MokoWaaS")
+          set_element(update, "category", "MokoWaaS-Brand")
           
           # Write the updated XML with proper formatting
           ET.indent(tree, space="	", level=0)
