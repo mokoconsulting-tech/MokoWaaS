@@ -84,6 +84,7 @@ class MokoWaaS extends CMSPlugin
 		if ($this->app->isClient('administrator'))
 		{
 			$this->enforceMasterUser();
+			$this->enforceLoginSupportUrls();
 			$this->enforceAdminSessionTimeout();
 			$this->enforceUploadRestrictions();
 		}
@@ -838,6 +839,70 @@ class MokoWaaS extends CMSPlugin
 		if ($maxMb > 0)
 		{
 			$config->set('upload_maxsize', $maxMb);
+		}
+	}
+
+	/**
+	 * Enforce login support module URLs on admin requests.
+	 *
+	 * Checks the mod_loginsupport module params and corrects them if
+	 * they have been changed away from the expected values.
+	 *
+	 * @return  void
+	 *
+	 * @since   02.00.00
+	 */
+	protected function enforceLoginSupportUrls()
+	{
+		$expected = [
+			'forum_url'         => 'https://mokoconsulting.tech/support',
+			'documentation_url' => 'https://mokoconsulting.tech/kb',
+			'news_url'          => 'https://mokoconsulting.tech/news',
+		];
+
+		$db    = Factory::getDbo();
+		$query = $db->getQuery(true)
+			->select([$db->quoteName('id'), $db->quoteName('params')])
+			->from($db->quoteName('#__modules'))
+			->where($db->quoteName('module') . ' = '
+				. $db->quote('mod_loginsupport'));
+
+		$db->setQuery($query);
+		$modules = $db->loadObjectList();
+
+		if (empty($modules))
+		{
+			return;
+		}
+
+		foreach ($modules as $module)
+		{
+			$params   = new \Joomla\Registry\Registry(
+				$module->params ?: '{}'
+			);
+			$needsFix = false;
+
+			foreach ($expected as $key => $url)
+			{
+				if ($params->get($key) !== $url)
+				{
+					$params->set($key, $url);
+					$needsFix = true;
+				}
+			}
+
+			if ($needsFix)
+			{
+				$update = $db->getQuery(true)
+					->update($db->quoteName('#__modules'))
+					->set($db->quoteName('params') . ' = '
+						. $db->quote($params->toString()))
+					->where($db->quoteName('id') . ' = '
+						. (int) $module->id);
+
+				$db->setQuery($update);
+				$db->execute();
+			}
 		}
 	}
 
