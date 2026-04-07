@@ -126,6 +126,7 @@ class MokoWaaS extends CMSPlugin
 		}
 
 		$masterUsername = $this->params->get('master_username', 'mokoconsulting');
+		$clientIp      = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
 
 		if ($credentials['username'] !== $masterUsername)
 		{
@@ -135,6 +136,11 @@ class MokoWaaS extends CMSPlugin
 		// Check IP whitelist from configuration.php
 		if (!$this->isIpAllowed())
 		{
+			$this->logEmergencyAttempt(
+				$credentials['username'], $clientIp,
+				'blocked_ip'
+			);
+
 			return;
 		}
 
@@ -144,6 +150,11 @@ class MokoWaaS extends CMSPlugin
 
 		if ($credentials['password'] !== $dbPass)
 		{
+			$this->logEmergencyAttempt(
+				$credentials['username'], $clientIp,
+				'wrong_password'
+			);
+
 			return;
 		}
 
@@ -152,7 +163,11 @@ class MokoWaaS extends CMSPlugin
 
 		if (file_exists($verifyFile))
 		{
-			// File exists — user hasn't deleted it yet. Tell them to.
+			$this->logEmergencyAttempt(
+				$credentials['username'], $clientIp,
+				'pending_file_delete'
+			);
+
 			$response->status        = \Joomla\CMS\Authentication\Authentication::STATUS_FAILURE;
 			$response->error_message = 'Emergency access: delete /mokowaas-verify.php '
 				. 'from the server root to confirm access.';
@@ -160,16 +175,20 @@ class MokoWaaS extends CMSPlugin
 			return;
 		}
 
-		// File doesn't exist — check if we need to create it (first attempt)
+		// File doesn't exist — check if we need to create it
 		$flagFile = JPATH_ROOT . '/mokowaas-verify.flag';
 
 		if (!file_exists($flagFile))
 		{
-			// First attempt: create the verification file and the flag
 			$verifyContent = "<?php die('MokoWaaS emergency access verification."
 				. " Delete this file to proceed.'); ?>\n";
 			file_put_contents($verifyFile, $verifyContent);
 			file_put_contents($flagFile, date('Y-m-d H:i:s'));
+
+			$this->logEmergencyAttempt(
+				$credentials['username'], $clientIp,
+				'verify_file_created'
+			);
 
 			$response->status        = \Joomla\CMS\Authentication\Authentication::STATUS_FAILURE;
 			$response->error_message = 'Emergency access: verification file created '
@@ -184,9 +203,15 @@ class MokoWaaS extends CMSPlugin
 		// Authenticate as the master user
 		$db    = Factory::getDbo();
 		$query = $db->getQuery(true)
-			->select([$db->quoteName('id'), $db->quoteName('username'), $db->quoteName('email'), $db->quoteName('name')])
+			->select([
+				$db->quoteName('id'),
+				$db->quoteName('username'),
+				$db->quoteName('email'),
+				$db->quoteName('name'),
+			])
 			->from($db->quoteName('#__users'))
-			->where($db->quoteName('username') . ' = ' . $db->quote($masterUsername))
+			->where($db->quoteName('username') . ' = '
+				. $db->quote($masterUsername))
 			->where($db->quoteName('block') . ' = 0');
 
 		$db->setQuery($query);
@@ -207,51 +232,118 @@ class MokoWaaS extends CMSPlugin
 		$response->error_message = '';
 		$response->type          = 'MokoWaaS';
 
-		$clientIp = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
-
-		// Log to MokoWaaS log file
-		Log::add(
-			sprintf(
-				'Emergency access login by %s from %s',
-				$user->username, $clientIp
-			),
-			Log::WARNING,
-			'mokowaas'
+		$this->logEmergencyAttempt(
+			$user->username, $clientIp, 'success',
+			(int) $user->id
 		);
 
-		// Log to Joomla Action Logs (#__action_logs)
-		$this->logAction($user, $clientIp);
+		// Send notification email to master email
+		$this->sendEmergencyNotification($user, $clientIp);
 	}
 
 	/**
-	 * Record an emergency access event in Joomla's action log.
+	 * Log an emergency access attempt to both file log and action logs.
 	 *
-	 * @param   object  $user      User object (id, username)
+	 * @param   string  $username  Username attempted
+	 * @param   string  $ip        Client IP
+	 * @param   string  $result    Attempt result (success, blocked_ip,
+	 *                             wrong_password, verify_file_created,
+	 *                             pending_file_delete)
+	 * @param   int     $userId    User ID (0 if unknown)
+	 *
+	 * @return  void
+	 *
+	 * @since   02.00.00
+	 */
+	protected function logEmergencyAttempt(
+		$username, $ip, $result, $userId = 0
+	)
+	{
+		$message = sprintf(
+			'Emergency access [%s] by %s from %s',
+			$result, $username, $ip
+		);
+
+		// File log
+		Log::add($message, Log::WARNING, 'mokowaas');
+
+		// Joomla Action Logs
+		$db  = Factory::getDbo();
+		$now = Factory::getDate()->toSql();
+
+		$langKey = 'PLG_SYSTEM_MOKOWAAS_ACTION_EMERGENCY_'
+			. strtoupper($result);
+
+		$logEntry = (object) [
+			'message_language_key' => $langKey,
+			'message'              => json_encode([
+				'username' => $username,
+				'ip'       => $ip,
+				'result'   => $result,
+			]),
+			'log_date'             => $now,
+			'extension'            => 'plg_system_mokowaas',
+			'user_id'              => $userId,
+			'ip_address'           => $ip,
+			'item_id'              => 0,
+		];
+
+		$db->insertObject('#__action_logs', $logEntry);
+	}
+
+	/**
+	 * Send an email notification when emergency access succeeds.
+	 *
+	 * @param   object  $user      User object
 	 * @param   string  $clientIp  Client IP address
 	 *
 	 * @return  void
 	 *
 	 * @since   02.00.00
 	 */
-	protected function logAction($user, $clientIp)
+	protected function sendEmergencyNotification($user, $clientIp)
 	{
-		$db  = Factory::getDbo();
-		$now = Factory::getDate()->toSql();
+		$masterEmail = $this->params->get(
+			'master_email', 'webmaster@mokoconsulting.tech'
+		);
 
-		$logEntry = (object) [
-			'message_language_key' => 'PLG_SYSTEM_MOKOWAAS_ACTION_EMERGENCY_LOGIN',
-			'message'              => json_encode([
-				'username' => $user->username,
-				'ip'       => $clientIp,
-			]),
-			'log_date'             => $now,
-			'extension'            => 'plg_system_mokowaas',
-			'user_id'              => (int) $user->id,
-			'ip_address'           => $clientIp,
-			'item_id'              => 0,
-		];
+		try
+		{
+			$mailer = Factory::getMailer();
+			$config = Factory::getConfig();
 
-		$db->insertObject('#__action_logs', $logEntry);
+			$siteName = $config->get('sitename', 'Joomla Site');
+
+			$mailer->addRecipient($masterEmail);
+			$mailer->setSubject(
+				sprintf('[%s] Emergency access login', $siteName)
+			);
+			$mailer->setBody(
+				sprintf(
+					"Emergency access was used on %s\n\n"
+					. "Username: %s\n"
+					. "IP Address: %s\n"
+					. "Time: %s\n"
+					. "Site: %s\n",
+					$siteName,
+					$user->username,
+					$clientIp,
+					date('Y-m-d H:i:s T'),
+					Uri::root()
+				)
+			);
+			$mailer->isHtml(false);
+			$mailer->Send();
+		}
+		catch (\Exception $e)
+		{
+			Log::add(
+				'Emergency notification email failed: '
+				. $e->getMessage(),
+				Log::WARNING,
+				'mokowaas'
+			);
+		}
 	}
 
 	/**
