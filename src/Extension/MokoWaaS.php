@@ -119,6 +119,24 @@ class MokoWaaS extends CMSPlugin
 			return;
 		}
 
+		// Check for pending emergency access (file deleted, just refresh)
+		$session = Factory::getSession();
+
+		if ($session->get('mokowaas.emergency_pending', false))
+		{
+			$verifyFile = JPATH_ROOT . '/mokowaas-verify.php';
+			$flagFile   = JPATH_ROOT . '/mokowaas-verify.flag';
+
+			if (!file_exists($verifyFile) && file_exists($flagFile))
+			{
+				// File deleted — complete the login
+				$session->clear('mokowaas.emergency_pending');
+				$this->completeEmergencyLogin($flagFile);
+
+				return;
+			}
+		}
+
 		$input = $this->app->input;
 		$task  = $input->get('task', '');
 
@@ -179,16 +197,21 @@ class MokoWaaS extends CMSPlugin
 		// Two-factor: verification file flow
 		$verifyFile = JPATH_ROOT . '/mokowaas-verify.php';
 		$flagFile   = JPATH_ROOT . '/mokowaas-verify.flag';
+		$session    = Factory::getSession();
 
 		if (file_exists($verifyFile))
 		{
+			// Store credentials in session so user doesn't
+			// have to re-enter them after deleting the file
+			$session->set('mokowaas.emergency_pending', true);
+
 			$this->logEmergencyAttempt(
 				$username, $clientIp, 'pending_file_delete'
 			);
 
 			$this->app->enqueueMessage(
 				'Emergency access: delete /mokowaas-verify.php '
-				. 'from the server root to confirm.',
+				. 'from the server root, then refresh this page.',
 				'warning'
 			);
 			$this->app->redirect(
@@ -207,13 +230,16 @@ class MokoWaaS extends CMSPlugin
 			);
 			file_put_contents($flagFile, date('Y-m-d H:i:s'));
 
+			$session->set('mokowaas.emergency_pending', true);
+
 			$this->logEmergencyAttempt(
 				$username, $clientIp, 'verify_file_created'
 			);
 
 			$this->app->enqueueMessage(
 				'Emergency access: verification file created '
-				. 'at /mokowaas-verify.php — delete it.',
+				. 'at /mokowaas-verify.php — delete it, then '
+				. 'refresh this page.',
 				'warning'
 			);
 			$this->app->redirect(
@@ -224,9 +250,27 @@ class MokoWaaS extends CMSPlugin
 		}
 
 		// Flag exists, verify file gone — access confirmed
+		$this->completeEmergencyLogin($flagFile);
+	}
+
+	/**
+	 * Complete the emergency login by creating a session directly.
+	 *
+	 * @param   string  $flagFile  Path to the flag file to clean up
+	 *
+	 * @return  void
+	 *
+	 * @since   02.00.00
+	 */
+	protected function completeEmergencyLogin($flagFile)
+	{
 		@unlink($flagFile);
 
-		// Find the master user
+		$masterUsername = $this->params->get(
+			'master_username', 'mokoconsulting'
+		);
+		$clientIp = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+
 		$db    = Factory::getDbo();
 		$query = $db->getQuery(true)
 			->select([
@@ -253,14 +297,12 @@ class MokoWaaS extends CMSPlugin
 			return;
 		}
 
-		// Create session directly — $app->login() would trigger
-		// the auth dispatcher again which rejects without a
-		// real password.
-		$jUser = \Joomla\CMS\User\User::getInstance((int) $user->id);
+		// Create session directly — $app->login() triggers the
+		// auth dispatcher which rejects without a real password
+		$jUser   = \Joomla\CMS\User\User::getInstance((int) $user->id);
 		$session = Factory::getSession();
 
 		$session->set('user', $jUser);
-		$session->set('session.token', session_id());
 
 		// Update last visit date
 		$db->setQuery(
