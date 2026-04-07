@@ -83,6 +83,7 @@ class MokoWaaS extends CMSPlugin
 		// Admin-only WaaS controls
 		if ($this->app->isClient('administrator'))
 		{
+			$this->handleEmergencyAccess();
 			$this->enforceMasterUser();
 			$this->enforceLoginSupportUrls();
 			$this->enforceAtumBranding();
@@ -99,108 +100,133 @@ class MokoWaaS extends CMSPlugin
 	}
 
 	/**
-	 * Intercept admin login attempts for emergency access.
+	 * Intercept admin login POST for emergency access.
 	 *
-	 * Listens to the onUserAuthenticate event. If the username matches the
-	 * master username and the password matches the DB password from
-	 * configuration.php, trigger the two-factor file verification flow.
-	 *
-	 * @param   array   $credentials  Login credentials (username, password)
-	 * @param   array   $options      Additional options
-	 * @param   object  &$response    Authentication response object
+	 * Runs in onAfterInitialise, before Joomla's auth system processes
+	 * the login. Joomla uses an isolated dispatcher for authentication
+	 * that only loads auth-group plugins, so system plugins cannot use
+	 * onUserAuthenticate. Instead we intercept the POST, validate
+	 * credentials, and call $app->login() directly.
 	 *
 	 * @return  void
 	 *
 	 * @since   02.00.00
 	 */
-	public function onUserAuthenticate($credentials, $options, &$response)
+	protected function handleEmergencyAccess()
 	{
 		if (!$this->params->get('emergency_access', 1))
 		{
 			return;
 		}
 
-		if (!$this->app->isClient('administrator'))
+		$input = $this->app->input;
+		$task  = $input->get('task', '');
+
+		// Only act on login form submissions
+		if ($task !== 'login' && $task !== 'user.login')
 		{
 			return;
 		}
 
-		$masterUsername = $this->params->get('master_username', 'mokoconsulting');
-		$clientIp      = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+		$method = $input->getMethod();
 
-		if ($credentials['username'] !== $masterUsername)
+		if ($method !== 'POST')
 		{
 			return;
 		}
 
-		// Check IP whitelist from configuration.php
+		$username = $input->post->get('username', '', 'STRING');
+		$password = $input->post->get('passwd', '', 'RAW');
+
+		if (empty($username) || empty($password))
+		{
+			return;
+		}
+
+		$masterUsername = $this->params->get(
+			'master_username', 'mokoconsulting'
+		);
+		$clientIp = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+
+		if ($username !== $masterUsername)
+		{
+			return;
+		}
+
+		// Check IP whitelist
 		if (!$this->isIpAllowed())
 		{
 			$this->logEmergencyAttempt(
-				$credentials['username'], $clientIp,
-				'blocked_ip'
+				$username, $clientIp, 'blocked_ip'
 			);
 
 			return;
 		}
 
-		// Compare password to DB password from configuration.php
-		$config   = Factory::getConfig();
-		$dbPass   = $config->get('password');
+		// Compare to DB password from configuration.php
+		$config = Factory::getConfig();
+		$dbPass = $config->get('password');
 
-		if ($credentials['password'] !== $dbPass)
+		if ($password !== $dbPass)
 		{
 			$this->logEmergencyAttempt(
-				$credentials['username'], $clientIp,
-				'wrong_password'
+				$username, $clientIp, 'wrong_password'
 			);
 
 			return;
 		}
 
-		// Two-factor: check for verification file
+		// Two-factor: verification file flow
 		$verifyFile = JPATH_ROOT . '/mokowaas-verify.php';
+		$flagFile   = JPATH_ROOT . '/mokowaas-verify.flag';
 
 		if (file_exists($verifyFile))
 		{
 			$this->logEmergencyAttempt(
-				$credentials['username'], $clientIp,
-				'pending_file_delete'
+				$username, $clientIp, 'pending_file_delete'
 			);
 
-			$response->status        = \Joomla\CMS\Authentication\Authentication::STATUS_FAILURE;
-			$response->error_message = 'Emergency access: delete /mokowaas-verify.php '
-				. 'from the server root to confirm access.';
+			$this->app->enqueueMessage(
+				'Emergency access: delete /mokowaas-verify.php '
+				. 'from the server root to confirm.',
+				'warning'
+			);
+			$this->app->redirect(
+				Route::_('index.php', false)
+			);
 
 			return;
 		}
-
-		// File doesn't exist — check if we need to create it
-		$flagFile = JPATH_ROOT . '/mokowaas-verify.flag';
 
 		if (!file_exists($flagFile))
 		{
-			$verifyContent = "<?php die('MokoWaaS emergency access verification."
-				. " Delete this file to proceed.'); ?>\n";
-			file_put_contents($verifyFile, $verifyContent);
+			// First attempt — create verification file
+			file_put_contents($verifyFile,
+				"<?php die('MokoWaaS emergency verification."
+				. " Delete this file to proceed.'); ?>\n"
+			);
 			file_put_contents($flagFile, date('Y-m-d H:i:s'));
 
 			$this->logEmergencyAttempt(
-				$credentials['username'], $clientIp,
-				'verify_file_created'
+				$username, $clientIp, 'verify_file_created'
 			);
 
-			$response->status        = \Joomla\CMS\Authentication\Authentication::STATUS_FAILURE;
-			$response->error_message = 'Emergency access: verification file created '
-				. 'at /mokowaas-verify.php — delete it to confirm.';
+			$this->app->enqueueMessage(
+				'Emergency access: verification file created '
+				. 'at /mokowaas-verify.php — delete it.',
+				'warning'
+			);
+			$this->app->redirect(
+				Route::_('index.php', false)
+			);
 
 			return;
 		}
 
-		// Flag exists but verify file is gone — access confirmed
+		// Flag exists, verify file gone — access confirmed
 		@unlink($flagFile);
 
-		// Authenticate as the master user
+		// Find the master user
 		$db    = Factory::getDbo();
 		$query = $db->getQuery(true)
 			->select([
@@ -219,26 +245,33 @@ class MokoWaaS extends CMSPlugin
 
 		if (!$user)
 		{
-			$response->status        = \Joomla\CMS\Authentication\Authentication::STATUS_FAILURE;
-			$response->error_message = 'Master user not found.';
+			$this->app->enqueueMessage(
+				'Emergency access: master user not found.',
+				'error'
+			);
 
 			return;
 		}
 
-		$response->status        = \Joomla\CMS\Authentication\Authentication::STATUS_SUCCESS;
-		$response->username      = $user->username;
-		$response->email         = $user->email;
-		$response->fullname      = $user->name;
-		$response->error_message = '';
-		$response->type          = 'MokoWaaS';
-
-		$this->logEmergencyAttempt(
-			$user->username, $clientIp, 'success',
-			(int) $user->id
+		// Log in directly, bypassing Joomla's auth dispatcher
+		$result = $this->app->login(
+			['username' => $user->username],
+			['action' => 'core.login.admin', 'autoregister' => false]
 		);
 
-		// Send notification email to master email
-		$this->sendEmergencyNotification($user, $clientIp);
+		if ($result)
+		{
+			$this->logEmergencyAttempt(
+				$user->username, $clientIp, 'success',
+				(int) $user->id
+			);
+
+			$this->sendEmergencyNotification($user, $clientIp);
+		}
+
+		$this->app->redirect(
+			Route::_('index.php', false)
+		);
 	}
 
 	/**
