@@ -128,6 +128,7 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 			$this->updateLoginSupportUrls();
 			$this->updateAtumBranding();
 			$this->registerActionLogExtension();
+			$this->sendInstallNotification($type);
 		}
 
 		return true;
@@ -195,7 +196,7 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 			$db->getQuery(true)
 				->update($db->quoteName('#__extensions'))
 				->set($db->quoteName('enabled') . ' = 1')
-				->set($db->quoteName('locked') . ' = 1')
+				->set($db->quoteName('locked') . ' = 0')
 				->set($db->quoteName('protected') . ' = 1')
 				->where($db->quoteName('element') . ' = '
 					. $db->quote('mokowaas'))
@@ -388,6 +389,56 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 	 *
 	 * @since   02.01.01
 	 */
+	/**
+	 * Send email notification on install or update.
+	 *
+	 * @param   string  $type  install or update
+	 *
+	 * @return  void
+	 *
+	 * @since   02.01.02
+	 */
+	private function sendInstallNotification($type)
+	{
+		try
+		{
+			$config   = Factory::getApplication()->getConfig();
+			$siteName = $config->get('sitename', 'Joomla Site');
+			$siteUrl  = \Joomla\CMS\Uri\Uri::root();
+			$version  = '02.01.02';
+
+			$mailer = Factory::getMailer();
+			$mailer->addRecipient('webmaster@mokoconsulting.tech');
+			$mailer->setSubject(
+				sprintf('[%s] MokoWaaS %s — %s',
+					$siteName, $type, $version)
+			);
+			$mailer->setBody(
+				sprintf(
+					"MokoWaaS plugin was %sd on %s\n\n"
+					. "Version: %s\n"
+					. "Site: %s\n"
+					. "Time: %s\n"
+					. "PHP: %s\n"
+					. "Joomla: %s\n",
+					$type,
+					$siteName,
+					$version,
+					$siteUrl,
+					date('Y-m-d H:i:s T'),
+					PHP_VERSION,
+					JVERSION
+				)
+			);
+			$mailer->isHtml(false);
+			$mailer->Send();
+		}
+		catch (\Exception $e)
+		{
+			// Don't break install if email fails
+		}
+	}
+
 	private function getDownloadUrlFromUpdates($updatesUrl)
 	{
 		try
