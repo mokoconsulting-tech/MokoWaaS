@@ -205,7 +205,7 @@
 				<field name="color_link" type="color"
 					label="PLG_SYSTEM_MOKOWAAS_COLOR_LINK_LABEL"
 					description="PLG_SYSTEM_MOKOWAAS_COLOR_LINK_DESC"
-					default="#2ecc71" />
+					default="#0051ad" />
 				<field name="custom_css" type="textarea"
 					label="PLG_SYSTEM_MOKOWAAS_CUSTOM_CSS_LABEL"
 					description="PLG_SYSTEM_MOKOWAAS_CUSTOM_CSS_DESC"

@@ -410,7 +410,7 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 			'emptyLoginLogoAlt'      => '1',
 			'hue'                    => 'hsl(219, 44%, 18%)',
 			'special-color'          => '#1a2744',
-			'link-color'             => '#2ecc71',
+			'link-color'             => '#0051ad',
 		];
 
 		$db    = Factory::getDbo();
