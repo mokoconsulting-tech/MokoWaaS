@@ -11,12 +11,12 @@
  INGROUP: MokoWaaS
  REPO: https://github.com/mokoconsulting-tech/mokowaas
  PATH: /docs/plugin-basic.md
- VERSION: 02.00.01
+ VERSION: 02.01.08
  BRIEF: Baseline documentation for the MokoWaaS system plugin
  NOTE: Foundational reference for internal and external stakeholders
 -->
 
-# MokoWaaS Plugin Overview (VERSION: 02.00.01)
+# MokoWaaS Plugin Overview (VERSION: 02.01.08)
 
 ## Introduction
 

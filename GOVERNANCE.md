@@ -19,12 +19,12 @@
  DEFGROUP: mokoconsulting-tech.MokoWaaSBrand
  INGROUP: MokoStandards.Governance
  REPO: https://github.com/mokoconsulting-tech/MokoWaaSBrand
- VERSION: 02.00.01
+ VERSION: 02.01.08
  PATH: /GOVERNANCE.md
  BRIEF: Project governance rules, roles, and decision process for MokoWaaSBrand
 -->
 
-[![MokoStandards](https://img.shields.io/badge/MokoStandards-02.00.01-blue)](https://github.com/mokoconsulting-tech/MokoStandards)
+[![MokoStandards](https://img.shields.io/badge/MokoStandards-02.01.08-blue)](https://github.com/mokoconsulting-tech/MokoStandards)
 
 # Project Governance
 

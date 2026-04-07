@@ -10,13 +10,13 @@
  DEFGROUP: Joomla.Plugin
  INGROUP: MokoWaaS.Documentation
  REPO: https://github.com/mokoconsulting-tech/mokowaas
- VERSION: 02.00.01
+ VERSION: 02.01.08
  PATH: /docs/index.md
  BRIEF: Master index of all documentation for the MokoWaaS plugin
  NOTE: Automatically maintained index for all guide canvases
 -->
 
-# MokoWaaS Documentation Index (VERSION: 02.00.01)
+# MokoWaaS Documentation Index (VERSION: 02.01.08)
 
 ## Introduction
 

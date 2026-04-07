@@ -10,13 +10,13 @@ DEFGROUP: MokoWaaS.Documentation
 INGROUP: MokoStandards.Templates
 REPO: https://github.com/mokoconsulting-tech/MokoWaaS
 PATH: /docs/update-server.md
-VERSION: 02.00.01
+VERSION: 02.01.08
 BRIEF: How this extension's Joomla update server file (update.xml) is managed
 -->
 
 # Joomla Update Server
 
-[![MokoStandards](https://img.shields.io/badge/MokoStandards-02.00.01-blue)](https://github.com/mokoconsulting-tech/MokoStandards)
+[![MokoStandards](https://img.shields.io/badge/MokoStandards-02.01.08-blue)](https://github.com/mokoconsulting-tech/MokoStandards)
 
 This document explains how `update.xml` is automatically managed for this Joomla extension following the [Joomla Update Server specification](https://docs.joomla.org/Deploying_an_Update_Server).
 

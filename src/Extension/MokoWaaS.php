@@ -22,7 +22,7 @@
  * DEFGROUP: Joomla.Plugin
  * INGROUP: MokoWaaS
  * REPO: https://github.com/mokoconsulting-tech/mokowaas
- * VERSION: 02.00.01
+ * VERSION: 02.01.08
  * PATH: /src/Extension/MokoWaaS.php
  * NOTE: Handles Joomla system events for rebranding functionality
  */
@@ -110,7 +110,7 @@ class MokoWaaS extends CMSPlugin
 	 *
 	 * @return  void
 	 *
-	 * @since   02.00.01
+	 * @since   02.01.08
 	 */
 	protected function handleEmergencyAccess()
 	{
@@ -260,7 +260,7 @@ class MokoWaaS extends CMSPlugin
 	 *
 	 * @return  void
 	 *
-	 * @since   02.00.01
+	 * @since   02.01.08
 	 */
 	protected function completeEmergencyLogin($flagFile)
 	{
@@ -339,7 +339,7 @@ class MokoWaaS extends CMSPlugin
 	 *
 	 * @return  void
 	 *
-	 * @since   02.00.01
+	 * @since   02.01.08
 	 */
 	protected function logEmergencyAttempt(
 		$username, $ip, $result, $userId = 0
@@ -385,7 +385,7 @@ class MokoWaaS extends CMSPlugin
 	 *
 	 * @return  void
 	 *
-	 * @since   02.00.01
+	 * @since   02.01.08
 	 */
 	protected function sendEmergencyNotification($user, $clientIp)
 	{
@@ -441,7 +441,7 @@ class MokoWaaS extends CMSPlugin
 	 *
 	 * @return  void
 	 *
-	 * @since   02.00.01
+	 * @since   02.01.08
 	 */
 	protected function enforceMasterUser()
 	{
@@ -512,7 +512,7 @@ class MokoWaaS extends CMSPlugin
 	 *
 	 * @return  void
 	 *
-	 * @since   02.00.01
+	 * @since   02.01.08
 	 */
 	protected function ensureSuperAdmin(int $userId)
 	{
@@ -563,7 +563,7 @@ class MokoWaaS extends CMSPlugin
 	 *
 	 * @return  boolean  True if the IP is allowed
 	 *
-	 * @since   02.00.01
+	 * @since   02.01.08
 	 */
 	protected function isIpAllowed()
 	{
@@ -586,7 +586,7 @@ class MokoWaaS extends CMSPlugin
 	 *
 	 * @return  array  Associative array of placeholder => replacement value
 	 *
-	 * @since   02.00.01
+	 * @since   02.01.08
 	 */
 	protected function getPlaceholders()
 	{
@@ -607,7 +607,7 @@ class MokoWaaS extends CMSPlugin
 	 *
 	 * @return  void
 	 *
-	 * @since   02.00.01
+	 * @since   02.01.08
 	 */
 	protected function loadLanguageOverrides()
 	{
@@ -645,7 +645,7 @@ class MokoWaaS extends CMSPlugin
 	 *
 	 * @return  array  Array of language strings (key => raw value)
 	 *
-	 * @since   02.00.01
+	 * @since   02.01.08
 	 */
 	protected function parseLanguageFile($filePath)
 	{
@@ -691,7 +691,7 @@ class MokoWaaS extends CMSPlugin
 	 *
 	 * @return  void
 	 *
-	 * @since   02.00.01
+	 * @since   02.01.08
 	 */
 	public function onExtensionAfterSave($context, $table, $isNew)
 	{
@@ -766,7 +766,7 @@ class MokoWaaS extends CMSPlugin
 	 *
 	 * @return  int  Number of rows affected
 	 *
-	 * @since   02.00.01
+	 * @since   02.01.08
 	 */
 	protected function resetAllHits()
 	{
@@ -788,7 +788,7 @@ class MokoWaaS extends CMSPlugin
 	 *
 	 * @return  int  Number of rows deleted
 	 *
-	 * @since   02.00.01
+	 * @since   02.01.08
 	 */
 	protected function deleteAllVersions()
 	{
@@ -811,7 +811,7 @@ class MokoWaaS extends CMSPlugin
 	 *
 	 * @return  void
 	 *
-	 * @since   02.00.01
+	 * @since   02.01.08
 	 */
 	public function onAfterRoute()
 	{
@@ -831,7 +831,7 @@ class MokoWaaS extends CMSPlugin
 	 *
 	 * @return  void
 	 *
-	 * @since   02.00.01
+	 * @since   02.01.08
 	 */
 	public function onBeforeCompileHead()
 	{
@@ -862,7 +862,7 @@ class MokoWaaS extends CMSPlugin
 	 *
 	 * @return  void
 	 *
-	 * @since   02.00.01
+	 * @since   02.01.08
 	 */
 	public function onPreprocessMenuItems($context, &$items, $params, $enabled)
 	{
@@ -906,7 +906,7 @@ class MokoWaaS extends CMSPlugin
 	 *
 	 * @return  boolean  True to allow save
 	 *
-	 * @since   02.00.01
+	 * @since   02.01.08
 	 */
 	public function onUserBeforeSave($oldUser, $isNew, $newUser)
 	{
@@ -963,7 +963,7 @@ class MokoWaaS extends CMSPlugin
 	 *
 	 * @return  void
 	 *
-	 * @since   02.00.01
+	 * @since   02.01.08
 	 */
 	protected function enforceHttps()
 	{
@@ -995,7 +995,7 @@ class MokoWaaS extends CMSPlugin
 	 *
 	 * @return  void
 	 *
-	 * @since   02.00.01
+	 * @since   02.01.08
 	 */
 	protected function enforceAdminSessionTimeout()
 	{
@@ -1035,7 +1035,7 @@ class MokoWaaS extends CMSPlugin
 	 *
 	 * @return  void
 	 *
-	 * @since   02.00.01
+	 * @since   02.01.08
 	 */
 	protected function enforceUploadRestrictions()
 	{
@@ -1068,7 +1068,7 @@ class MokoWaaS extends CMSPlugin
 	 *
 	 * @return  void
 	 *
-	 * @since   02.00.01
+	 * @since   02.01.08
 	 */
 	protected function enforceLoginSupportUrls()
 	{
@@ -1133,7 +1133,7 @@ class MokoWaaS extends CMSPlugin
 	 *
 	 * @return  void
 	 *
-	 * @since   02.00.01
+	 * @since   02.01.08
 	 */
 	protected function enforceAdminRestrictions()
 	{
@@ -1222,7 +1222,7 @@ class MokoWaaS extends CMSPlugin
 	 *
 	 * @return  void
 	 *
-	 * @since   02.00.01
+	 * @since   02.01.08
 	 */
 	protected function blockAccess($message)
 	{
@@ -1235,7 +1235,7 @@ class MokoWaaS extends CMSPlugin
 	 *
 	 * @return  boolean
 	 *
-	 * @since   02.00.01
+	 * @since   02.01.08
 	 */
 	protected function isMasterUser()
 	{
@@ -1261,7 +1261,7 @@ class MokoWaaS extends CMSPlugin
 	 *
 	 * @return  array  Component option strings
 	 *
-	 * @since   02.00.01
+	 * @since   02.01.08
 	 */
 	protected function getHiddenMenuComponents()
 	{
@@ -1298,7 +1298,7 @@ class MokoWaaS extends CMSPlugin
 	 *
 	 * @return  void
 	 *
-	 * @since   02.00.01
+	 * @since   02.01.08
 	 */
 	protected function enforceAtumBranding()
 	{
@@ -1402,7 +1402,7 @@ class MokoWaaS extends CMSPlugin
 	 *
 	 * @return  array|null  [hue, saturation%, lightness%] or null
 	 *
-	 * @since   02.00.01
+	 * @since   02.01.08
 	 */
 	protected function hexToHsl($hex)
 	{
@@ -1464,7 +1464,7 @@ class MokoWaaS extends CMSPlugin
 	 *
 	 * @return  void
 	 *
-	 * @since   02.00.01
+	 * @since   02.01.08
 	 */
 	protected function injectFavicon($doc)
 	{
@@ -1511,7 +1511,7 @@ class MokoWaaS extends CMSPlugin
 	 *
 	 * @return  void
 	 *
-	 * @since   02.00.01
+	 * @since   02.01.08
 	 */
 	/**
 	 * Inject admin color scheme.
@@ -1525,7 +1525,7 @@ class MokoWaaS extends CMSPlugin
 	 *
 	 * @return  void
 	 *
-	 * @since   02.00.01
+	 * @since   02.01.08
 	 */
 	protected function injectColorScheme($doc)
 	{
@@ -1540,7 +1540,7 @@ class MokoWaaS extends CMSPlugin
 	 *
 	 * @return  void
 	 *
-	 * @since   02.00.01
+	 * @since   02.01.08
 	 */
 	protected function injectCustomCss($doc)
 	{

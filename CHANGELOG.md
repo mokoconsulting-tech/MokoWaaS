@@ -14,7 +14,7 @@
  INGROUP: MokoWaaS.Documentation
  REPO: https://github.com/mokoconsulting-tech/mokowaas
  PATH: ./CHANGELOG.md
- VERSION: 02.00.01
+ VERSION: 02.01.08
  BRIEF: Version history using `Keep a Changelog`
 -->
 
@@ -32,7 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - License/subscription check
 - System email template branding (DB approach)
 
-## [02.00.01] - 2026-04-07
+## [02.01.08] - 2026-04-07
 
 ### Added
 - Template-based language overrides with `{{BRAND_NAME}}`, `{{COMPANY_NAME}}`, `{{SUPPORT_URL}}` placeholders
@@ -75,7 +75,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Auto-complete emergency login after verify file deletion (no re-entering credentials)
 
 ### Changed
-- Version bumped to 02.00.01 across all files
+- Version bumped to 02.01.08 across all files
 - Configuration guide fully rewritten with all fieldsets documented
 - Testing guide with 17 test suites
 - README updated with Usage section, new features, Joomla 5/6 badges
