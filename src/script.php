@@ -122,6 +122,7 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 		// Only install overrides on install or update
 		if ($type === 'install' || $type === 'update')
 		{
+			$this->enableAndLockPlugin();
 			$this->installLanguageOverrides();
 			$this->updateLoginSupportUrls();
 			$this->updateAtumBranding();
@@ -142,23 +143,6 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 	 */
 	public function install(InstallerAdapter $adapter): bool
 	{
-		// Auto-enable and lock the plugin on first install
-		$db = Factory::getDbo();
-		$db->setQuery(
-			$db->getQuery(true)
-				->update($db->quoteName('#__extensions'))
-				->set($db->quoteName('enabled') . ' = 1')
-				->set($db->quoteName('locked') . ' = 1')
-				->set($db->quoteName('protected') . ' = 1')
-				->where($db->quoteName('element') . ' = '
-					. $db->quote('mokowaas'))
-				->where($db->quoteName('folder') . ' = '
-					. $db->quote('system'))
-				->where($db->quoteName('type') . ' = '
-					. $db->quote('plugin'))
-		);
-		$db->execute();
-
 		return true;
 	}
 
@@ -194,6 +178,34 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 	}
 
 	/** Sentinel comment that marks the start of MokoWaaS overrides inside a Joomla override file. */
+	/**
+	 * Enable, lock, and protect the plugin in #__extensions.
+	 *
+	 * Runs on both install and update so existing installs get locked.
+	 *
+	 * @return  void
+	 *
+	 * @since   02.00.02
+	 */
+	private function enableAndLockPlugin()
+	{
+		$db = Factory::getDbo();
+		$db->setQuery(
+			$db->getQuery(true)
+				->update($db->quoteName('#__extensions'))
+				->set($db->quoteName('enabled') . ' = 1')
+				->set($db->quoteName('locked') . ' = 1')
+				->set($db->quoteName('protected') . ' = 1')
+				->where($db->quoteName('element') . ' = '
+					. $db->quote('mokowaas'))
+				->where($db->quoteName('folder') . ' = '
+					. $db->quote('system'))
+				->where($db->quoteName('type') . ' = '
+					. $db->quote('plugin'))
+		);
+		$db->execute();
+	}
+
 	private const BLOCK_START = '; ===== BEGIN MokoWaaS Overrides (do not edit this block) =====';
 
 	/** Sentinel comment that marks the end of MokoWaaS overrides inside a Joomla override file. */
