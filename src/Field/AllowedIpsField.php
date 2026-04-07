@@ -7,7 +7,7 @@
  * FILE INFORMATION
  * DEFGROUP: Joomla.Plugin
  * INGROUP: MokoWaaS
- * VERSION: 02.00.00
+ * VERSION: 02.00.01
  * PATH: /src/Field/AllowedIpsField.php
  * BRIEF: Custom form field that displays the current IP whitelist
  */

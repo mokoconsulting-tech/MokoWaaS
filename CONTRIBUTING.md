@@ -10,12 +10,12 @@
  DEFGROUP: Joomla.Plugin
  INGROUP: MokoWaaS.Contributing
  REPO: https://github.com/mokoconsulting-tech/mokowaas
- VERSION: 02.00.00
+ VERSION: 02.00.01
  PATH: /CONTRIBUTING.md
  BRIEF: Contribution guidelines for the MokoWaaS plugin
 -->
 
-# Contributing to MokoWaaS (VERSION: 02.00.00)
+# Contributing to MokoWaaS (VERSION: 02.00.01)
 
 ## Overview
 Contributions to the MokoWaaS plugin follow standardized development, governance, and quality control expectations defined by Moko Consulting. This document outlines contribution requirements, acceptable change types, branch management, testing expectations, and release readiness standards.

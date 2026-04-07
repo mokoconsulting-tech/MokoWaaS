@@ -10,13 +10,13 @@
  DEFGROUP: Joomla.Plugin
  INGROUP: MokoWaaS.Guides
  REPO: https://github.com/mokoconsulting-tech/mokowaas
- VERSION: 02.00.00
+ VERSION: 02.00.01
  PATH: /docs/guides/troubleshooting-guide.md
  BRIEF: Troubleshooting guide for diagnosing and resolving issues related to the MokoWaaS plugin
  NOTE: Designed for administrators and WaaS operations teams
 -->
 
-# MokoWaaS Troubleshooting Guide (VERSION: 02.00.00)
+# MokoWaaS Troubleshooting Guide (VERSION: 02.00.01)
 
 ## Introduction
 

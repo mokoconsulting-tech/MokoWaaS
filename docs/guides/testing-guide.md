@@ -7,13 +7,13 @@
  DEFGROUP: Joomla.Plugin
  INGROUP: MokoWaaS.Guides
  REPO: https://github.com/mokoconsulting-tech/mokowaas
- VERSION: 02.00.00
+ VERSION: 02.00.01
  PATH: /docs/guides/testing-guide.md
- BRIEF: Testing guide for MokoWaaS v02.00.00
+ BRIEF: Testing guide for MokoWaaS v02.00.01
  NOTE: Covers manual test procedures for language overrides, install/uninstall, and configuration
 -->
 
-# MokoWaaS Testing Guide (VERSION: 02.00.00)
+# MokoWaaS Testing Guide (VERSION: 02.00.01)
 
 ## 1. Prerequisites
 
@@ -95,7 +95,7 @@
 | # | Step | Expected Result | Pass |
 |---|------|-----------------|------|
 | 1 | Install v01.x of MokoWaaS first | Old version installed | [ ] |
-| 2 | Install v02.00.00 over it | Upgrade succeeds with "Installed" messages | [ ] |
+| 2 | Install v02.00.01 over it | Upgrade succeeds with "Installed" messages | [ ] |
 | 3 | Check override files | MokoWaaS sentinel block present, no duplicate keys | [ ] |
 | 4 | Verify old inline overrides (from v01.x) are cleaned up | No stray MokoWaaS keys outside the sentinel block | [ ] |
 
@@ -289,8 +289,8 @@ grep -r '"MokoWaaS' src/language/overrides/ src/administrator/language/overrides
 grep -c 'BLOCK_START\|BLOCK_END' src/script.php
 # Expected: 6+ references
 
-# Verify all .ini files have version 02.00.00
-grep -r 'Version:' src/**/*.ini | grep -v '02.00.00'
+# Verify all .ini files have version 02.00.01
+grep -r 'Version:' src/**/*.ini | grep -v '02.00.01'
 # Expected: no output
 ```
 
@@ -298,4 +298,4 @@ grep -r 'Version:' src/**/*.ini | grep -v '02.00.00'
 
 | Version  | Date       | Author                          | Description                     |
 | -------- | ---------- | ------------------------------- | ------------------------------- |
-| 02.00.00 | 2026-04-07 | Jonathan Miller (@jmiller-moko) | Full testing guide: 17 suites covering install, branding, access, visual, security, maintenance, edge cases |
+| 02.00.01 | 2026-04-07 | Jonathan Miller (@jmiller-moko) | Full testing guide: 17 suites covering install, branding, access, visual, security, maintenance, edge cases |

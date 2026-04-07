@@ -22,7 +22,7 @@
  * DEFGROUP: Joomla.Plugin
  * INGROUP: MokoWaaS
  * REPO: https://github.com/mokoconsulting-tech/mokowaas
- * VERSION: 02.00.00
+ * VERSION: 02.00.01
  * PATH: /src/script.php
  * BRIEF: Installation script for MokoWaaS plugin
  * NOTE: Handles installation, update, and uninstallation tasks including language override deployment
@@ -44,7 +44,7 @@ use Joomla\Filesystem\Folder;
  * This script handles the installation and uninstallation of language override files
  * to Joomla's global language override directories.
  *
- * @since  02.00.00
+ * @since  02.00.01
  */
 class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 {
@@ -52,7 +52,7 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 	 * Minimum Joomla version required to install the extension.
 	 *
 	 * @var    string
-	 * @since  02.00.00
+	 * @since  02.00.01
 	 */
 	private $minimumJoomla = '5.0.0';
 
@@ -60,7 +60,7 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 	 * Minimum PHP version required to install the extension.
 	 *
 	 * @var    string
-	 * @since  02.00.00
+	 * @since  02.00.01
 	 */
 	private $minimumPhp = '8.1.0';
 
@@ -68,7 +68,7 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 	 * Language tags supported by this plugin.
 	 *
 	 * @var    array
-	 * @since  02.00.00
+	 * @since  02.00.01
 	 */
 	private $languageTags = ['en-GB', 'en-US'];
 
@@ -80,7 +80,7 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 	 *
 	 * @return  boolean  True on success
 	 *
-	 * @since   02.00.00
+	 * @since   02.00.01
 	 */
 	public function preflight($type, $adapter): bool
 	{
@@ -115,7 +115,7 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 	 *
 	 * @return  boolean  True on success
 	 *
-	 * @since   02.00.00
+	 * @since   02.00.01
 	 */
 	public function postflight($type, $adapter): bool
 	{
@@ -138,7 +138,7 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 	 *
 	 * @return  boolean  True on success
 	 *
-	 * @since   02.00.00
+	 * @since   02.00.01
 	 */
 	public function install(InstallerAdapter $adapter): bool
 	{
@@ -167,7 +167,7 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 	 *
 	 * @return  boolean  True on success
 	 *
-	 * @since   02.00.00
+	 * @since   02.00.01
 	 */
 	public function update(InstallerAdapter $adapter): bool
 	{
@@ -181,7 +181,7 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 	 *
 	 * @return  boolean  True on success
 	 *
-	 * @since   02.00.00
+	 * @since   02.00.01
 	 */
 	public function uninstall(InstallerAdapter $adapter): bool
 	{
@@ -205,7 +205,7 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 	 *
 	 * @return  array  Associative array of placeholder => replacement value
 	 *
-	 * @since   02.00.00
+	 * @since   02.00.01
 	 */
 	private function getPlaceholders()
 	{
@@ -223,7 +223,7 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 	 *
 	 * @return  \Joomla\Registry\Registry
 	 *
-	 * @since   02.00.00
+	 * @since   02.00.01
 	 */
 	private function getPluginParams()
 	{
@@ -248,7 +248,7 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 	 *
 	 * @return  array  The same array with placeholders replaced
 	 *
-	 * @since   02.00.00
+	 * @since   02.00.01
 	 */
 	private function resolvePlaceholders(array $strings)
 	{
@@ -274,7 +274,7 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 	 *
 	 * @return  void
 	 *
-	 * @since   02.00.00
+	 * @since   02.00.01
 	 */
 	private function installLanguageOverrides()
 	{
@@ -335,7 +335,7 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 	 *
 	 * @return  void
 	 *
-	 * @since   02.00.00
+	 * @since   02.00.01
 	 */
 	private function updateLoginSupportUrls()
 	{
@@ -392,7 +392,7 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 	 *
 	 * @return  void
 	 *
-	 * @since   02.00.00
+	 * @since   02.00.01
 	 */
 	private function updateAtumBranding()
 	{
@@ -462,7 +462,7 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 	 *
 	 * @return  void
 	 *
-	 * @since   02.00.00
+	 * @since   02.00.01
 	 */
 	private function registerActionLogExtension()
 	{
@@ -516,7 +516,7 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 	 *
 	 * @return  void
 	 *
-	 * @since   02.00.00
+	 * @since   02.00.01
 	 */
 	private function unregisterActionLogExtension()
 	{
@@ -548,7 +548,7 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 	 *
 	 * @return  void
 	 *
-	 * @since   02.00.00
+	 * @since   02.00.01
 	 */
 	private function uninstallLanguageOverrides()
 	{
@@ -600,7 +600,7 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 	 *
 	 * @return  boolean  True on success
 	 *
-	 * @since   02.00.00
+	 * @since   02.00.01
 	 */
 	private function mergeOverridesIntoFile($dest, array $overrides)
 	{
@@ -671,7 +671,7 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 	 *
 	 * @return  boolean  True on success
 	 *
-	 * @since   02.00.00
+	 * @since   02.00.01
 	 */
 	private function removeOverridesFromFile($dest, array $keys)
 	{
@@ -736,7 +736,7 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 	 *
 	 * @return  array  Lines with the block removed
 	 *
-	 * @since   02.00.00
+	 * @since   02.00.01
 	 */
 	private function stripMokoWaaSBlock(array $lines)
 	{
@@ -773,7 +773,7 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 	 *
 	 * @return  array  Array of language strings (key => value)
 	 *
-	 * @since   02.00.00
+	 * @since   02.00.01
 	 */
 	private function parseLanguageFile($filePath)
 	{

@@ -10,13 +10,13 @@
  DEFGROUP: Joomla.Plugin
  INGROUP: MokoWaaS.Guides
  REPO: https://github.com/mokoconsulting-tech/mokowaas
- VERSION: 02.00.00
+ VERSION: 02.00.01
  PATH: /docs/guides/configuration-guide.md
  BRIEF: Configuration guide for the MokoWaaS system plugin
  NOTE: Defines plugin parameters, expected behaviors, and recommended defaults
 -->
 
-# MokoWaaS Configuration Guide (VERSION: 02.00.00)
+# MokoWaaS Configuration Guide (VERSION: 02.00.01)
 
 ## 1. Objective
 
@@ -266,4 +266,4 @@ Restricted components are automatically hidden from the admin menu via `onPrepro
 | Version  | Date       | Author                          | Description                                    |
 | -------- | ---------- | ------------------------------- | ---------------------------------------------- |
 | 01.02.00 | 2025-12-11 | Jonathan Miller (@jmiller-moko) | Initial standalone configuration guide created |
-| 02.00.00 | 2026-04-07 | Jonathan Miller (@jmiller-moko) | Full rewrite: WaaS access, visual branding, tenant restrictions, security, maintenance, action logs |
+| 02.00.01 | 2026-04-07 | Jonathan Miller (@jmiller-moko) | Full rewrite: WaaS access, visual branding, tenant restrictions, security, maintenance, action logs |

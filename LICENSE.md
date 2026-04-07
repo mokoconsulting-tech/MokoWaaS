@@ -15,7 +15,7 @@
 	INGROUP: MokoWaaS.Documentation
   REPO: https://github.com/mokoconsulting-tech/mokowaas
 	PATH: ./LICENSE.md
-	VERSION: 02.00.00
+	VERSION: 02.00.01
 	BRIEF: Project license (GPL-3.0-or-later)
 -->
 										GNU GENERAL PUBLIC LICENSE

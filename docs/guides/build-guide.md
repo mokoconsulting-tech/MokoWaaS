@@ -11,13 +11,13 @@
  INGROUP: MokoWaaS.Build
  REPO: https://github.com/mokoconsulting-tech/mokowaas
  FILE: build-guide.md
- VERSION: 02.00.00
+ VERSION: 02.00.01
  PATH: /docs/guides/
  BRIEF: Build and packaging guide for the MokoWaaS system plugin
  NOTE: Defines environment setup, repository layout, packaging rules, and release preparation
 -->
 
-# MokoWaaS Build Guide (VERSION: 02.00.00)
+# MokoWaaS Build Guide (VERSION: 02.00.01)
 
 ## 1. Purpose
 
