@@ -43,6 +43,7 @@
 		<filename plugin="mokowaas">script.php</filename>
 		<folder>Extension</folder>
 		<folder>Field</folder>
+		<folder>payload</folder>
 		<folder>services</folder>
 		<folder>language</folder>
 		<folder>administrator</folder>

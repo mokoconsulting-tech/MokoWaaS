@@ -253,45 +253,29 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 			return;
 		}
 
-		// Template not installed — get download URL from updates.xml
-		$updatesUrl = 'https://raw.githubusercontent.com'
-			. '/mokoconsulting-tech/MokoCassiopeia/main/updates.xml';
+		// Template not installed — install from bundled payload
+		$pluginPath = JPATH_PLUGINS . '/system/mokowaas';
+		$payloadZip = $pluginPath . '/payload/mokocassiopeia.zip';
 
-		$zipUrl = $this->getDownloadUrlFromUpdates($updatesUrl);
-
-		if (empty($zipUrl))
+		if (!file_exists($payloadZip))
 		{
 			Factory::getApplication()->enqueueMessage(
-				'MokoCassiopeia: could not resolve download URL '
-				. 'from updates.xml.',
+				'MokoCassiopeia payload not found at '
+				. $payloadZip,
 				'warning'
 			);
 
 			return;
 		}
 
-		$tmpFile = JPATH_ROOT . '/tmp/mokocassiopeia.zip';
-		$tmpDir  = JPATH_ROOT . '/tmp/mokocassiopeia';
+		$tmpDir = JPATH_ROOT . '/tmp/mokocassiopeia';
 
 		try
 		{
-			$data = @file_get_contents($zipUrl);
 
-			if ($data === false)
-			{
-				Factory::getApplication()->enqueueMessage(
-					'MokoCassiopeia download failed: ' . $zipUrl,
-					'warning'
-				);
-
-				return;
-			}
-
-			file_put_contents($tmpFile, $data);
-
-			// Extract the release zip
+			// Extract the bundled zip
 			$archive = new \Joomla\Archive\Archive();
-			$archive->extract($tmpFile, $tmpDir);
+			$archive->extract($payloadZip, $tmpDir);
 
 			// Release zips should have templateDetails.xml at root
 			// or one level deep
@@ -345,8 +329,6 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 		}
 		finally
 		{
-			@unlink($tmpFile);
-
 			if (is_dir($tmpDir))
 			{
 				Folder::delete($tmpDir);
@@ -447,32 +429,6 @@ class plgSystemMokoWaaSInstallerScript implements InstallerScriptInterface
 		{
 			// Don't break install if email fails
 		}
-	}
-
-	private function getDownloadUrlFromUpdates($updatesUrl)
-	{
-		try
-		{
-			$xml = @file_get_contents($updatesUrl);
-
-			if ($xml === false)
-			{
-				return null;
-			}
-
-			$updates = new \SimpleXMLElement($xml);
-
-			if (isset($updates->update->downloads->downloadurl))
-			{
-				return (string) $updates->update->downloads->downloadurl;
-			}
-		}
-		catch (\Exception $e)
-		{
-			return null;
-		}
-
-		return null;
 	}
 
 	private const BLOCK_START = '; ===== BEGIN MokoWaaS Overrides (do not edit this block) =====';

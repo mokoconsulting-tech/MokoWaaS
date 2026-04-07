@@ -1,0 +1,48 @@
+name: Update MokoCassiopeia Payload
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  update-payload:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get latest MokoCassiopeia release URL
+        id: moko
+        run: |
+          DOWNLOAD_URL=$(curl -s https://api.github.com/repos/mokoconsulting-tech/MokoCassiopeia/releases \
+            | jq -r '[.[] | select(.assets | length > 0)][0].assets[0].browser_download_url')
+          echo "url=$DOWNLOAD_URL" >> $GITHUB_OUTPUT
+          echo "Found: $DOWNLOAD_URL"
+
+      - name: Download MokoCassiopeia zip
+        if: steps.moko.outputs.url != 'null'
+        run: |
+          mkdir -p src/payload
+          curl -sL "${{ steps.moko.outputs.url }}" -o src/payload/mokocassiopeia.zip
+          ls -la src/payload/
+
+      - name: Check if payload changed
+        id: diff
+        run: |
+          git add src/payload/mokocassiopeia.zip
+          if git diff --cached --quiet; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit updated payload
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore: update mokocassiopeia payload"
+          git push
