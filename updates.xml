@@ -29,7 +29,6 @@
 		<element>mokowaas</element>
 		<type>plugin</type>
 		<folder>system</folder>
-		<client>site</client>
 		<version>02.01.11</version>
 		<stability>stable</stability>
 		<infourl title="MokoWaaS">https://github.com/mokoconsulting-tech/mokowaas</infourl>
@@ -50,7 +49,6 @@
 		<element>mokowaas</element>
 		<type>plugin</type>
 		<folder>system</folder>
-		<client>site</client>
 		<version>02.01.11</version>
 		<stability>rc</stability>
 		<infourl title="MokoWaaS RC">https://github.com/mokoconsulting-tech/MokoWaaS/releases/tag/rc</infourl>
@@ -70,7 +68,6 @@
 		<element>mokowaas</element>
 		<type>plugin</type>
 		<folder>system</folder>
-		<client>site</client>
 		<version>02.01.11</version>
 		<stability>beta</stability>
 		<infourl title="MokoWaaS Beta">https://github.com/mokoconsulting-tech/MokoWaaS/releases/tag/beta</infourl>
@@ -90,7 +87,6 @@
 		<element>mokowaas</element>
 		<type>plugin</type>
 		<folder>system</folder>
-		<client>site</client>
 		<version>02.01.11</version>
 		<stability>alpha</stability>
 		<infourl title="MokoWaaS Alpha">https://github.com/mokoconsulting-tech/MokoWaaS/releases/tag/alpha</infourl>
@@ -110,7 +106,6 @@
 		<element>mokowaas</element>
 		<type>plugin</type>
 		<folder>system</folder>
-		<client>site</client>
 		<version>02.01.11</version>
 		<stability>development</stability>
 		<infourl title="MokoWaaS Dev">https://github.com/mokoconsulting-tech/MokoWaaS/releases/tag/development</infourl>
