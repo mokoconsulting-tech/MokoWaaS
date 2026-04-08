@@ -10,7 +10,7 @@
 # VERSION: 04.05.13
 # BRIEF: Update Joomla update server XML feed with stable/rc/dev entries
 #
-# Writes update.xml with multiple <update> entries:
+# Writes updates.xml with multiple <update> entries:
 #   - <tag>stable</tag>     on push to main (from auto-release)
 #   - <tag>rc</tag>         on push to rc/**
 #   - <tag>development</tag> on push to dev/**
@@ -47,7 +47,7 @@ permissions:
 
 jobs:
   update-xml:
-    name: Update update.xml
+    name: Update updates.xml
     runs-on: ubuntu-latest
 
     steps:
@@ -69,7 +69,7 @@ jobs:
             cd /tmp/mokostandards && composer install --no-dev --no-interaction --quiet 2>/dev/null || true
           fi
 
-      - name: Generate update.xml entry
+      - name: Generate updates.xml entry
         run: |
           BRANCH="${{ github.ref_name }}"
           REPO="${{ github.repository }}"
@@ -149,20 +149,20 @@ jobs:
 XMLEOF
 )
 
-          # ── Merge into update.xml ─────────────────────────────────────
-          if [ ! -f "update.xml" ]; then
+          # ── Merge into updates.xml ─────────────────────────────────────
+          if [ ! -f "updates.xml" ]; then
             # Create fresh
-            printf '%s\n' '<?xml version="1.0" encoding="utf-8"?>' > update.xml
-            printf '%s\n' '<updates>' >> update.xml
-            echo "$NEW_ENTRY" >> update.xml
-            printf '%s\n' '</updates>' >> update.xml
+            printf '%s\n' '<?xml version="1.0" encoding="utf-8"?>' > updates.xml
+            printf '%s\n' '<updates>' >> updates.xml
+            echo "$NEW_ENTRY" >> updates.xml
+            printf '%s\n' '</updates>' >> updates.xml
           else
             # Remove existing entry for this stability, add new one
             # Use python for reliable XML manipulation
             python3 -c "
 import re, sys
 
-with open('update.xml', 'r') as f:
+with open('updates.xml', 'r') as f:
     content = f.read()
 
 # Remove existing entry with this stability tag
@@ -176,29 +176,29 @@ content = content.replace('</updates>', new_entry + '\n</updates>')
 # Clean up empty lines
 content = re.sub(r'\n{3,}', '\n\n', content)
 
-with open('update.xml', 'w') as f:
+with open('updates.xml', 'w') as f:
     f.write(content)
 " 2>/dev/null || {
               # Fallback: just rewrite the whole file if python fails
               # Keep existing stable entry if present
               STABLE_ENTRY=""
-              if [ "$STABILITY" != "stable" ] && grep -q '<tag>stable</tag>' update.xml; then
-                STABLE_ENTRY=$(sed -n '/<update>/,/<\/update>/{ /<tag>stable<\/tag>/,/<\/update>/p; /<update>/,/<tag>stable<\/tag>/p }' update.xml | sort -u)
+              if [ "$STABILITY" != "stable" ] && grep -q '<tag>stable</tag>' updates.xml; then
+                STABLE_ENTRY=$(sed -n '/<update>/,/<\/update>/{ /<tag>stable<\/tag>/,/<\/update>/p; /<update>/,/<tag>stable<\/tag>/p }' updates.xml | sort -u)
               fi
               RC_ENTRY=""
-              if [ "$STABILITY" != "rc" ] && grep -q '<tag>rc</tag>' update.xml; then
+              if [ "$STABILITY" != "rc" ] && grep -q '<tag>rc</tag>' updates.xml; then
                 RC_ENTRY=$(python3 -c "
 import re
-with open('update.xml') as f: c = f.read()
+with open('updates.xml') as f: c = f.read()
 m = re.search(r'(<update>.*?<tag>rc</tag>.*?</update>)', c, re.DOTALL)
 if m: print(m.group(1))
 " 2>/dev/null || true)
               fi
               DEV_ENTRY=""
-              if [ "$STABILITY" != "development" ] && grep -q '<tag>development</tag>' update.xml; then
+              if [ "$STABILITY" != "development" ] && grep -q '<tag>development</tag>' updates.xml; then
                 DEV_ENTRY=$(python3 -c "
 import re
-with open('update.xml') as f: c = f.read()
+with open('updates.xml') as f: c = f.read()
 m = re.search(r'(<update>.*?<tag>development</tag>.*?</update>)', c, re.DOTALL)
 if m: print(m.group(1))
 " 2>/dev/null || true)
@@ -212,16 +212,16 @@ if m: print(m.group(1))
                 [ -n "$DEV_ENTRY" ] && echo "$DEV_ENTRY"
                 echo "$NEW_ENTRY"
                 printf '%s\n' '</updates>'
-              } > update.xml
+              } > updates.xml
             }
           fi
 
           # Commit
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add update.xml
+          git add updates.xml
           git diff --cached --quiet || {
-            git commit -m "chore: update update.xml (${STABILITY}: ${DISPLAY_VERSION}) [skip ci]" \
+            git commit -m "chore: update updates.xml (${STABILITY}: ${DISPLAY_VERSION}) [skip ci]" \
               --author="github-actions[bot] <github-actions[bot]@users.noreply.github.com>"
             git push
           }

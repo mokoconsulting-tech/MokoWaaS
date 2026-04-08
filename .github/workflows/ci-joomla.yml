@@ -312,11 +312,11 @@ jobs:
             fi
           fi
 
-          # Check update.xml exists
-          if [ -f "update.xml" ] || [ -f "updates.xml" ]; then
+          # Check updates.xml exists
+          if [ -f "updates.xml" ] || [ -f "updates.xml" ]; then
             echo "Update XML present." >> $GITHUB_STEP_SUMMARY
           else
-            echo "No update.xml found." >> $GITHUB_STEP_SUMMARY
+            echo "No updates.xml found." >> $GITHUB_STEP_SUMMARY
             ERRORS=$((ERRORS + 1))
           fi
 

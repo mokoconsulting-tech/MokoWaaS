@@ -595,9 +595,9 @@ jobs:
             joomla_findings+=("No .ini language files found")
           fi
 
-          # update.xml must exist in root (Joomla update server)
-          if [ ! -f 'update.xml' ]; then
-            joomla_findings+=("update.xml missing in root (required for Joomla update server)")
+          # updates.xml must exist in root (Joomla update server)
+          if [ ! -f 'updates.xml' ]; then
+            joomla_findings+=("updates.xml missing in root (required for Joomla update server)")
           fi
 
           # index.html files for directory listing protection
