@@ -69,7 +69,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GH_TOKEN || github.token }}
           COMPOSER_AUTH: '{"github-oauth":{"github.com":"${{ secrets.GH_TOKEN || github.token }}"}}'
         run: |
-          git clone --depth 1 --branch version/04.05 --quiet \
+          git clone --depth 1 --branch version/04 --quiet \
             "https://x-access-token:${GH_TOKEN}@github.com/mokoconsulting-tech/MokoStandards.git" \
             /tmp/mokostandards
           cd /tmp/mokostandards
@@ -316,34 +316,60 @@ jobs:
           DOWNLOAD_URL="https://github.com/${REPO}/releases/download/v${VERSION}/${EXT_ELEMENT}-${VERSION}.zip"
           INFO_URL="https://github.com/${REPO}/releases/tag/v${VERSION}"
 
-          # -- Write updates.xml (stable release) --------------------------
+          # -- Build stable entry ──────────────────────────────────────
+          STABLE_ENTRY=$(cat <<XMLEOF
+  <update>
+    <name>${EXT_NAME}</name>
+    <description>${EXT_NAME} update</description>
+    <element>${EXT_ELEMENT}</element>
+    <type>${EXT_TYPE}</type>
+    <version>${VERSION}</version>
+    $([ -n "$CLIENT_TAG" ] && echo "    ${CLIENT_TAG}")
+    $([ -n "$FOLDER_TAG" ] && echo "    ${FOLDER_TAG}")
+    <tags>
+      <tag>stable</tag>
+    </tags>
+    <infourl title="${EXT_NAME}">${INFO_URL}</infourl>
+    <downloads>
+      <downloadurl type="full" format="zip">${DOWNLOAD_URL}</downloadurl>
+    </downloads>
+    ${TARGET_PLATFORM}
+    $([ -n "$PHP_TAG" ] && echo "    ${PHP_TAG}")
+    <maintainer>Moko Consulting</maintainer>
+    <maintainerurl>https://mokoconsulting.tech</maintainerurl>
+  </update>
+XMLEOF
+)
+
+          # -- Write updates.xml preserving dev/rc entries ──────────────
+          # Extract existing dev and rc entries if present
+          RC_ENTRY=""
+          DEV_ENTRY=""
+          if [ -f "updates.xml" ]; then
+            RC_ENTRY=$(python3 -c "
+import re
+with open('updates.xml') as f: c = f.read()
+m = re.search(r'(  <update>.*?<tag>rc</tag>.*?</update>)', c, re.DOTALL)
+if m: print(m.group(1))
+" 2>/dev/null || true)
+            DEV_ENTRY=$(python3 -c "
+import re
+with open('updates.xml') as f: c = f.read()
+m = re.search(r'(  <update>.*?<tag>development</tag>.*?</update>)', c, re.DOTALL)
+if m: print(m.group(1))
+" 2>/dev/null || true)
+          fi
+
           {
             printf '%s\n' '<?xml version="1.0" encoding="utf-8"?>'
             printf '%s\n' '<updates>'
-            printf '%s\n' '  <update>'
-            printf '%s\n' "    <name>${EXT_NAME}</name>"
-            printf '%s\n' "    <description>${EXT_NAME} update</description>"
-            printf '%s\n' "    <element>${EXT_ELEMENT}</element>"
-            printf '%s\n' "    <type>${EXT_TYPE}</type>"
-            printf '%s\n' "    <version>${VERSION}</version>"
-            [ -n "$CLIENT_TAG" ] && printf '%s\n' "    ${CLIENT_TAG}"
-            [ -n "$FOLDER_TAG" ] && printf '%s\n' "    ${FOLDER_TAG}"
-            printf '%s\n' '    <tags>'
-            printf '%s\n' '      <tag>stable</tag>'
-            printf '%s\n' '    </tags>'
-            printf '%s\n' "    <infourl title=\"${EXT_NAME}\">${INFO_URL}</infourl>"
-            printf '%s\n' '    <downloads>'
-            printf '%s\n' "      <downloadurl type=\"full\" format=\"zip\">${DOWNLOAD_URL}</downloadurl>"
-            printf '%s\n' '    </downloads>'
-            printf '%s\n' "    ${TARGET_PLATFORM}"
-            [ -n "$PHP_TAG" ] && printf '%s\n' "    ${PHP_TAG}"
-            printf '%s\n' '    <maintainer>Moko Consulting</maintainer>'
-            printf '%s\n' '    <maintainerurl>https://mokoconsulting.tech</maintainerurl>'
-            printf '%s\n' '  </update>'
+            echo "$STABLE_ENTRY"
+            [ -n "$RC_ENTRY" ] && echo "$RC_ENTRY"
+            [ -n "$DEV_ENTRY" ] && echo "$DEV_ENTRY"
             printf '%s\n' '</updates>'
           } > updates.xml
 
-          echo "updates.xml: ${VERSION} (stable) — ${EXT_TYPE}/${EXT_ELEMENT}" >> $GITHUB_STEP_SUMMARY
+          echo "updates.xml: ${VERSION} (stable + rc/dev preserved)" >> $GITHUB_STEP_SUMMARY
 
       # -- Commit all changes ---------------------------------------------------
       - name: Commit release changes
