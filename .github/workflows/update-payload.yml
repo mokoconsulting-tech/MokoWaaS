@@ -18,7 +18,7 @@ jobs:
         id: moko
         run: |
           DOWNLOAD_URL=$(curl -s https://api.github.com/repos/mokoconsulting-tech/MokoCassiopeia/releases \
-            | jq -r '[.[] | select(.assets | length > 0)][0].assets[0].browser_download_url')
+            | jq -r '[.[] | select(.prerelease == false and .draft == false and (.assets | length > 0)][0].assets[0].browser_download_url')
           echo "url=$DOWNLOAD_URL" >> $GITHUB_OUTPUT
           echo "Found: $DOWNLOAD_URL"
 
