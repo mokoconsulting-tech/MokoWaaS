@@ -22,8 +22,8 @@
 		<element>mokowaas</element>
 		<type>plugin</type>
 		<folder>system</folder>
-		<version>02.01.11</version>
-		<stability>development</stability>
+		<version>02.01.12</version>
+		<stability>dev</stability>
 		<infourl title="MokoWaaS Dev">https://github.com/mokoconsulting-tech/MokoWaaS/releases/tag/development</infourl>
 		<downloads>
 			<downloadurl type="full" format="zip">https://github.com/mokoconsulting-tech/MokoWaaS/releases/download/development/MokoWaaS-02.01.12-dev.zip</downloadurl>
@@ -41,7 +41,7 @@
 		<element>mokowaas</element>
 		<type>plugin</type>
 		<folder>system</folder>
-		<version>02.01.11</version>
+		<version>02.01.12</version>
 		<stability>alpha</stability>
 		<infourl title="MokoWaaS Alpha">https://github.com/mokoconsulting-tech/MokoWaaS/releases/tag/alpha</infourl>
 		<downloads>
@@ -60,7 +60,7 @@
 		<element>mokowaas</element>
 		<type>plugin</type>
 		<folder>system</folder>
-		<version>02.01.11</version>
+		<version>02.01.12</version>
 		<stability>beta</stability>
 		<infourl title="MokoWaaS Beta">https://github.com/mokoconsulting-tech/MokoWaaS/releases/tag/beta</infourl>
 		<downloads>
@@ -79,7 +79,7 @@
 		<element>mokowaas</element>
 		<type>plugin</type>
 		<folder>system</folder>
-		<version>02.01.11</version>
+		<version>02.01.12</version>
 		<stability>rc</stability>
 		<infourl title="MokoWaaS RC">https://github.com/mokoconsulting-tech/MokoWaaS/releases/tag/release-candidate</infourl>
 		<downloads>
@@ -98,7 +98,7 @@
 		<element>mokowaas</element>
 		<type>plugin</type>
 		<folder>system</folder>
-		<version>02.01.11</version>
+		<version>02.01.12</version>
 		<stability>stable</stability>
 		<infourl title="MokoWaaS">https://github.com/mokoconsulting-tech/mokowaas</infourl>
 		<downloads>
