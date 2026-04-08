@@ -79,6 +79,20 @@ jobs:
           REPO="${{ github.repository }}"
           VERSION=$(php /tmp/mokostandards/api/cli/version_read.php --path . 2>/dev/null || echo "0.0.0")
 
+          # Auto-bump patch on alpha/beta/rc branches (not dev — dev bumps manually)
+          if [[ "$BRANCH" != dev/* ]]; then
+            git config --local user.email "github-actions[bot]@users.noreply.github.com"
+            git config --local user.name "github-actions[bot]"
+            BUMPED=$(php /tmp/mokostandards/api/cli/version_bump.php --path . 2>/dev/null || true)
+            if [ -n "$BUMPED" ]; then
+              VERSION=$(php /tmp/mokostandards/api/cli/version_read.php --path . 2>/dev/null || echo "$VERSION")
+              git add -A
+              git commit -m "chore(version): auto-bump patch ${VERSION} [skip ci]" \
+                --author="github-actions[bot] <github-actions[bot]@users.noreply.github.com>" 2>/dev/null || true
+              git push 2>/dev/null || true
+            fi
+          fi
+
           # Determine stability from branch or input
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             STABILITY="${{ inputs.stability }}"
@@ -151,7 +165,7 @@ jobs:
           [ ! -d "$SOURCE_DIR" ] && SOURCE_DIR="htdocs"
           if [ -d "$SOURCE_DIR" ]; then
             cd "$SOURCE_DIR"
-            zip -r "/tmp/${PACKAGE_NAME}" .
+            zip -r "/tmp/${PACKAGE_NAME}" . -x '.ftpignore' 'sftp-config*' '*.ppk' '*.pem' '*.key' '.env*'
             cd ..
 
             SHA256=$(sha256sum "/tmp/${PACKAGE_NAME}" | cut -d' ' -f1)
@@ -239,6 +253,64 @@ jobs:
             git push
           }
 
+      - name: SFTP deploy to dev server
+        if: contains(github.ref, 'dev/')
+        env:
+          DEV_HOST: ${{ vars.DEV_FTP_HOST }}
+          DEV_PATH: ${{ vars.DEV_FTP_PATH }}
+          DEV_SUFFIX: ${{ vars.DEV_FTP_SUFFIX }}
+          DEV_USER: ${{ vars.DEV_FTP_USERNAME }}
+          DEV_PORT: ${{ vars.DEV_FTP_PORT }}
+          DEV_KEY: ${{ secrets.DEV_FTP_KEY }}
+          DEV_PASS: ${{ secrets.DEV_FTP_PASSWORD }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN || github.token }}
+        run: |
+          # ── Permission check: admin or maintain role required ──────
+          ACTOR="${{ github.actor }}"
+          REPO="${{ github.repository }}"
+          PERMISSION=$(gh api "repos/${REPO}/collaborators/${ACTOR}/permission" \
+            --jq '.permission' 2>/dev/null || \
+            gh api "repos/${REPO}/collaborators/${ACTOR}" \
+            --jq '.role' 2>/dev/null || echo "read")
+          case "$PERMISSION" in
+            admin|maintain|write) ;;
+            *)
+              echo "Deploy denied: ${ACTOR} has '${PERMISSION}' — requires admin, maintain, or write"
+              exit 0
+              ;;
+          esac
+
+          [ -z "$DEV_HOST" ] || [ -z "$DEV_PATH" ] && { echo "DEV FTP not configured — skipping SFTP"; exit 0; }
+
+          SOURCE_DIR="src"
+          [ ! -d "$SOURCE_DIR" ] && SOURCE_DIR="htdocs"
+          [ ! -d "$SOURCE_DIR" ] && exit 0
+
+          PORT="${DEV_PORT:-22}"
+          REMOTE="${DEV_PATH%/}"
+          [ -n "$DEV_SUFFIX" ] && REMOTE="${REMOTE}/${DEV_SUFFIX#/}"
+
+          printf '{"host":"%s","port":%s,"username":"%s","remotePath":"%s"' \
+            "$DEV_HOST" "$PORT" "$DEV_USER" "$REMOTE" > /tmp/sftp-config.json
+          if [ -n "$DEV_KEY" ]; then
+            echo "$DEV_KEY" > /tmp/deploy_key && chmod 600 /tmp/deploy_key
+            printf ',"privateKeyPath":"/tmp/deploy_key"}' >> /tmp/sftp-config.json
+          else
+            printf ',"password":"%s"}' "$DEV_PASS" >> /tmp/sftp-config.json
+          fi
+
+          PLATFORM=$(php /tmp/mokostandards/api/cli/platform_detect.php --path . 2>/dev/null || true)
+          if [ "$PLATFORM" = "waas-component" ] && [ -f "/tmp/mokostandards/api/deploy/deploy-joomla.php" ]; then
+            php /tmp/mokostandards/api/deploy/deploy-joomla.php --path . --src-dir "$SOURCE_DIR" --config /tmp/sftp-config.json
+          elif [ -f "/tmp/mokostandards/api/deploy/deploy-sftp.php" ]; then
+            php /tmp/mokostandards/api/deploy/deploy-sftp.php --path . --src-dir "$SOURCE_DIR" --config /tmp/sftp-config.json
+          fi
+          rm -f /tmp/deploy_key /tmp/sftp-config.json
+          echo "SFTP deploy to dev complete" >> $GITHUB_STEP_SUMMARY
+
+      - name: Summary
+        if: always()
+        run: |
           echo "## Joomla Update Server" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Field | Value |" >> $GITHUB_STEP_SUMMARY

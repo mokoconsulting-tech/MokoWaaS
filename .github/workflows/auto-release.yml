@@ -477,7 +477,7 @@ jobs:
           [ ! -d "$SOURCE_DIR" ] && { echo "No src/ or htdocs/ — skipping package"; exit 0; }
 
           cd "$SOURCE_DIR"
-          zip -r "/tmp/${PACKAGE_NAME}" .
+          zip -r "/tmp/${PACKAGE_NAME}" . -x '.ftpignore' 'sftp-config*' '*.ppk' '*.pem' '*.key' '.env*'
           cd ..
 
           FILESIZE=$(stat -c%s "/tmp/${PACKAGE_NAME}" 2>/dev/null || stat -f%z "/tmp/${PACKAGE_NAME}" 2>/dev/null || echo "unknown")

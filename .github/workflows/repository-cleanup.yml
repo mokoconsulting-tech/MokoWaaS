@@ -154,6 +154,10 @@ jobs:
             ".github/workflows/auto-version-branch.yml"
             ".github/workflows/publish-to-mokodolibarr.yml"
             ".github/workflows/ci.yml"
+            ".github/workflows/deploy-rs.yml"
+            "sftp-config.json"
+            "sftp-config.json.template"
+            "scripts/sftp-config"
           )
 
           DELETED=0
