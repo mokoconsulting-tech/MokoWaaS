@@ -27,6 +27,7 @@
 /.github/workflows/ci-dolibarr.yml               @jmiller-moko
 /.github/workflows/publish-to-mokodolimods.yml   @jmiller-moko
 /.github/workflows/changelog-validation.yml      @jmiller-moko
+/.github/workflows/branch-freeze.yml             @jmiller-moko
 # Custom workflows in .github/workflows/ not listed above are repo-owned.
 
 # ── GitHub configuration ─────────────────────────────────────────────────

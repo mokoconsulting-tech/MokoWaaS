@@ -35,13 +35,14 @@
 name: Build & Release
 
 on:
-  push:
+  pull_request:
+    types: [closed]
     branches:
       - main
-      - master
     paths:
       - 'src/**'
       - 'htdocs/**'
+  workflow_dispatch:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -54,8 +55,7 @@ jobs:
     name: Build & Release Pipeline
     runs-on: ubuntu-latest
     if: >-
-      !contains(github.event.head_commit.message, '[skip ci]') &&
-      github.actor != 'github-actions[bot]'
+      github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch'
 
     steps:
       - name: Checkout repository
@@ -147,7 +147,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
 
           # -- Version drift check (must pass before release) --------
-          README_VER=$(grep -oP 'VERSION:\s*\K[\d.]+' README.md 2>/dev/null | head -1)
+          README_VER=$(sed -n 's/.*VERSION:[[:space:]]*\([0-9][0-9]\.[0-9][0-9]\.[0-9][0-9]\).*/\1/p' README.md 2>/dev/null | head -1)
           if [ "$README_VER" != "$VERSION" ]; then
             echo "- Version drift: README says \`${README_VER}\` but releasing \`${VERSION}\`" >> $GITHUB_STEP_SUMMARY
             ERRORS=$((ERRORS+1))
@@ -156,7 +156,7 @@ jobs:
           fi
 
           # Check CHANGELOG version matches
-          CL_VER=$(grep -oP 'VERSION:\s*\K[\d.]+' CHANGELOG.md 2>/dev/null | head -1)
+          CL_VER=$(sed -n 's/.*VERSION:[[:space:]]*\([0-9][0-9]\.[0-9][0-9]\.[0-9][0-9]\).*/\1/p' CHANGELOG.md 2>/dev/null | head -1)
           if [ -n "$CL_VER" ] && [ "$CL_VER" != "$VERSION" ]; then
             echo "- CHANGELOG drift: \`${CL_VER}\` != \`${VERSION}\`" >> $GITHUB_STEP_SUMMARY
             ERRORS=$((ERRORS+1))
@@ -164,7 +164,7 @@ jobs:
 
           # Check composer.json version if present
           if [ -f "composer.json" ]; then
-            COMP_VER=$(grep -oP '"version"\s*:\s*"\K[^"]+' composer.json 2>/dev/null | head -1)
+            COMP_VER=$(sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' composer.json 2>/dev/null | head -1)
             if [ -n "$COMP_VER" ] && [ "$COMP_VER" != "$VERSION" ]; then
               echo "- composer.json drift: \`${COMP_VER}\` != \`${VERSION}\`" >> $GITHUB_STEP_SUMMARY
               ERRORS=$((ERRORS+1))
@@ -188,7 +188,7 @@ jobs:
           # -- Joomla: manifest version drift --------
           MANIFEST=$(find . -maxdepth 2 -name "*.xml" -exec grep -l '<extension' {} \; 2>/dev/null | head -1)
           if [ -n "$MANIFEST" ]; then
-            XML_VER=$(grep -oP '<version>\K[^<]+' "$MANIFEST" 2>/dev/null | head -1)
+            XML_VER=$(sed -n 's/.*<version>\([^<]*\)<\/version>.*/\1/p' "$MANIFEST" 2>/dev/null | head -1)
             if [ -n "$XML_VER" ] && [ "$XML_VER" != "$VERSION" ]; then
               echo "- Manifest drift: \`${XML_VER}\` != \`${VERSION}\`" >> $GITHUB_STEP_SUMMARY
               ERRORS=$((ERRORS+1))
@@ -205,7 +205,7 @@ jobs:
             echo "- Manifest: \`${MANIFEST}\`" >> $GITHUB_STEP_SUMMARY
 
             # -- Joomla: extension type check --------
-            TYPE=$(grep -oP '<extension[^>]+type="\K[^"]+' "$MANIFEST" 2>/dev/null)
+            TYPE=$(sed -n 's/.*<extension[^>]*type="\([^"]*\)".*/\1/p' "$MANIFEST" 2>/dev/null)
             echo "- Extension type: ${TYPE:-unknown}" >> $GITHUB_STEP_SUMMARY
           fi
 
@@ -275,17 +275,22 @@ jobs:
             exit 0
           fi
 
-          EXT_NAME=$(grep -oP '<name>\K[^<]+' "$MANIFEST" 2>/dev/null | head -1 || echo "${{ github.event.repository.name }}")
-          EXT_TYPE=$(grep -oP '<extension[^>]+type="\K[^"]+' "$MANIFEST" 2>/dev/null || echo "component")
-          EXT_ELEMENT=$(grep -oP '<element>\K[^<]+' "$MANIFEST" 2>/dev/null | head -1 || echo "")
-          EXT_CLIENT=$(grep -oP '<extension[^>]+client="\K[^"]+' "$MANIFEST" 2>/dev/null || echo "")
-          EXT_FOLDER=$(grep -oP '<extension[^>]+group="\K[^"]+' "$MANIFEST" 2>/dev/null || echo "")
-          TARGET_PLATFORM=$(grep -oP '<targetplatform[^/]*/>' "$MANIFEST" 2>/dev/null | head -1 || echo "")
-          PHP_MINIMUM=$(grep -oP '<php_minimum>\K[^<]+' "$MANIFEST" 2>/dev/null | head -1 || echo "")
+          # Extract fields using sed (portable — no grep -P)
+          EXT_NAME=$(sed -n 's/.*<name>\([^<]*\)<\/name>.*/\1/p' "$MANIFEST" | head -1)
+          EXT_TYPE=$(sed -n 's/.*<extension[^>]*type="\([^"]*\)".*/\1/p' "$MANIFEST" | head -1)
+          EXT_ELEMENT=$(sed -n 's/.*<element>\([^<]*\)<\/element>.*/\1/p' "$MANIFEST" | head -1)
+          EXT_CLIENT=$(sed -n 's/.*<extension[^>]*client="\([^"]*\)".*/\1/p' "$MANIFEST" | head -1)
+          EXT_FOLDER=$(sed -n 's/.*<extension[^>]*group="\([^"]*\)".*/\1/p' "$MANIFEST" | head -1)
+          TARGET_PLATFORM=$(sed -n 's/.*\(<targetplatform[^/]*\/>\).*/\1/p' "$MANIFEST" | head -1)
+          PHP_MINIMUM=$(sed -n 's/.*<php_minimum>\([^<]*\)<\/php_minimum>.*/\1/p' "$MANIFEST" | head -1)
 
-          # Derive element from manifest filename if not in XML
+          # Fallbacks
+          [ -z "$EXT_NAME" ] && EXT_NAME="${{ github.event.repository.name }}"
+          [ -z "$EXT_TYPE" ] && EXT_TYPE="component"
+
+          # Templates/modules don't have <element> — derive from <name> (lowercased)
           if [ -z "$EXT_ELEMENT" ]; then
-            EXT_ELEMENT=$(basename "$MANIFEST" .xml)
+            EXT_ELEMENT=$(echo "$EXT_NAME" | tr '[:upper:]' '[:lower:]' | tr -d ' ')
           fi
 
           # Build client tag: plugins and frontend modules need <client>site</client>
@@ -341,24 +346,28 @@ jobs:
           } > /tmp/stable_entry.xml
 
           # -- Write updates.xml preserving dev/rc entries ──────────────
-          RC_ENTRY=""
-          DEV_ENTRY=""
+          # Extract existing entries for other stability levels
+          # Order reflects release workflow: development → alpha → beta → rc → stable
           if [ -f "updates.xml" ]; then
-            printf 'import re\n' > /tmp/extract.py
+            printf 'import re, sys\n' > /tmp/extract.py
             printf 'with open("updates.xml") as f: c = f.read()\n' >> /tmp/extract.py
-            printf 'import sys; tag = sys.argv[1]\n' >> /tmp/extract.py
+            printf 'tag = sys.argv[1]\n' >> /tmp/extract.py
             printf 'm = re.search(r"(  <update>.*?<tag>" + re.escape(tag) + r"</tag>.*?</update>)", c, re.DOTALL)\n' >> /tmp/extract.py
             printf 'if m: print(m.group(1))\n' >> /tmp/extract.py
-            RC_ENTRY=$(python3 /tmp/extract.py rc 2>/dev/null || true)
-            DEV_ENTRY=$(python3 /tmp/extract.py development 2>/dev/null || true)
           fi
+          DEV_ENTRY=$(python3 /tmp/extract.py development 2>/dev/null || true)
+          ALPHA_ENTRY=$(python3 /tmp/extract.py alpha 2>/dev/null || true)
+          BETA_ENTRY=$(python3 /tmp/extract.py beta 2>/dev/null || true)
+          RC_ENTRY=$(python3 /tmp/extract.py rc 2>/dev/null || true)
 
           {
             printf '%s\n' '<?xml version="1.0" encoding="utf-8"?>'
             printf '%s\n' '<updates>'
-            cat /tmp/stable_entry.xml
-            [ -n "$RC_ENTRY" ] && echo "$RC_ENTRY"
             [ -n "$DEV_ENTRY" ] && echo "$DEV_ENTRY"
+            [ -n "$ALPHA_ENTRY" ] && echo "$ALPHA_ENTRY"
+            [ -n "$BETA_ENTRY" ] && echo "$BETA_ENTRY"
+            [ -n "$RC_ENTRY" ] && echo "$RC_ENTRY"
+            cat /tmp/stable_entry.xml
             printf '%s\n' '</updates>'
           } > updates.xml
 
@@ -468,55 +477,64 @@ jobs:
           MANIFEST=$(find . -maxdepth 2 -name "*.xml" -exec grep -l '<extension' {} \; 2>/dev/null | head -1 || true)
           [ -z "$MANIFEST" ] && exit 0
 
-          EXT_ELEMENT=$(grep -oP '<element>\K[^<]+' "$MANIFEST" 2>/dev/null | head -1 || basename "$MANIFEST" .xml)
-          PACKAGE_NAME="${EXT_ELEMENT}-${VERSION}.zip"
+          EXT_ELEMENT=$(sed -n 's/.*<element>\([^<]*\)<\/element>.*/\1/p' "$MANIFEST" 2>/dev/null | head -1 || basename "$MANIFEST" .xml)
+          ZIP_NAME="${EXT_ELEMENT}-${VERSION}.zip"
+          TAR_NAME="${EXT_ELEMENT}-${VERSION}.tar.gz"
 
-          # -- Build install-ready ZIP from src/ ----------------------------
+          # -- Build install packages from src/ ----------------------------
           SOURCE_DIR="src"
           [ ! -d "$SOURCE_DIR" ] && SOURCE_DIR="htdocs"
           [ ! -d "$SOURCE_DIR" ] && { echo "No src/ or htdocs/ — skipping package"; exit 0; }
 
+          EXCLUDES=".ftpignore sftp-config* *.ppk *.pem *.key .env*"
+
+          # ZIP package
           cd "$SOURCE_DIR"
-          zip -r "/tmp/${PACKAGE_NAME}" . -x '.ftpignore' 'sftp-config*' '*.ppk' '*.pem' '*.key' '.env*'
+          zip -r "/tmp/${ZIP_NAME}" . -x $EXCLUDES
           cd ..
 
-          FILESIZE=$(stat -c%s "/tmp/${PACKAGE_NAME}" 2>/dev/null || stat -f%z "/tmp/${PACKAGE_NAME}" 2>/dev/null || echo "unknown")
+          # tar.gz package
+          tar -czf "/tmp/${TAR_NAME}" -C "$SOURCE_DIR" \
+            --exclude='.ftpignore' --exclude='sftp-config*' \
+            --exclude='*.ppk' --exclude='*.pem' --exclude='*.key' --exclude='.env*' .
 
-          # -- Calculate SHA-256 -------------------------------------------
-          SHA256=$(sha256sum "/tmp/${PACKAGE_NAME}" | cut -d' ' -f1)
+          ZIP_SIZE=$(stat -c%s "/tmp/${ZIP_NAME}" 2>/dev/null || stat -f%z "/tmp/${ZIP_NAME}" 2>/dev/null || echo "unknown")
+          TAR_SIZE=$(stat -c%s "/tmp/${TAR_NAME}" 2>/dev/null || stat -f%z "/tmp/${TAR_NAME}" 2>/dev/null || echo "unknown")
 
-          # -- Upload ZIP to the minor release tag -------------------------
-          gh release upload "$RELEASE_TAG" "/tmp/${PACKAGE_NAME}" --clobber 2>/dev/null || {
-            echo "Could not upload with --clobber, retrying..."
-            gh release upload "$RELEASE_TAG" "/tmp/${PACKAGE_NAME}" 2>/dev/null || true
-          }
+          # -- Calculate SHA-256 for both ----------------------------------
+          SHA256_ZIP=$(sha256sum "/tmp/${ZIP_NAME}" | cut -d' ' -f1)
+          SHA256_TAR=$(sha256sum "/tmp/${TAR_NAME}" | cut -d' ' -f1)
 
-          # -- Update updates.xml with SHA-256 for latest patch -------------
+          # -- Upload both to release tag ----------------------------------
+          gh release upload "$RELEASE_TAG" "/tmp/${ZIP_NAME}" --clobber 2>/dev/null || true
+          gh release upload "$RELEASE_TAG" "/tmp/${TAR_NAME}" --clobber 2>/dev/null || true
+
+          # -- Update updates.xml with both download formats ---------------
           if [ -f "updates.xml" ]; then
+            ZIP_URL="https://github.com/${REPO}/releases/download/${RELEASE_TAG}/${ZIP_NAME}"
+            TAR_URL="https://github.com/${REPO}/releases/download/${RELEASE_TAG}/${TAR_NAME}"
+
+            # Replace downloads block with both formats + SHA
+            sed -i "s|<downloads>.*</downloads>|<downloads>\n      <downloadurl type=\"full\" format=\"zip\">${ZIP_URL}</downloadurl>\n      <downloadurl type=\"full\" format=\"tar.gz\">${TAR_URL}</downloadurl>\n    </downloads>|" updates.xml 2>/dev/null || true
             if grep -q '<sha256>' updates.xml; then
-              sed -i "s|<sha256>.*</sha256>|<sha256>sha256:${SHA256}</sha256>|" updates.xml
+              sed -i "s|<sha256>.*</sha256>|<sha256>sha256:${SHA256_ZIP}</sha256>|" updates.xml
             else
-              sed -i "s|</downloads>|</downloads>\n    <sha256>sha256:${SHA256}</sha256>|" updates.xml
+              sed -i "s|</downloads>|</downloads>\n    <sha256>sha256:${SHA256_ZIP}</sha256>|" updates.xml
             fi
 
-            # Also update the download URL to point to this patch's ZIP
-            DOWNLOAD_URL="https://github.com/${REPO}/releases/download/${RELEASE_TAG}/${PACKAGE_NAME}"
-            sed -i "s|<downloadurl[^>]*>[^<]*</downloadurl>|<downloadurl type=\"full\" format=\"zip\">${DOWNLOAD_URL}</downloadurl>|" updates.xml
-
             git add updates.xml
-            git commit -m "chore(release): SHA-256 + download URL for ${VERSION} [skip ci]" \
+            git commit -m "chore(release): ZIP + tar.gz for ${VERSION} [skip ci]" \
               --author="github-actions[bot] <github-actions[bot]@users.noreply.github.com>" || true
             git push || true
           fi
 
-          echo "### Joomla Package" >> $GITHUB_STEP_SUMMARY
+          echo "### Joomla Packages" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Field | Value |" >> $GITHUB_STEP_SUMMARY
-          echo "|-------|-------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Package | \`${PACKAGE_NAME}\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| Size | ${FILESIZE} bytes |" >> $GITHUB_STEP_SUMMARY
-          echo "| SHA-256 | \`${SHA256}\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| Release | \`${RELEASE_TAG}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Package | Size | SHA-256 |" >> $GITHUB_STEP_SUMMARY
+          echo "|---------|------|---------|" >> $GITHUB_STEP_SUMMARY
+          echo "| \`${ZIP_NAME}\` | ${ZIP_SIZE} | \`${SHA256_ZIP}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| \`${TAR_NAME}\` | ${TAR_SIZE} | \`${SHA256_TAR}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Release | \`${RELEASE_TAG}\` | |" >> $GITHUB_STEP_SUMMARY
           echo "| Download | [${PACKAGE_NAME}](https://github.com/${REPO}/releases/download/${RELEASE_TAG}/${PACKAGE_NAME}) |" >> $GITHUB_STEP_SUMMARY
 
       # -- Summary --------------------------------------------------------------

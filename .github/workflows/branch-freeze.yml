@@ -1,0 +1,114 @@
+# Copyright (C) 2026 Moko Consulting <hello@mokoconsulting.tech>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# FILE INFORMATION
+# DEFGROUP: GitHub.Workflow
+# INGROUP: MokoStandards.Automation
+# REPO: https://github.com/mokoconsulting-tech/MokoStandards
+# PATH: /templates/workflows/shared/branch-freeze.yml.template
+# VERSION: 04.06.00
+# BRIEF: Freeze or unfreeze any branch via ruleset — manual workflow_dispatch
+
+name: Branch Freeze
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to freeze/unfreeze (e.g., version/04, dev/feature)'
+        required: true
+        type: string
+      action:
+        description: 'Action to perform'
+        required: true
+        type: choice
+        options:
+          - freeze
+          - unfreeze
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+permissions:
+  contents: read
+
+jobs:
+  manage-freeze:
+    name: "${{ inputs.action }} branch: ${{ inputs.branch }}"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check permissions
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN || github.token }}
+        run: |
+          ACTOR="${{ github.actor }}"
+          REPO="${{ github.repository }}"
+          PERMISSION=$(gh api "repos/${REPO}/collaborators/${ACTOR}/permission" \
+            --jq '.permission' 2>/dev/null || echo "read")
+          if [ "$PERMISSION" != "admin" ]; then
+            echo "Denied: only admins can freeze/unfreeze branches (${ACTOR} has ${PERMISSION})"
+            exit 1
+          fi
+
+      - name: "${{ inputs.action }} branch"
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN || github.token }}
+        run: |
+          BRANCH="${{ inputs.branch }}"
+          ACTION="${{ inputs.action }}"
+          REPO="${{ github.repository }}"
+          RULESET_NAME="FROZEN: ${BRANCH}"
+
+          echo "## Branch Freeze" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "$ACTION" = "freeze" ]; then
+            # Check if ruleset already exists
+            EXISTING=$(gh api "repos/${REPO}/rulesets" \
+              --jq ".[] | select(.name == \"${RULESET_NAME}\") | .id" 2>/dev/null || true)
+
+            if [ -n "$EXISTING" ]; then
+              echo "Branch \`${BRANCH}\` is already frozen (ruleset #${EXISTING})" >> $GITHUB_STEP_SUMMARY
+              exit 0
+            fi
+
+            # Create freeze ruleset — blocks all updates except admin bypass
+            printf '{"name":"%s","target":"branch","enforcement":"active",' "${RULESET_NAME}" > /tmp/ruleset.json
+            printf '"bypass_actors":[{"actor_id":5,"actor_type":"RepositoryRole","bypass_mode":"always"}],' >> /tmp/ruleset.json
+            printf '"conditions":{"ref_name":{"include":["refs/heads/%s"],"exclude":[]}},' "${BRANCH}" >> /tmp/ruleset.json
+            printf '"rules":[{"type":"update"},{"type":"deletion"},{"type":"non_fast_forward"}]}' >> /tmp/ruleset.json
+
+            RESULT=$(gh api "repos/${REPO}/rulesets" -X POST --input /tmp/ruleset.json --jq '.id' 2>&1) || true
+
+            if echo "$RESULT" | grep -qE '^[0-9]+$'; then
+              echo "Frozen \`${BRANCH}\` — ruleset #${RESULT}" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "| Field | Value |" >> $GITHUB_STEP_SUMMARY
+              echo "|-------|-------|" >> $GITHUB_STEP_SUMMARY
+              echo "| Branch | \`${BRANCH}\` |" >> $GITHUB_STEP_SUMMARY
+              echo "| Ruleset | #${RESULT} |" >> $GITHUB_STEP_SUMMARY
+              echo "| Rules | No updates, no deletion, no force push |" >> $GITHUB_STEP_SUMMARY
+              echo "| Bypass | Repository admins only |" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "Failed to freeze: ${RESULT}" >> $GITHUB_STEP_SUMMARY
+              exit 1
+            fi
+
+          elif [ "$ACTION" = "unfreeze" ]; then
+            # Find and delete the freeze ruleset
+            RULESET_ID=$(gh api "repos/${REPO}/rulesets" \
+              --jq ".[] | select(.name == \"${RULESET_NAME}\") | .id" 2>/dev/null || true)
+
+            if [ -z "$RULESET_ID" ]; then
+              echo "Branch \`${BRANCH}\` is not frozen (no ruleset found)" >> $GITHUB_STEP_SUMMARY
+              exit 0
+            fi
+
+            gh api "repos/${REPO}/rulesets/${RULESET_ID}" -X DELETE --silent 2>/dev/null
+
+            echo "Unfrozen \`${BRANCH}\` — ruleset #${RULESET_ID} deleted" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          rm -f /tmp/ruleset.json

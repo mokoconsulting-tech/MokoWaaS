@@ -16,12 +16,10 @@
 name: Changelog Validation
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
     branches:
       - main
+      - 'dev/**'
   workflow_dispatch:
 
 permissions:
