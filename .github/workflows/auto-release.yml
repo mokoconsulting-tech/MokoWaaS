@@ -8,7 +8,7 @@
 # REPO: https://github.com/mokoconsulting-tech/MokoStandards
 # PATH: /templates/workflows/joomla/auto-release.yml.template
 # VERSION: 04.05.13
-# BRIEF: Joomla build & release — ZIP package, update.xml, SHA-256 checksum
+# BRIEF: Joomla build & release — ZIP package, updates.xml, SHA-256 checksum
 #
 # +========================================================================+
 # |                    BUILD & RELEASE PIPELINE (JOOMLA)                   |
@@ -20,10 +20,10 @@
 # |    1. Read version from README.md                                      |
 # |    3. Set platform version (Joomla <version>)                          |
 # |    4. Update [VERSION: XX.YY.ZZ] badges in markdown files              |
-# |    5. Write update.xml (Joomla update server XML)                      |
+# |    5. Write updates.xml (Joomla update server XML)                      |
 # |    6. Create git tag vXX.YY.ZZ                                        |
 # |    7a. Patch: update existing GitHub Release for this minor            |
-# |    8. Build ZIP, upload asset, write SHA-256 to update.xml             |
+# |    8. Build ZIP, upload asset, write SHA-256 to updates.xml             |
 # |                                                                        |
 # |  Every version change: archives main -> version/XX.YY branch           |
 # |  Patch 00 = development (no release). First release = patch 01.        |
@@ -39,6 +39,9 @@ on:
     branches:
       - main
       - master
+    paths:
+      - 'src/**'
+      - 'htdocs/**'
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -256,8 +259,8 @@ jobs:
             fi
           done
 
-      # -- STEP 5: Write update.xml (Joomla update server) ---------------------
-      - name: "Step 5: Write update.xml"
+      # -- STEP 5: Write updates.xml (Joomla update server) ---------------------
+      - name: "Step 5: Write updates.xml"
         if: >-
           steps.version.outputs.skip != 'true' &&
           steps.check.outputs.already_released != 'true'
@@ -268,7 +271,7 @@ jobs:
           # -- Parse extension metadata from XML manifest ----------------
           MANIFEST=$(find . -maxdepth 2 -name "*.xml" -exec grep -l '<extension' {} \; 2>/dev/null | head -1)
           if [ -z "$MANIFEST" ]; then
-            echo "Warning: No Joomla XML manifest found — skipping update.xml" >> $GITHUB_STEP_SUMMARY
+            echo "Warning: No Joomla XML manifest found — skipping updates.xml" >> $GITHUB_STEP_SUMMARY
             exit 0
           fi
 
@@ -313,7 +316,7 @@ jobs:
           DOWNLOAD_URL="https://github.com/${REPO}/releases/download/v${VERSION}/${EXT_ELEMENT}-${VERSION}.zip"
           INFO_URL="https://github.com/${REPO}/releases/tag/v${VERSION}"
 
-          # -- Write update.xml (stable release) --------------------------
+          # -- Write updates.xml (stable release) --------------------------
           {
             printf '%s\n' '<?xml version="1.0" encoding="utf-8"?>'
             printf '%s\n' '<updates>'
@@ -338,9 +341,9 @@ jobs:
             printf '%s\n' '    <maintainerurl>https://mokoconsulting.tech</maintainerurl>'
             printf '%s\n' '  </update>'
             printf '%s\n' '</updates>'
-          } > update.xml
+          } > updates.xml
 
-          echo "update.xml: ${VERSION} (stable) — ${EXT_TYPE}/${EXT_ELEMENT}" >> $GITHUB_STEP_SUMMARY
+          echo "updates.xml: ${VERSION} (stable) — ${EXT_TYPE}/${EXT_ELEMENT}" >> $GITHUB_STEP_SUMMARY
 
       # -- Commit all changes ---------------------------------------------------
       - name: Commit release changes
@@ -469,19 +472,19 @@ jobs:
             gh release upload "$RELEASE_TAG" "/tmp/${PACKAGE_NAME}" 2>/dev/null || true
           }
 
-          # -- Update update.xml with SHA-256 for latest patch -------------
-          if [ -f "update.xml" ]; then
-            if grep -q '<sha256>' update.xml; then
-              sed -i "s|<sha256>.*</sha256>|<sha256>sha256:${SHA256}</sha256>|" update.xml
+          # -- Update updates.xml with SHA-256 for latest patch -------------
+          if [ -f "updates.xml" ]; then
+            if grep -q '<sha256>' updates.xml; then
+              sed -i "s|<sha256>.*</sha256>|<sha256>sha256:${SHA256}</sha256>|" updates.xml
             else
-              sed -i "s|</downloads>|</downloads>\n    <sha256>sha256:${SHA256}</sha256>|" update.xml
+              sed -i "s|</downloads>|</downloads>\n    <sha256>sha256:${SHA256}</sha256>|" updates.xml
             fi
 
             # Also update the download URL to point to this patch's ZIP
             DOWNLOAD_URL="https://github.com/${REPO}/releases/download/${RELEASE_TAG}/${PACKAGE_NAME}"
-            sed -i "s|<downloadurl[^>]*>[^<]*</downloadurl>|<downloadurl type=\"full\" format=\"zip\">${DOWNLOAD_URL}</downloadurl>|" update.xml
+            sed -i "s|<downloadurl[^>]*>[^<]*</downloadurl>|<downloadurl type=\"full\" format=\"zip\">${DOWNLOAD_URL}</downloadurl>|" updates.xml
 
-            git add update.xml
+            git add updates.xml
             git commit -m "chore(release): SHA-256 + download URL for ${VERSION} [skip ci]" \
               --author="github-actions[bot] <github-actions[bot]@users.noreply.github.com>" || true
             git push || true
