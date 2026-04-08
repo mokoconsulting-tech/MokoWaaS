@@ -63,7 +63,47 @@
 		<category>MokoWaaS</category>
 	</update>
 
-	<!-- Dev channel -->
+	<!-- Beta channel -->
+	<update>
+		<name>MokoWaaS (Beta)</name>
+		<description>MokoWaaS beta — feature complete, testing in progress</description>
+		<element>mokowaas</element>
+		<type>plugin</type>
+		<folder>system</folder>
+		<client>site</client>
+		<version>02.01.10</version>
+		<stability>beta</stability>
+		<infourl title="MokoWaaS Beta">https://github.com/mokoconsulting-tech/MokoWaaS/releases/tag/beta</infourl>
+		<downloads>
+			<downloadurl type="full" format="zip">https://github.com/mokoconsulting-tech/MokoWaaS/releases/download/beta/MokoWaaS-beta.zip</downloadurl>
+		</downloads>
+		<maintainer>Moko Consulting</maintainer>
+		<maintainerurl>https://mokoconsulting.tech</maintainerurl>
+		<targetplatform name="joomla" version="[56]\.[0-9]" />
+		<category>MokoWaaS</category>
+	</update>
+
+	<!-- Alpha channel -->
+	<update>
+		<name>MokoWaaS (Alpha)</name>
+		<description>MokoWaaS alpha — early testing</description>
+		<element>mokowaas</element>
+		<type>plugin</type>
+		<folder>system</folder>
+		<client>site</client>
+		<version>02.01.10</version>
+		<stability>alpha</stability>
+		<infourl title="MokoWaaS Alpha">https://github.com/mokoconsulting-tech/MokoWaaS/releases/tag/alpha</infourl>
+		<downloads>
+			<downloadurl type="full" format="zip">https://github.com/mokoconsulting-tech/MokoWaaS/releases/download/alpha/MokoWaaS-alpha.zip</downloadurl>
+		</downloads>
+		<maintainer>Moko Consulting</maintainer>
+		<maintainerurl>https://mokoconsulting.tech</maintainerurl>
+		<targetplatform name="joomla" version="[56]\.[0-9]" />
+		<category>MokoWaaS</category>
+	</update>
+
+	<!-- Development channel -->
 	<update>
 		<name>MokoWaaS (Dev)</name>
 		<description>MokoWaaS development build — not for production</description>
@@ -72,8 +112,8 @@
 		<folder>system</folder>
 		<client>site</client>
 		<version>02.01.10</version>
-		<stability>alpha</stability>
-		<infourl title="MokoWaaS Dev">https://github.com/mokoconsulting-tech/MokoWaaS/releases/tag/dev</infourl>
+		<stability>development</stability>
+		<infourl title="MokoWaaS Dev">https://github.com/mokoconsulting-tech/MokoWaaS/releases/tag/development</infourl>
 		<downloads>
 			<downloadurl type="full" format="zip">https://github.com/mokoconsulting-tech/MokoWaaS/releases/download/development/MokoWaaS-dev.zip</downloadurl>
 		</downloads>
