@@ -6,17 +6,10 @@
 
  SPDX-LICENSE-IDENTIFIER: GPL-3.0-or-later
 
- This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License (./LICENSE.md).
-
  # FILE INFORMATION
  DEFGROUP: Joomla.UpdateServer
  INGROUP: MokoWaaS
  REPO: https://github.com/mokoconsulting-tech/mokowaas
- VERSION: 02.01.11
  PATH: /updates.xml
  BRIEF: Joomla update server XML feed for automatic plugin updates
  NOTE: This file is automatically updated by GitHub Actions on each release
