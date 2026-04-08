@@ -1,0 +1,132 @@
+# Copyright (C) 2026 Moko Consulting <hello@mokoconsulting.tech>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# FILE INFORMATION
+# DEFGROUP: GitHub.Workflow
+# INGROUP: MokoStandards.Deploy
+# REPO: https://github.com/mokoconsulting-tech/MokoStandards
+# PATH: /templates/workflows/joomla/deploy-manual.yml.template
+# VERSION: 04.06.00
+# BRIEF: Manual SFTP deploy to dev server for Joomla repos
+# NOTE: Joomla repos use update.xml for distribution. This is for manual
+#       dev server testing only — triggered via workflow_dispatch.
+
+name: Deploy to Dev (Manual)
+
+on:
+  workflow_dispatch:
+    inputs:
+      clear_remote:
+        description: 'Delete all remote files before uploading'
+        required: false
+        default: 'false'
+        type: boolean
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: SFTP Deploy to Dev
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # v2.31.0
+        with:
+          php-version: '8.2'
+          extensions: json, ssh2
+          tools: composer
+          coverage: none
+
+      - name: Setup MokoStandards tools
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN || github.token }}
+          COMPOSER_AUTH: '{"github-oauth":{"github.com":"${{ secrets.GH_TOKEN || github.token }}"}}'
+        run: |
+          git clone --depth 1 --branch version/04 --quiet \
+            "https://x-access-token:${GH_TOKEN}@github.com/mokoconsulting-tech/MokoStandards.git" \
+            /tmp/mokostandards 2>/dev/null || true
+          if [ -d "/tmp/mokostandards" ] && [ -f "/tmp/mokostandards/composer.json" ]; then
+            cd /tmp/mokostandards && composer install --no-dev --no-interaction --quiet 2>/dev/null || true
+          fi
+
+      - name: Check FTP configuration
+        id: check
+        env:
+          HOST: ${{ vars.DEV_FTP_HOST }}
+          PATH_VAR: ${{ vars.DEV_FTP_PATH }}
+          SUFFIX: ${{ vars.DEV_FTP_SUFFIX }}
+          PORT: ${{ vars.DEV_FTP_PORT }}
+        run: |
+          if [ -z "$HOST" ] || [ -z "$PATH_VAR" ]; then
+            echo "DEV_FTP_HOST or DEV_FTP_PATH not configured — cannot deploy"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "skip=false" >> "$GITHUB_OUTPUT"
+          echo "host=$HOST" >> "$GITHUB_OUTPUT"
+
+          REMOTE="${PATH_VAR%/}"
+          [ -n "$SUFFIX" ] && REMOTE="${REMOTE}/${SUFFIX#/}"
+          echo "remote=$REMOTE" >> "$GITHUB_OUTPUT"
+
+          [ -z "$PORT" ] && PORT="22"
+          echo "port=$PORT" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy via SFTP
+        if: steps.check.outputs.skip != 'true'
+        env:
+          SFTP_KEY: ${{ secrets.DEV_FTP_KEY }}
+          SFTP_PASS: ${{ secrets.DEV_FTP_PASSWORD }}
+          SFTP_USER: ${{ vars.DEV_FTP_USERNAME }}
+        run: |
+          SOURCE_DIR="src"
+          [ ! -d "$SOURCE_DIR" ] && SOURCE_DIR="htdocs"
+          [ ! -d "$SOURCE_DIR" ] && { echo "No src/ or htdocs/ — nothing to deploy"; exit 0; }
+
+          printf '{"host":"%s","port":%s,"username":"%s","remotePath":"%s"' \
+            "${{ steps.check.outputs.host }}" "${{ steps.check.outputs.port }}" "$SFTP_USER" "${{ steps.check.outputs.remote }}" \
+            > /tmp/sftp-config.json
+
+          if [ -n "$SFTP_KEY" ]; then
+            echo "$SFTP_KEY" > /tmp/deploy_key
+            chmod 600 /tmp/deploy_key
+            printf ',"privateKeyPath":"/tmp/deploy_key"}' >> /tmp/sftp-config.json
+          else
+            printf ',"password":"%s"}' "$SFTP_PASS" >> /tmp/sftp-config.json
+          fi
+
+          DEPLOY_ARGS=(--path . --src-dir "$SOURCE_DIR" --config /tmp/sftp-config.json)
+          [ "${{ inputs.clear_remote }}" = "true" ] && DEPLOY_ARGS+=(--clear-remote)
+
+          PLATFORM=$(php /tmp/mokostandards/api/cli/platform_detect.php --path . 2>/dev/null || true)
+          if [ "$PLATFORM" = "waas-component" ] && [ -f "/tmp/mokostandards/api/deploy/deploy-joomla.php" ]; then
+            php /tmp/mokostandards/api/deploy/deploy-joomla.php "${DEPLOY_ARGS[@]}"
+          else
+            php /tmp/mokostandards/api/deploy/deploy-sftp.php "${DEPLOY_ARGS[@]}"
+          fi
+
+          rm -f /tmp/deploy_key /tmp/sftp-config.json
+
+      - name: Summary
+        if: always()
+        run: |
+          if [ "${{ steps.check.outputs.skip }}" = "true" ]; then
+            echo "### Deploy Skipped — FTP not configured" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### Manual Dev Deploy Complete" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "| Field | Value |" >> $GITHUB_STEP_SUMMARY
+            echo "|-------|-------|" >> $GITHUB_STEP_SUMMARY
+            echo "| Host | \`${{ steps.check.outputs.host }}\` |" >> $GITHUB_STEP_SUMMARY
+            echo "| Remote | \`${{ steps.check.outputs.remote }}\` |" >> $GITHUB_STEP_SUMMARY
+            echo "| Clear | ${{ inputs.clear_remote }} |" >> $GITHUB_STEP_SUMMARY
+          fi
