@@ -21,18 +21,12 @@
  NOTE: Internal WaaS identity abstraction layer
 -->
 
+# MokoWaaS Plugin
 
 [![Version](https://img.shields.io/badge/version-02.01.11-blue.svg?logo=v&logoColor=white)](https://github.com/mokoconsulting-tech/MokoWaaS/releases/tag/v02)
 [![License](https://img.shields.io/badge/license-GPL--3.0--or--later-green.svg?logo=gnu&logoColor=white)](LICENSE)
 [![Joomla](https://img.shields.io/badge/Joomla-5.x%20%7C%206.x-red.svg?logo=joomla&logoColor=white)](https://www.joomla.org)
 [![PHP](https://img.shields.io/badge/PHP-8.1%2B-777BB4.svg?logo=php&logoColor=white)](https://www.php.net)
-
-# MokoWaaS Plugin
-
-](https://img.shields.io/badge/version-02.01.11-blue.svg)](https://github.com/mokoconsulting-tech/mokowaas)
-](https://img.shields.io/badge/license-GPL--3.0--or--later-green.svg)](LICENSE.md)
-](https://img.shields.io/badge/Joomla-5.x%20%7C%206.x-orange.svg)](https://www.joomla.org)
-](https://img.shields.io/badge/PHP-8.1%2B-blue.svg)](https://www.php.net)
 
 MokoWaaS is a Joomla 5.x / 6.x system plugin that provides a configurable white-label identity layer for the MokoWaaS platform. It replaces all visible Joomla branding with your own brand name, company name, and support URLs — configurable from the plugin admin without code changes.
 
