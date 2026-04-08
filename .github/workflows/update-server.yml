@@ -1,0 +1,260 @@
+# Copyright (C) 2026 Moko Consulting <hello@mokoconsulting.tech>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# FILE INFORMATION
+# DEFGROUP: GitHub.Workflow
+# INGROUP: MokoStandards.Joomla
+# REPO: https://github.com/mokoconsulting-tech/MokoStandards
+# PATH: /templates/workflows/joomla/update-server.yml.template
+# VERSION: 04.05.13
+# BRIEF: Update Joomla update server XML feed with stable/rc/dev entries
+#
+# Writes updates.xml with multiple <update> entries:
+#   - <tag>stable</tag>     on push to main (from auto-release)
+#   - <tag>rc</tag>         on push to rc/**
+#   - <tag>development</tag> on push to dev/**
+#
+# Joomla filters by user's "Minimum Stability" setting.
+
+name: Update Joomla Update Server XML Feed
+
+on:
+  push:
+    branches:
+      - 'dev/**'
+      - 'rc/**'
+    paths:
+      - 'src/**'
+      - 'htdocs/**'
+  workflow_dispatch:
+    inputs:
+      stability:
+        description: 'Stability tag (development, rc, stable)'
+        required: true
+        default: 'development'
+        type: choice
+        options:
+          - development
+          - rc
+          - stable
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+permissions:
+  contents: write
+
+jobs:
+  update-xml:
+    name: Update updates.xml
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          token: ${{ secrets.GH_TOKEN || github.token }}
+          fetch-depth: 0
+
+      - name: Setup MokoStandards tools
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN || github.token }}
+          COMPOSER_AUTH: '{"github-oauth":{"github.com":"${{ secrets.GH_TOKEN || github.token }}"}}'
+        run: |
+          git clone --depth 1 --branch version/04.05 --quiet \
+            "https://x-access-token:${GH_TOKEN}@github.com/mokoconsulting-tech/MokoStandards.git" \
+            /tmp/mokostandards 2>/dev/null || true
+          if [ -d "/tmp/mokostandards" ] && [ -f "/tmp/mokostandards/composer.json" ]; then
+            cd /tmp/mokostandards && composer install --no-dev --no-interaction --quiet 2>/dev/null || true
+          fi
+
+      - name: Generate updates.xml entry
+        run: |
+          BRANCH="${{ github.ref_name }}"
+          REPO="${{ github.repository }}"
+          VERSION=$(php /tmp/mokostandards/api/cli/version_read.php --path . 2>/dev/null || echo "0.0.0")
+
+          # Determine stability from branch or input
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            STABILITY="${{ inputs.stability }}"
+          elif [[ "$BRANCH" == rc/* ]]; then
+            STABILITY="rc"
+          elif [[ "$BRANCH" == dev/* ]]; then
+            STABILITY="development"
+          else
+            STABILITY="stable"
+          fi
+
+          # Parse manifest
+          MANIFEST=$(find . -maxdepth 2 -name "*.xml" -exec grep -l '<extension' {} \; 2>/dev/null | head -1)
+          if [ -z "$MANIFEST" ]; then
+            echo "No Joomla manifest found — skipping"
+            exit 0
+          fi
+
+          EXT_NAME=$(grep -oP '<name>\K[^<]+' "$MANIFEST" 2>/dev/null | head -1 || echo "${{ github.event.repository.name }}")
+          EXT_TYPE=$(grep -oP '<extension[^>]+type="\K[^"]+' "$MANIFEST" 2>/dev/null || echo "component")
+          EXT_ELEMENT=$(grep -oP '<element>\K[^<]+' "$MANIFEST" 2>/dev/null | head -1 || basename "$MANIFEST" .xml)
+          EXT_CLIENT=$(grep -oP '<extension[^>]+client="\K[^"]+' "$MANIFEST" 2>/dev/null || echo "")
+          EXT_FOLDER=$(grep -oP '<extension[^>]+group="\K[^"]+' "$MANIFEST" 2>/dev/null || echo "")
+          TARGET_PLATFORM=$(grep -oP '<targetplatform[^/]*/>' "$MANIFEST" 2>/dev/null | head -1 || echo "")
+          PHP_MINIMUM=$(grep -oP '<php_minimum>\K[^<]+' "$MANIFEST" 2>/dev/null | head -1 || echo "")
+
+          [ -z "$EXT_ELEMENT" ] && EXT_ELEMENT=$(basename "$MANIFEST" .xml)
+          [ -z "$TARGET_PLATFORM" ] && TARGET_PLATFORM=$(printf '<targetplatform name="joomla" version="5.*" %s>' "/")
+
+          CLIENT_TAG=""
+          [ -n "$EXT_CLIENT" ] && CLIENT_TAG="<client>${EXT_CLIENT}</client>"
+          [ -z "$CLIENT_TAG" ] && ([ "$EXT_TYPE" = "module" ] || [ "$EXT_TYPE" = "plugin" ]) && CLIENT_TAG="<client>site</client>"
+
+          FOLDER_TAG=""
+          [ -n "$EXT_FOLDER" ] && [ "$EXT_TYPE" = "plugin" ] && FOLDER_TAG="<folder>${EXT_FOLDER}</folder>"
+
+          PHP_TAG=""
+          [ -n "$PHP_MINIMUM" ] && PHP_TAG="<php_minimum>${PHP_MINIMUM}</php_minimum>"
+
+          # Version suffix for non-stable
+          DISPLAY_VERSION="$VERSION"
+          [ "$STABILITY" = "rc" ] && DISPLAY_VERSION="${VERSION}-rc"
+          [ "$STABILITY" = "development" ] && DISPLAY_VERSION="${VERSION}-dev"
+
+          MAJOR=$(echo "$VERSION" | awk -F. '{print $1}')
+          RELEASE_TAG="v${MAJOR}"
+          PACKAGE_NAME="${EXT_ELEMENT}-${DISPLAY_VERSION}.zip"
+          DOWNLOAD_URL="https://github.com/${REPO}/releases/download/${RELEASE_TAG}/${PACKAGE_NAME}"
+          INFO_URL="https://github.com/${REPO}"
+
+          # ── Build install-ready ZIP ─────────────────────────────────
+          SOURCE_DIR="src"
+          [ ! -d "$SOURCE_DIR" ] && SOURCE_DIR="htdocs"
+          if [ -d "$SOURCE_DIR" ]; then
+            cd "$SOURCE_DIR"
+            zip -r "/tmp/${PACKAGE_NAME}" .
+            cd ..
+
+            SHA256=$(sha256sum "/tmp/${PACKAGE_NAME}" | cut -d' ' -f1)
+
+            # Ensure draft release exists for this major
+            gh release view "$RELEASE_TAG" --json tagName > /dev/null 2>&1 || \
+              gh release create "$RELEASE_TAG" --title "v${MAJOR}" --notes "Development release" --draft --target main 2>/dev/null || true
+
+            # Upload ZIP to the major release
+            gh release upload "$RELEASE_TAG" "/tmp/${PACKAGE_NAME}" --clobber 2>/dev/null || true
+
+            echo "Package: ${PACKAGE_NAME} (SHA: ${SHA256})" >> $GITHUB_STEP_SUMMARY
+          else
+            SHA256=""
+          fi
+
+          # ── Build the new entry ───────────────────────────────────────
+          NEW_ENTRY=$(cat <<XMLEOF
+  <update>
+    <name>${EXT_NAME}</name>
+    <description>${EXT_NAME} (${STABILITY})</description>
+    <element>${EXT_ELEMENT}</element>
+    <type>${EXT_TYPE}</type>
+    <version>${DISPLAY_VERSION}</version>
+    $([ -n "$CLIENT_TAG" ] && echo "    ${CLIENT_TAG}")
+    $([ -n "$FOLDER_TAG" ] && echo "    ${FOLDER_TAG}")
+    <tags>
+      <tag>${STABILITY}</tag>
+    </tags>
+    <infourl title="${EXT_NAME}">${INFO_URL}</infourl>
+    <downloads>
+      <downloadurl type="full" format="zip">${DOWNLOAD_URL}</downloadurl>
+    </downloads>
+    $([ -n "$SHA256" ] && echo "    <sha256>sha256:${SHA256}</sha256>")
+    ${TARGET_PLATFORM}
+    $([ -n "$PHP_TAG" ] && echo "    ${PHP_TAG}")
+    <maintainer>Moko Consulting</maintainer>
+    <maintainerurl>https://mokoconsulting.tech</maintainerurl>
+  </update>
+XMLEOF
+)
+
+          # ── Merge into updates.xml ─────────────────────────────────────
+          if [ ! -f "updates.xml" ]; then
+            # Create fresh
+            printf '%s\n' '<?xml version="1.0" encoding="utf-8"?>' > updates.xml
+            printf '%s\n' '<updates>' >> updates.xml
+            echo "$NEW_ENTRY" >> updates.xml
+            printf '%s\n' '</updates>' >> updates.xml
+          else
+            # Remove existing entry for this stability, add new one
+            # Use python for reliable XML manipulation
+            python3 -c "
+import re, sys
+
+with open('updates.xml', 'r') as f:
+    content = f.read()
+
+# Remove existing entry with this stability tag
+pattern = r'  <update>.*?<tag>${STABILITY}</tag>.*?</update>\n?'
+content = re.sub(pattern, '', content, flags=re.DOTALL)
+
+# Insert new entry before </updates>
+new_entry = '''${NEW_ENTRY}'''
+content = content.replace('</updates>', new_entry + '\n</updates>')
+
+# Clean up empty lines
+content = re.sub(r'\n{3,}', '\n\n', content)
+
+with open('updates.xml', 'w') as f:
+    f.write(content)
+" 2>/dev/null || {
+              # Fallback: just rewrite the whole file if python fails
+              # Keep existing stable entry if present
+              STABLE_ENTRY=""
+              if [ "$STABILITY" != "stable" ] && grep -q '<tag>stable</tag>' updates.xml; then
+                STABLE_ENTRY=$(sed -n '/<update>/,/<\/update>/{ /<tag>stable<\/tag>/,/<\/update>/p; /<update>/,/<tag>stable<\/tag>/p }' updates.xml | sort -u)
+              fi
+              RC_ENTRY=""
+              if [ "$STABILITY" != "rc" ] && grep -q '<tag>rc</tag>' updates.xml; then
+                RC_ENTRY=$(python3 -c "
+import re
+with open('updates.xml') as f: c = f.read()
+m = re.search(r'(<update>.*?<tag>rc</tag>.*?</update>)', c, re.DOTALL)
+if m: print(m.group(1))
+" 2>/dev/null || true)
+              fi
+              DEV_ENTRY=""
+              if [ "$STABILITY" != "development" ] && grep -q '<tag>development</tag>' updates.xml; then
+                DEV_ENTRY=$(python3 -c "
+import re
+with open('updates.xml') as f: c = f.read()
+m = re.search(r'(<update>.*?<tag>development</tag>.*?</update>)', c, re.DOTALL)
+if m: print(m.group(1))
+" 2>/dev/null || true)
+              fi
+
+              {
+                printf '%s\n' '<?xml version="1.0" encoding="utf-8"?>'
+                printf '%s\n' '<updates>'
+                [ -n "$STABLE_ENTRY" ] && echo "$STABLE_ENTRY"
+                [ -n "$RC_ENTRY" ] && echo "$RC_ENTRY"
+                [ -n "$DEV_ENTRY" ] && echo "$DEV_ENTRY"
+                echo "$NEW_ENTRY"
+                printf '%s\n' '</updates>'
+              } > updates.xml
+            }
+          fi
+
+          # Commit
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add updates.xml
+          git diff --cached --quiet || {
+            git commit -m "chore: update updates.xml (${STABILITY}: ${DISPLAY_VERSION}) [skip ci]" \
+              --author="github-actions[bot] <github-actions[bot]@users.noreply.github.com>"
+            git push
+          }
+
+          echo "## Joomla Update Server" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Field | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Stability | \`${STABILITY}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Version | \`${DISPLAY_VERSION}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Element | \`${EXT_ELEMENT}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Download | [ZIP](${DOWNLOAD_URL}) |" >> $GITHUB_STEP_SUMMARY
