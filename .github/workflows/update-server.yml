@@ -23,6 +23,8 @@ on:
   push:
     branches:
       - 'dev/**'
+      - 'alpha/**'
+      - 'beta/**'
       - 'rc/**'
     paths:
       - 'src/**'
@@ -30,12 +32,14 @@ on:
   workflow_dispatch:
     inputs:
       stability:
-        description: 'Stability tag (development, rc, stable)'
+        description: 'Stability tag'
         required: true
         default: 'development'
         type: choice
         options:
           - development
+          - alpha
+          - beta
           - rc
           - stable
 
@@ -80,6 +84,10 @@ jobs:
             STABILITY="${{ inputs.stability }}"
           elif [[ "$BRANCH" == rc/* ]]; then
             STABILITY="rc"
+          elif [[ "$BRANCH" == beta/* ]]; then
+            STABILITY="beta"
+          elif [[ "$BRANCH" == alpha/* ]]; then
+            STABILITY="alpha"
           elif [[ "$BRANCH" == dev/* ]]; then
             STABILITY="development"
           else
@@ -116,11 +124,24 @@ jobs:
 
           # Version suffix for non-stable
           DISPLAY_VERSION="$VERSION"
-          [ "$STABILITY" = "rc" ] && DISPLAY_VERSION="${VERSION}-rc"
-          [ "$STABILITY" = "development" ] && DISPLAY_VERSION="${VERSION}-dev"
+          case "$STABILITY" in
+            development) DISPLAY_VERSION="${VERSION}-dev" ;;
+            alpha)       DISPLAY_VERSION="${VERSION}-alpha" ;;
+            beta)        DISPLAY_VERSION="${VERSION}-beta" ;;
+            rc)          DISPLAY_VERSION="${VERSION}-rc" ;;
+          esac
 
           MAJOR=$(echo "$VERSION" | awk -F. '{print $1}')
-          RELEASE_TAG="v${MAJOR}"
+
+          # Each stability level has its own release tag
+          case "$STABILITY" in
+            development) RELEASE_TAG="development" ;;
+            alpha)       RELEASE_TAG="alpha" ;;
+            beta)        RELEASE_TAG="beta" ;;
+            rc)          RELEASE_TAG="release-candidate" ;;
+            *)           RELEASE_TAG="v${MAJOR}" ;;
+          esac
+
           PACKAGE_NAME="${EXT_ELEMENT}-${DISPLAY_VERSION}.zip"
           DOWNLOAD_URL="https://github.com/${REPO}/releases/download/${RELEASE_TAG}/${PACKAGE_NAME}"
           INFO_URL="https://github.com/${REPO}"
@@ -137,7 +158,7 @@ jobs:
 
             # Ensure draft release exists for this major
             gh release view "$RELEASE_TAG" --json tagName > /dev/null 2>&1 || \
-              gh release create "$RELEASE_TAG" --title "v${MAJOR}" --notes "Development release" --draft --target main 2>/dev/null || true
+              gh release create "$RELEASE_TAG" --title "${RELEASE_TAG} (${DISPLAY_VERSION})" --notes "${STABILITY} release" --prerelease --target main 2>/dev/null || true
 
             # Upload ZIP to the major release
             gh release upload "$RELEASE_TAG" "/tmp/${PACKAGE_NAME}" --clobber 2>/dev/null || true
@@ -148,95 +169,63 @@ jobs:
           fi
 
           # ── Build the new entry ───────────────────────────────────────
-          NEW_ENTRY=$(cat <<XMLEOF
-  <update>
-    <name>${EXT_NAME}</name>
-    <description>${EXT_NAME} (${STABILITY})</description>
-    <element>${EXT_ELEMENT}</element>
-    <type>${EXT_TYPE}</type>
-    <version>${DISPLAY_VERSION}</version>
-    $([ -n "$CLIENT_TAG" ] && echo "    ${CLIENT_TAG}")
-    $([ -n "$FOLDER_TAG" ] && echo "    ${FOLDER_TAG}")
-    <tags>
-      <tag>${STABILITY}</tag>
-    </tags>
-    <infourl title="${EXT_NAME}">${INFO_URL}</infourl>
-    <downloads>
-      <downloadurl type="full" format="zip">${DOWNLOAD_URL}</downloadurl>
-    </downloads>
-    $([ -n "$SHA256" ] && echo "    <sha256>sha256:${SHA256}</sha256>")
-    ${TARGET_PLATFORM}
-    $([ -n "$PHP_TAG" ] && echo "    ${PHP_TAG}")
-    <maintainer>Moko Consulting</maintainer>
-    <maintainerurl>https://mokoconsulting.tech</maintainerurl>
-  </update>
-XMLEOF
-)
+          NEW_ENTRY=""
+          NEW_ENTRY="${NEW_ENTRY}  <update>\n"
+          NEW_ENTRY="${NEW_ENTRY}    <name>${EXT_NAME}</name>\n"
+          NEW_ENTRY="${NEW_ENTRY}    <description>${EXT_NAME} (${STABILITY})</description>\n"
+          NEW_ENTRY="${NEW_ENTRY}    <element>${EXT_ELEMENT}</element>\n"
+          NEW_ENTRY="${NEW_ENTRY}    <type>${EXT_TYPE}</type>\n"
+          NEW_ENTRY="${NEW_ENTRY}    <version>${DISPLAY_VERSION}</version>\n"
+          [ -n "$CLIENT_TAG" ] && NEW_ENTRY="${NEW_ENTRY}    ${CLIENT_TAG}\n"
+          [ -n "$FOLDER_TAG" ] && NEW_ENTRY="${NEW_ENTRY}    ${FOLDER_TAG}\n"
+          NEW_ENTRY="${NEW_ENTRY}    <tags>\n"
+          NEW_ENTRY="${NEW_ENTRY}      <tag>${STABILITY}</tag>\n"
+          NEW_ENTRY="${NEW_ENTRY}    </tags>\n"
+          NEW_ENTRY="${NEW_ENTRY}    <infourl title=\"${EXT_NAME}\">${INFO_URL}</infourl>\n"
+          NEW_ENTRY="${NEW_ENTRY}    <downloads>\n"
+          NEW_ENTRY="${NEW_ENTRY}      <downloadurl type=\"full\" format=\"zip\">${DOWNLOAD_URL}</downloadurl>\n"
+          NEW_ENTRY="${NEW_ENTRY}    </downloads>\n"
+          [ -n "$SHA256" ] && NEW_ENTRY="${NEW_ENTRY}    <sha256>sha256:${SHA256}</sha256>\n"
+          NEW_ENTRY="${NEW_ENTRY}    ${TARGET_PLATFORM}\n"
+          [ -n "$PHP_TAG" ] && NEW_ENTRY="${NEW_ENTRY}    ${PHP_TAG}\n"
+          NEW_ENTRY="${NEW_ENTRY}    <maintainer>Moko Consulting</maintainer>\n"
+          NEW_ENTRY="${NEW_ENTRY}    <maintainerurl>https://mokoconsulting.tech</maintainerurl>\n"
+          NEW_ENTRY="${NEW_ENTRY}  </update>"
+
+          # ── Write new entry to temp file ───────────────────────────────
+          printf '%b' "$NEW_ENTRY" > /tmp/new_entry.xml
 
           # ── Merge into updates.xml ─────────────────────────────────────
           if [ ! -f "updates.xml" ]; then
-            # Create fresh
             printf '%s\n' '<?xml version="1.0" encoding="utf-8"?>' > updates.xml
             printf '%s\n' '<updates>' >> updates.xml
-            echo "$NEW_ENTRY" >> updates.xml
-            printf '%s\n' '</updates>' >> updates.xml
+            cat /tmp/new_entry.xml >> updates.xml
+            printf '\n%s\n' '</updates>' >> updates.xml
           else
-            # Remove existing entry for this stability, add new one
-            # Use python for reliable XML manipulation
-            python3 -c "
-import re, sys
-
-with open('updates.xml', 'r') as f:
-    content = f.read()
-
-# Remove existing entry with this stability tag
-pattern = r'  <update>.*?<tag>${STABILITY}</tag>.*?</update>\n?'
-content = re.sub(pattern, '', content, flags=re.DOTALL)
-
-# Insert new entry before </updates>
-new_entry = '''${NEW_ENTRY}'''
-content = content.replace('</updates>', new_entry + '\n</updates>')
-
-# Clean up empty lines
-content = re.sub(r'\n{3,}', '\n\n', content)
-
-with open('updates.xml', 'w') as f:
-    f.write(content)
-" 2>/dev/null || {
-              # Fallback: just rewrite the whole file if python fails
-              # Keep existing stable entry if present
-              STABLE_ENTRY=""
-              if [ "$STABILITY" != "stable" ] && grep -q '<tag>stable</tag>' updates.xml; then
-                STABLE_ENTRY=$(sed -n '/<update>/,/<\/update>/{ /<tag>stable<\/tag>/,/<\/update>/p; /<update>/,/<tag>stable<\/tag>/p }' updates.xml | sort -u)
-              fi
-              RC_ENTRY=""
-              if [ "$STABILITY" != "rc" ] && grep -q '<tag>rc</tag>' updates.xml; then
-                RC_ENTRY=$(python3 -c "
-import re
-with open('updates.xml') as f: c = f.read()
-m = re.search(r'(<update>.*?<tag>rc</tag>.*?</update>)', c, re.DOTALL)
-if m: print(m.group(1))
-" 2>/dev/null || true)
-              fi
-              DEV_ENTRY=""
-              if [ "$STABILITY" != "development" ] && grep -q '<tag>development</tag>' updates.xml; then
-                DEV_ENTRY=$(python3 -c "
-import re
-with open('updates.xml') as f: c = f.read()
-m = re.search(r'(<update>.*?<tag>development</tag>.*?</update>)', c, re.DOTALL)
-if m: print(m.group(1))
-" 2>/dev/null || true)
-              fi
-
+            # Remove existing entry for this stability, insert new one
+            printf 'import re\nstability = "%s"\n' "${STABILITY}" > /tmp/merge_xml.py
+            printf 'with open("updates.xml") as f: content = f.read()\n' >> /tmp/merge_xml.py
+            printf 'with open("/tmp/new_entry.xml") as f: new_entry = f.read()\n' >> /tmp/merge_xml.py
+            printf 'pattern = r"  <update>.*?<tag>" + re.escape(stability) + r"</tag>.*?</update>\\n?"\n' >> /tmp/merge_xml.py
+            printf 'content = re.sub(pattern, "", content, flags=re.DOTALL)\n' >> /tmp/merge_xml.py
+            printf 'content = content.replace("</updates>", new_entry + "\\n</updates>")\n' >> /tmp/merge_xml.py
+            printf 'content = re.sub(r"\\n{3,}", "\\n\\n", content)\n' >> /tmp/merge_xml.py
+            printf 'with open("updates.xml", "w") as f: f.write(content)\n' >> /tmp/merge_xml.py
+            python3 /tmp/merge_xml.py 2>/dev/null || {
+              # Fallback: rebuild keeping other stability entries
               {
                 printf '%s\n' '<?xml version="1.0" encoding="utf-8"?>'
                 printf '%s\n' '<updates>'
-                [ -n "$STABLE_ENTRY" ] && echo "$STABLE_ENTRY"
-                [ -n "$RC_ENTRY" ] && echo "$RC_ENTRY"
-                [ -n "$DEV_ENTRY" ] && echo "$DEV_ENTRY"
-                echo "$NEW_ENTRY"
-                printf '%s\n' '</updates>'
-              } > updates.xml
+                for TAG in stable rc development; do
+                  [ "$TAG" = "${STABILITY}" ] && continue
+                  if grep -q "<tag>${TAG}</tag>" updates.xml 2>/dev/null; then
+                    sed -n "/<update>/,/<\/update>/{ /<tag>${TAG}<\/tag>/p; }" updates.xml
+                  fi
+                done
+                cat /tmp/new_entry.xml
+                printf '\n%s\n' '</updates>'
+              } > /tmp/updates_new.xml
+              mv /tmp/updates_new.xml updates.xml
             }
           fi
 
