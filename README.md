@@ -15,7 +15,7 @@
  DEFGROUP: Joomla.Plugin
  INGROUP: MokoWaaS
  REPO: https://github.com/mokoconsulting-tech/mokowaas
- VERSION: 02.01.12
+ VERSION: 02.01.13
  PATH: /README.md
  BRIEF: Rebranding plugin for MokoWaaS platform
  NOTE: Internal WaaS identity abstraction layer
