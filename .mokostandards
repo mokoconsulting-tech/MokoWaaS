@@ -5,9 +5,9 @@
 # INGROUP: MokoStandards.Templates
 # REPO: https://github.com/mokoconsulting-tech/MokoStandards
 # PATH: /templates/configs/moko-standards.yml
-# VERSION: 04.04.01
+# VERSION: 04.05.13
 # BRIEF: Governance attachment template — synced to .mokostandards in every governed repository
-# NOTE: Tokens replaced at sync time: mokoconsulting-tech, MokoWaaS, waas-component, 04.04.00
+# NOTE: Tokens replaced at sync time: mokoconsulting-tech, MokoWaaS, waas-component, 04.05.13
 #
 # This file is managed automatically by MokoStandards bulk sync.
 # Do not edit manually — changes will be overwritten on the next sync.
@@ -15,6 +15,6 @@
 # https://github.com/mokoconsulting-tech/MokoStandards
 
 standards_source: "https://github.com/mokoconsulting-tech/MokoStandards"
-standards_version: "04.04.00"
+standards_version: "04.05.13"
 platform: "waas-component"
 governed_repo: "mokoconsulting-tech/MokoWaaS"
