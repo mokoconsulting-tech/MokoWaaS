@@ -23,7 +23,7 @@ DEFGROUP: [PROJECT_NAME]
 INGROUP: [PROJECT_NAME].Documentation
 REPO: [REPOSITORY_URL]
 PATH: /SECURITY.md
-VERSION: 02.01.08
+VERSION: 04.05.13
 BRIEF: Security vulnerability reporting and handling policy
 -->
 
