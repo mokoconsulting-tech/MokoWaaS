@@ -6,8 +6,8 @@
 # DEFGROUP: GitHub.Workflow
 # INGROUP: MokoStandards.Joomla
 # REPO: https://github.com/mokoconsulting-tech/MokoStandards
-# PATH: /templates/workflows/joomla/update-server.yml.template
-# VERSION: 04.06.00
+# PATH: /templates/workflows/joomla/update-server.yml
+# VERSION: 04.05.13
 # BRIEF: Update Joomla update server XML feed with stable/rc/dev entries
 #
 # Writes updates.xml with multiple <update> entries:
@@ -20,12 +20,9 @@
 name: Update Joomla Update Server XML Feed
 
 on:
-  pull_request:
-    types: [closed]
+  push:
     branches:
       - 'dev/**'
-      - 'alpha/**'
-      - 'beta/**'
       - 'rc/**'
     paths:
       - 'src/**'
@@ -33,14 +30,12 @@ on:
   workflow_dispatch:
     inputs:
       stability:
-        description: 'Stability tag'
+        description: 'Stability tag (development, rc, stable)'
         required: true
         default: 'development'
         type: choice
         options:
           - development
-          - alpha
-          - beta
           - rc
           - stable
 
@@ -54,8 +49,6 @@ jobs:
   update-xml:
     name: Update updates.xml
     runs-on: ubuntu-latest
-    if: >-
-      github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch'
 
     steps:
       - name: Checkout repository
@@ -82,64 +75,33 @@ jobs:
           REPO="${{ github.repository }}"
           VERSION=$(php /tmp/mokostandards/api/cli/version_read.php --path . 2>/dev/null || echo "0.0.0")
 
-          # Auto-bump patch on alpha/beta/rc branches (not dev — dev bumps manually)
-          if [[ "$BRANCH" != dev/* ]]; then
-            git config --local user.email "github-actions[bot]@users.noreply.github.com"
-            git config --local user.name "github-actions[bot]"
-            BUMPED=$(php /tmp/mokostandards/api/cli/version_bump.php --path . 2>/dev/null || true)
-            if [ -n "$BUMPED" ]; then
-              VERSION=$(php /tmp/mokostandards/api/cli/version_read.php --path . 2>/dev/null || echo "$VERSION")
-              git add -A
-              git commit -m "chore(version): auto-bump patch ${VERSION} [skip ci]" \
-                --author="github-actions[bot] <github-actions[bot]@users.noreply.github.com>" 2>/dev/null || true
-              git push 2>/dev/null || true
-            fi
-          fi
-
           # Determine stability from branch or input
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             STABILITY="${{ inputs.stability }}"
           elif [[ "$BRANCH" == rc/* ]]; then
             STABILITY="rc"
-          elif [[ "$BRANCH" == beta/* ]]; then
-            STABILITY="beta"
-          elif [[ "$BRANCH" == alpha/* ]]; then
-            STABILITY="alpha"
           elif [[ "$BRANCH" == dev/* ]]; then
             STABILITY="development"
           else
             STABILITY="stable"
           fi
 
-          # Parse manifest (portable — no grep -P)
+          # Parse manifest
           MANIFEST=$(find . -maxdepth 2 -name "*.xml" -exec grep -l '<extension' {} \; 2>/dev/null | head -1)
           if [ -z "$MANIFEST" ]; then
             echo "No Joomla manifest found — skipping"
             exit 0
           fi
 
-          # Extract fields using sed (works on all runners)
-          EXT_NAME=$(sed -n 's/.*<name>\([^<]*\)<\/name>.*/\1/p' "$MANIFEST" | head -1)
-          EXT_TYPE=$(sed -n 's/.*<extension[^>]*type="\([^"]*\)".*/\1/p' "$MANIFEST" | head -1)
-          EXT_ELEMENT=$(sed -n 's/.*<element>\([^<]*\)<\/element>.*/\1/p' "$MANIFEST" | head -1)
-          EXT_CLIENT=$(sed -n 's/.*<extension[^>]*client="\([^"]*\)".*/\1/p' "$MANIFEST" | head -1)
-          EXT_FOLDER=$(sed -n 's/.*<extension[^>]*group="\([^"]*\)".*/\1/p' "$MANIFEST" | head -1)
-          EXT_VERSION=$(sed -n 's/.*<version>\([^<]*\)<\/version>.*/\1/p' "$MANIFEST" | head -1)
-          TARGET_PLATFORM=$(sed -n 's/.*\(<targetplatform[^/]*\/>\).*/\1/p' "$MANIFEST" | head -1)
-          PHP_MINIMUM=$(sed -n 's/.*<php_minimum>\([^<]*\)<\/php_minimum>.*/\1/p' "$MANIFEST" | head -1)
+          EXT_NAME=$(grep -oP '<name>\K[^<]+' "$MANIFEST" 2>/dev/null | head -1 || echo "${{ github.event.repository.name }}")
+          EXT_TYPE=$(grep -oP '<extension[^>]+type="\K[^"]+' "$MANIFEST" 2>/dev/null || echo "component")
+          EXT_ELEMENT=$(grep -oP '<element>\K[^<]+' "$MANIFEST" 2>/dev/null | head -1 || basename "$MANIFEST" .xml)
+          EXT_CLIENT=$(grep -oP '<extension[^>]+client="\K[^"]+' "$MANIFEST" 2>/dev/null || echo "")
+          EXT_FOLDER=$(grep -oP '<extension[^>]+group="\K[^"]+' "$MANIFEST" 2>/dev/null || echo "")
+          TARGET_PLATFORM=$(grep -oP '<targetplatform[^/]*/>' "$MANIFEST" 2>/dev/null | head -1 || echo "")
+          PHP_MINIMUM=$(grep -oP '<php_minimum>\K[^<]+' "$MANIFEST" 2>/dev/null | head -1 || echo "")
 
-          # Fallbacks
-          [ -z "$EXT_NAME" ] && EXT_NAME="${{ github.event.repository.name }}"
-          [ -z "$EXT_TYPE" ] && EXT_TYPE="component"
-
-          # Templates and modules don't have <element> — derive from <name>
-          if [ -z "$EXT_ELEMENT" ]; then
-            EXT_ELEMENT=$(echo "$EXT_NAME" | tr '[:upper:]' '[:lower:]' | tr -d ' ')
-          fi
-
-          # Use manifest version if README version is empty
-          [ "$VERSION" = "0.0.0" ] && [ -n "$EXT_VERSION" ] && VERSION="$EXT_VERSION"
-
+          [ -z "$EXT_ELEMENT" ] && EXT_ELEMENT=$(basename "$MANIFEST" .xml)
           [ -z "$TARGET_PLATFORM" ] && TARGET_PLATFORM=$(printf '<targetplatform name="joomla" version="5.*" %s>' "/")
 
           CLIENT_TAG=""
@@ -154,117 +116,127 @@ jobs:
 
           # Version suffix for non-stable
           DISPLAY_VERSION="$VERSION"
-          case "$STABILITY" in
-            development) DISPLAY_VERSION="${VERSION}-dev" ;;
-            alpha)       DISPLAY_VERSION="${VERSION}-alpha" ;;
-            beta)        DISPLAY_VERSION="${VERSION}-beta" ;;
-            rc)          DISPLAY_VERSION="${VERSION}-rc" ;;
-          esac
+          [ "$STABILITY" = "rc" ] && DISPLAY_VERSION="${VERSION}-rc"
+          [ "$STABILITY" = "development" ] && DISPLAY_VERSION="${VERSION}-dev"
 
           MAJOR=$(echo "$VERSION" | awk -F. '{print $1}')
-
-          # Each stability level has its own release tag
-          case "$STABILITY" in
-            development) RELEASE_TAG="development" ;;
-            alpha)       RELEASE_TAG="alpha" ;;
-            beta)        RELEASE_TAG="beta" ;;
-            rc)          RELEASE_TAG="release-candidate" ;;
-            *)           RELEASE_TAG="v${MAJOR}" ;;
-          esac
-
+          RELEASE_TAG="v${MAJOR}"
           PACKAGE_NAME="${EXT_ELEMENT}-${DISPLAY_VERSION}.zip"
           DOWNLOAD_URL="https://github.com/${REPO}/releases/download/${RELEASE_TAG}/${PACKAGE_NAME}"
           INFO_URL="https://github.com/${REPO}"
 
-          # ── Build install packages (ZIP + tar.gz) ───────────────────
+          # ── Build install-ready ZIP ─────────────────────────────────
           SOURCE_DIR="src"
           [ ! -d "$SOURCE_DIR" ] && SOURCE_DIR="htdocs"
           if [ -d "$SOURCE_DIR" ]; then
-            EXCLUDES=".ftpignore sftp-config* *.ppk *.pem *.key .env*"
-            TAR_NAME="${EXT_ELEMENT}-${DISPLAY_VERSION}.tar.gz"
-
             cd "$SOURCE_DIR"
-            zip -r "/tmp/${PACKAGE_NAME}" . -x $EXCLUDES
+            zip -r "/tmp/${PACKAGE_NAME}" .
             cd ..
-            tar -czf "/tmp/${TAR_NAME}" -C "$SOURCE_DIR" \
-              --exclude='.ftpignore' --exclude='sftp-config*' \
-              --exclude='*.ppk' --exclude='*.pem' --exclude='*.key' --exclude='.env*' .
 
             SHA256=$(sha256sum "/tmp/${PACKAGE_NAME}" | cut -d' ' -f1)
 
-            # Ensure release exists
+            # Ensure draft release exists for this major
             gh release view "$RELEASE_TAG" --json tagName > /dev/null 2>&1 || \
-              gh release create "$RELEASE_TAG" --title "${RELEASE_TAG} (${DISPLAY_VERSION})" --notes "${STABILITY} release" --prerelease --target main 2>/dev/null || true
+              gh release create "$RELEASE_TAG" --title "v${MAJOR}" --notes "Development release" --draft --target main 2>/dev/null || true
 
-            # Upload both formats
+            # Upload ZIP to the major release
             gh release upload "$RELEASE_TAG" "/tmp/${PACKAGE_NAME}" --clobber 2>/dev/null || true
-            gh release upload "$RELEASE_TAG" "/tmp/${TAR_NAME}" --clobber 2>/dev/null || true
 
-            echo "Packages: ${PACKAGE_NAME} + ${TAR_NAME} (SHA: ${SHA256})" >> $GITHUB_STEP_SUMMARY
+            echo "Package: ${PACKAGE_NAME} (SHA: ${SHA256})" >> $GITHUB_STEP_SUMMARY
           else
             SHA256=""
           fi
 
           # ── Build the new entry ───────────────────────────────────────
-          NEW_ENTRY=""
-          NEW_ENTRY="${NEW_ENTRY}  <update>\n"
-          NEW_ENTRY="${NEW_ENTRY}    <name>${EXT_NAME}</name>\n"
-          NEW_ENTRY="${NEW_ENTRY}    <description>${EXT_NAME} (${STABILITY})</description>\n"
-          NEW_ENTRY="${NEW_ENTRY}    <element>${EXT_ELEMENT}</element>\n"
-          NEW_ENTRY="${NEW_ENTRY}    <type>${EXT_TYPE}</type>\n"
-          NEW_ENTRY="${NEW_ENTRY}    <version>${DISPLAY_VERSION}</version>\n"
-          [ -n "$CLIENT_TAG" ] && NEW_ENTRY="${NEW_ENTRY}    ${CLIENT_TAG}\n"
-          [ -n "$FOLDER_TAG" ] && NEW_ENTRY="${NEW_ENTRY}    ${FOLDER_TAG}\n"
-          NEW_ENTRY="${NEW_ENTRY}    <tags>\n"
-          NEW_ENTRY="${NEW_ENTRY}      <tag>${STABILITY}</tag>\n"
-          NEW_ENTRY="${NEW_ENTRY}    </tags>\n"
-          NEW_ENTRY="${NEW_ENTRY}    <infourl title=\"${EXT_NAME}\">${INFO_URL}</infourl>\n"
-          NEW_ENTRY="${NEW_ENTRY}    <downloads>\n"
-          TAR_URL="https://github.com/${REPO}/releases/download/${RELEASE_TAG}/${EXT_ELEMENT}-${DISPLAY_VERSION}.tar.gz"
-          NEW_ENTRY="${NEW_ENTRY}      <downloadurl type=\"full\" format=\"zip\">${DOWNLOAD_URL}</downloadurl>\n"
-          NEW_ENTRY="${NEW_ENTRY}      <downloadurl type=\"full\" format=\"tar.gz\">${TAR_URL}</downloadurl>\n"
-          NEW_ENTRY="${NEW_ENTRY}    </downloads>\n"
-          [ -n "$SHA256" ] && NEW_ENTRY="${NEW_ENTRY}    <sha256>sha256:${SHA256}</sha256>\n"
-          NEW_ENTRY="${NEW_ENTRY}    ${TARGET_PLATFORM}\n"
-          [ -n "$PHP_TAG" ] && NEW_ENTRY="${NEW_ENTRY}    ${PHP_TAG}\n"
-          NEW_ENTRY="${NEW_ENTRY}    <maintainer>Moko Consulting</maintainer>\n"
-          NEW_ENTRY="${NEW_ENTRY}    <maintainerurl>https://mokoconsulting.tech</maintainerurl>\n"
-          NEW_ENTRY="${NEW_ENTRY}  </update>"
-
-          # ── Write new entry to temp file ───────────────────────────────
-          printf '%b' "$NEW_ENTRY" > /tmp/new_entry.xml
+          NEW_ENTRY=$(cat <<XMLEOF
+  <update>
+    <name>${EXT_NAME}</name>
+    <description>${EXT_NAME} (${STABILITY})</description>
+    <element>${EXT_ELEMENT}</element>
+    <type>${EXT_TYPE}</type>
+    <version>${DISPLAY_VERSION}</version>
+    $([ -n "$CLIENT_TAG" ] && echo "    ${CLIENT_TAG}")
+    $([ -n "$FOLDER_TAG" ] && echo "    ${FOLDER_TAG}")
+    <tags>
+      <tag>${STABILITY}</tag>
+    </tags>
+    <infourl title="${EXT_NAME}">${INFO_URL}</infourl>
+    <downloads>
+      <downloadurl type="full" format="zip">${DOWNLOAD_URL}</downloadurl>
+    </downloads>
+    $([ -n "$SHA256" ] && echo "    <sha256>sha256:${SHA256}</sha256>")
+    ${TARGET_PLATFORM}
+    $([ -n "$PHP_TAG" ] && echo "    ${PHP_TAG}")
+    <maintainer>Moko Consulting</maintainer>
+    <maintainerurl>https://mokoconsulting.tech</maintainerurl>
+  </update>
+XMLEOF
+)
 
           # ── Merge into updates.xml ─────────────────────────────────────
           if [ ! -f "updates.xml" ]; then
+            # Create fresh
             printf '%s\n' '<?xml version="1.0" encoding="utf-8"?>' > updates.xml
             printf '%s\n' '<updates>' >> updates.xml
-            cat /tmp/new_entry.xml >> updates.xml
-            printf '\n%s\n' '</updates>' >> updates.xml
+            echo "$NEW_ENTRY" >> updates.xml
+            printf '%s\n' '</updates>' >> updates.xml
           else
-            # Remove existing entry for this stability, insert new one
-            printf 'import re\nstability = "%s"\n' "${STABILITY}" > /tmp/merge_xml.py
-            printf 'with open("updates.xml") as f: content = f.read()\n' >> /tmp/merge_xml.py
-            printf 'with open("/tmp/new_entry.xml") as f: new_entry = f.read()\n' >> /tmp/merge_xml.py
-            printf 'pattern = r"  <update>.*?<tag>" + re.escape(stability) + r"</tag>.*?</update>\\n?"\n' >> /tmp/merge_xml.py
-            printf 'content = re.sub(pattern, "", content, flags=re.DOTALL)\n' >> /tmp/merge_xml.py
-            printf 'content = content.replace("</updates>", new_entry + "\\n</updates>")\n' >> /tmp/merge_xml.py
-            printf 'content = re.sub(r"\\n{3,}", "\\n\\n", content)\n' >> /tmp/merge_xml.py
-            printf 'with open("updates.xml", "w") as f: f.write(content)\n' >> /tmp/merge_xml.py
-            python3 /tmp/merge_xml.py 2>/dev/null || {
-              # Fallback: rebuild keeping other stability entries
+            # Remove existing entry for this stability, add new one
+            # Use python for reliable XML manipulation
+            python3 -c "
+import re, sys
+
+with open('updates.xml', 'r') as f:
+    content = f.read()
+
+# Remove existing entry with this stability tag
+pattern = r'  <update>.*?<tag>${STABILITY}</tag>.*?</update>\n?'
+content = re.sub(pattern, '', content, flags=re.DOTALL)
+
+# Insert new entry before </updates>
+new_entry = '''${NEW_ENTRY}'''
+content = content.replace('</updates>', new_entry + '\n</updates>')
+
+# Clean up empty lines
+content = re.sub(r'\n{3,}', '\n\n', content)
+
+with open('updates.xml', 'w') as f:
+    f.write(content)
+" 2>/dev/null || {
+              # Fallback: just rewrite the whole file if python fails
+              # Keep existing stable entry if present
+              STABLE_ENTRY=""
+              if [ "$STABILITY" != "stable" ] && grep -q '<tag>stable</tag>' updates.xml; then
+                STABLE_ENTRY=$(sed -n '/<update>/,/<\/update>/{ /<tag>stable<\/tag>/,/<\/update>/p; /<update>/,/<tag>stable<\/tag>/p }' updates.xml | sort -u)
+              fi
+              RC_ENTRY=""
+              if [ "$STABILITY" != "rc" ] && grep -q '<tag>rc</tag>' updates.xml; then
+                RC_ENTRY=$(python3 -c "
+import re
+with open('updates.xml') as f: c = f.read()
+m = re.search(r'(<update>.*?<tag>rc</tag>.*?</update>)', c, re.DOTALL)
+if m: print(m.group(1))
+" 2>/dev/null || true)
+              fi
+              DEV_ENTRY=""
+              if [ "$STABILITY" != "development" ] && grep -q '<tag>development</tag>' updates.xml; then
+                DEV_ENTRY=$(python3 -c "
+import re
+with open('updates.xml') as f: c = f.read()
+m = re.search(r'(<update>.*?<tag>development</tag>.*?</update>)', c, re.DOTALL)
+if m: print(m.group(1))
+" 2>/dev/null || true)
+              fi
+
               {
                 printf '%s\n' '<?xml version="1.0" encoding="utf-8"?>'
                 printf '%s\n' '<updates>'
-                for TAG in stable rc development; do
-                  [ "$TAG" = "${STABILITY}" ] && continue
-                  if grep -q "<tag>${TAG}</tag>" updates.xml 2>/dev/null; then
-                    sed -n "/<update>/,/<\/update>/{ /<tag>${TAG}<\/tag>/p; }" updates.xml
-                  fi
-                done
-                cat /tmp/new_entry.xml
-                printf '\n%s\n' '</updates>'
-              } > /tmp/updates_new.xml
-              mv /tmp/updates_new.xml updates.xml
+                [ -n "$STABLE_ENTRY" ] && echo "$STABLE_ENTRY"
+                [ -n "$RC_ENTRY" ] && echo "$RC_ENTRY"
+                [ -n "$DEV_ENTRY" ] && echo "$DEV_ENTRY"
+                echo "$NEW_ENTRY"
+                printf '%s\n' '</updates>'
+              } > updates.xml
             }
           fi
 
@@ -278,64 +250,6 @@ jobs:
             git push
           }
 
-      - name: SFTP deploy to dev server
-        if: contains(github.ref, 'dev/')
-        env:
-          DEV_HOST: ${{ vars.DEV_FTP_HOST }}
-          DEV_PATH: ${{ vars.DEV_FTP_PATH }}
-          DEV_SUFFIX: ${{ vars.DEV_FTP_SUFFIX }}
-          DEV_USER: ${{ vars.DEV_FTP_USERNAME }}
-          DEV_PORT: ${{ vars.DEV_FTP_PORT }}
-          DEV_KEY: ${{ secrets.DEV_FTP_KEY }}
-          DEV_PASS: ${{ secrets.DEV_FTP_PASSWORD }}
-          GH_TOKEN: ${{ secrets.GH_TOKEN || github.token }}
-        run: |
-          # ── Permission check: admin or maintain role required ──────
-          ACTOR="${{ github.actor }}"
-          REPO="${{ github.repository }}"
-          PERMISSION=$(gh api "repos/${REPO}/collaborators/${ACTOR}/permission" \
-            --jq '.permission' 2>/dev/null || \
-            gh api "repos/${REPO}/collaborators/${ACTOR}" \
-            --jq '.role' 2>/dev/null || echo "read")
-          case "$PERMISSION" in
-            admin|maintain|write) ;;
-            *)
-              echo "Deploy denied: ${ACTOR} has '${PERMISSION}' — requires admin, maintain, or write"
-              exit 0
-              ;;
-          esac
-
-          [ -z "$DEV_HOST" ] || [ -z "$DEV_PATH" ] && { echo "DEV FTP not configured — skipping SFTP"; exit 0; }
-
-          SOURCE_DIR="src"
-          [ ! -d "$SOURCE_DIR" ] && SOURCE_DIR="htdocs"
-          [ ! -d "$SOURCE_DIR" ] && exit 0
-
-          PORT="${DEV_PORT:-22}"
-          REMOTE="${DEV_PATH%/}"
-          [ -n "$DEV_SUFFIX" ] && REMOTE="${REMOTE}/${DEV_SUFFIX#/}"
-
-          printf '{"host":"%s","port":%s,"username":"%s","remotePath":"%s"' \
-            "$DEV_HOST" "$PORT" "$DEV_USER" "$REMOTE" > /tmp/sftp-config.json
-          if [ -n "$DEV_KEY" ]; then
-            echo "$DEV_KEY" > /tmp/deploy_key && chmod 600 /tmp/deploy_key
-            printf ',"privateKeyPath":"/tmp/deploy_key"}' >> /tmp/sftp-config.json
-          else
-            printf ',"password":"%s"}' "$DEV_PASS" >> /tmp/sftp-config.json
-          fi
-
-          PLATFORM=$(php /tmp/mokostandards/api/cli/platform_detect.php --path . 2>/dev/null || true)
-          if [ "$PLATFORM" = "waas-component" ] && [ -f "/tmp/mokostandards/api/deploy/deploy-joomla.php" ]; then
-            php /tmp/mokostandards/api/deploy/deploy-joomla.php --path . --src-dir "$SOURCE_DIR" --config /tmp/sftp-config.json
-          elif [ -f "/tmp/mokostandards/api/deploy/deploy-sftp.php" ]; then
-            php /tmp/mokostandards/api/deploy/deploy-sftp.php --path . --src-dir "$SOURCE_DIR" --config /tmp/sftp-config.json
-          fi
-          rm -f /tmp/deploy_key /tmp/sftp-config.json
-          echo "SFTP deploy to dev complete" >> $GITHUB_STEP_SUMMARY
-
-      - name: Summary
-        if: always()
-        run: |
           echo "## Joomla Update Server" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Field | Value |" >> $GITHUB_STEP_SUMMARY
