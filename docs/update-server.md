@@ -10,15 +10,15 @@ DEFGROUP: MokoWaaS.Documentation
 INGROUP: MokoStandards.Templates
 REPO: https://github.com/mokoconsulting-tech/MokoWaaS
 PATH: /docs/update-server.md
-VERSION: 02.01.08
-BRIEF: How this extension's Joomla update server file (update.xml) is managed
+VERSION: 04.05.13
+BRIEF: How this extension's Joomla update server file (updates.xml) is managed
 -->
 
 # Joomla Update Server
 
-[![MokoStandards](https://img.shields.io/badge/MokoStandards-02.01.08-blue)](https://github.com/mokoconsulting-tech/MokoStandards)
+[![MokoStandards](https://img.shields.io/badge/MokoStandards-04.05.13-blue)](https://github.com/mokoconsulting-tech/MokoStandards)
 
-This document explains how `update.xml` is automatically managed for this Joomla extension following the [Joomla Update Server specification](https://docs.joomla.org/Deploying_an_Update_Server).
+This document explains how `updates.xml` is automatically managed for this Joomla extension following the [Joomla Update Server specification](https://docs.joomla.org/Deploying_an_Update_Server).
 
 ## How It Works
 
@@ -76,7 +76,7 @@ All metadata is extracted from the extension's XML manifest (`src/*.xml`) at bui
 
 ### Extension Manifest Setup
 
-Your XML manifest must include an `<updateservers>` tag pointing to the `update.xml` on the `main` branch:
+Your XML manifest must include an `<updateservers>` tag pointing to the `updates.xml` on the `main` branch:
 
 ```xml
 <extension type="component" client="site" method="upgrade">
@@ -85,7 +85,7 @@ Your XML manifest must include an `<updateservers>` tag pointing to the `update.
     <!-- ... -->
     <updateservers>
         <server type="extension" name="My Extension Updates">
-            https://raw.githubusercontent.com/mokoconsulting-tech/MokoWaaS/main/update.xml
+            https://raw.githubusercontent.com/mokoconsulting-tech/MokoWaaS/main/updates.xml
         </server>
     </updateservers>
 </extension>
@@ -94,20 +94,20 @@ Your XML manifest must include an `<updateservers>` tag pointing to the `update.
 ### Branch Lifecycle
 
 ```
-dev/XX.YY.ZZ  →  rc/XX.YY.ZZ  →  main  →  version/XX.YY
+dev/XX.YY.ZZ  →  rc/XX.YY.ZZ  →  main  →  version/XX
 (development)     (rc)              (stable)    (frozen snapshot)
 ```
 
-1. **Development** (`dev/**`): `update.xml` with `<tag>development</tag>`, download points to branch archive
-2. **Release Candidate** (`rc/**`): `update.xml` with `<tag>rc</tag>`, version set to `XX.YY.ZZ-rc`
-3. **Stable Release** (merge to `main`): `update.xml` with `<tag>stable</tag>`, download points to GitHub Release asset
-4. **Frozen Snapshot** (`version/XX.YY`): immutable, never force-pushed
+1. **Development** (`dev/**`): `updates.xml` with `<tag>development</tag>`, download points to branch archive
+2. **Release Candidate** (`rc/**`): `updates.xml` with `<tag>rc</tag>`, version set to `XX.YY.ZZ-rc`
+3. **Stable Release** (merge to `main`): `updates.xml` with `<tag>stable</tag>`, download points to GitHub Release asset
+4. **Frozen Snapshot** (`version/XX`): immutable, never force-pushed
 
 ### Health Checks
 
 The `repo_health.yml` workflow verifies on every commit:
 
-- `update.xml` exists in the repository root
+- `updates.xml` exists in the repository root
 - XML manifest exists with `<extension>` tag
 - `<version>`, `<name>`, `<author>`, `<namespace>` tags present
 - Extension `type` attribute is valid
