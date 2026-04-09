@@ -1,22 +1,3 @@
-<!--
-Copyright (C) 2026 Moko Consulting <hello@mokoconsulting.tech>
-
-This file is part of a Moko Consulting project.
-
-SPDX-License-Identifier: GPL-3.0-or-later
-
-# FILE INFORMATION
-DEFGROUP: MokoStandards.Templates.GitHub
-INGROUP: MokoStandards.Templates
-REPO: https://github.com/mokoconsulting-tech/MokoStandards
-PATH: /templates/github/copilot-instructions.joomla.md.template
-VERSION: XX.YY.ZZ
-BRIEF: GitHub Copilot custom instructions template for Joomla/MokoWaaS governed repositories
-NOTE: Synced to .github/copilot-instructions.md in all Joomla/WaaS repos via bulk sync.
-      Tokens replaced at sync time: MokoWaaS, https://github.com/mokoconsulting-tech/MokoWaaS, {{EXTENSION_NAME}},
-      {{EXTENSION_TYPE}}, {{EXTENSION_ELEMENT}}
--->
-
 > [!IMPORTANT]
 > **🔧 AI Self-Update Required on First Use**
 >
@@ -122,13 +103,13 @@ BRIEF: One-line description
 
 ### Joomla Version Alignment
 
-The version in `README.md` **must always match** the `<version>` tag in `manifest.xml` and the latest entry in `updates.xml`. The `make release` command / release workflow updates all three automatically.
+The version in `README.md` **must always match** the `<version>` tag in `manifest.xml` and the latest entry in `update.xml`. The `make release` command / release workflow updates all three automatically.
 
 ```xml
 <!-- In manifest.xml — must match README.md version -->
 <version>01.02.04</version>
 
-<!-- In updates.xml — prepend a new <update> block for every release.
+<!-- In update.xml — prepend a new <update> block for every release.
      Note: the backslash in version="4\.[0-9]+" is a literal backslash character
      in the XML attribute value. Joomla's update server treats the value as a
      regular expression, so \. matches a literal dot. -->
@@ -154,7 +135,7 @@ The version in `README.md` **must always match** the `<version>` tag in `manifes
 ```
 MokoWaaS/
 ├── manifest.xml          # Joomla installer manifest (root — required)
-├── updates.xml            # Update server manifest (root — required, see below)
+├── update.xml            # Update server manifest (root — required, see below)
 ├── site/                 # Frontend (site) code
 │   ├── controller.php
 │   ├── controllers/
@@ -183,22 +164,22 @@ MokoWaaS/
 
 ---
 
-## updates.xml — Required in Repo Root
+## update.xml — Required in Repo Root
 
-`updates.xml` **must exist at the repository root**. It is the Joomla update server manifest that allows Joomla installations to check for new versions of this extension.
+`update.xml` **must exist at the repository root**. It is the Joomla update server manifest that allows Joomla installations to check for new versions of this extension.
 
 The `manifest.xml` must reference it via:
 ```xml
 <updateservers>
 	<server type="extension" priority="1" name="{{EXTENSION_NAME}}">
-		https://github.com/mokoconsulting-tech/MokoWaaS/raw/main/updates.xml
+		https://github.com/mokoconsulting-tech/MokoWaaS/raw/main/update.xml
 	</server>
 </updateservers>
 ```
 
 **Rules:**
-- Every release must prepend a new `<update>` block at the top of `updates.xml` — old entries must be preserved below.
-- The `<version>` in `updates.xml` must exactly match `<version>` in `manifest.xml` and the version in `README.md`.
+- Every release must prepend a new `<update>` block at the top of `update.xml` — old entries must be preserved below.
+- The `<version>` in `update.xml` must exactly match `<version>` in `manifest.xml` and the version in `README.md`.
 - The `<downloadurl>` must be a publicly accessible direct download link (GitHub Releases asset URL).
 - `<targetplatform name="joomla" version="4\.[0-9]+">` — the backslash is a **literal backslash character** in the XML attribute value; Joomla's update-server parser treats the value as a regular expression, so `\.` matches a literal dot and `[0-9]+` matches one or more digits. Do not double-escape it.
 
@@ -207,8 +188,8 @@ The `manifest.xml` must reference it via:
 ## manifest.xml Rules
 
 - Lives at the repo root as `manifest.xml` (not inside `site/` or `admin/`).
-- `<version>` tag must be kept in sync with `README.md` version and `updates.xml`.
-- Must include `<updateservers>` block pointing to this repo's `updates.xml`.
+- `<version>` tag must be kept in sync with `README.md` version and `update.xml`.
+- Must include `<updateservers>` block pointing to this repo's `update.xml`.
 - Must include `<files folder="site">` and `<administration>` sections.
 - Joomla 4.x requires `<namespace path="src">Moko\{{EXTENSION_NAME}}</namespace>` for namespaced extensions.
 
@@ -286,8 +267,8 @@ Approved prefixes: `dev/` · `rc/` · `version/` · `patch/` · `copilot/` · `d
 | Change type | Documentation to update |
 |-------------|------------------------|
 | New or renamed PHP class/method | PHPDoc block; `docs/api/` entry |
-| New or changed manifest.xml | Update `updates.xml` version; bump README.md version |
-| New release | Prepend `<update>` block to `updates.xml`; update CHANGELOG.md; bump README.md version |
+| New or changed manifest.xml | Update `update.xml` version; bump README.md version |
+| New release | Prepend `<update>` block to `update.xml`; update CHANGELOG.md; bump README.md version |
 | New or changed workflow | `docs/workflows/<workflow-name>.md` |
 | Any modified file | Update the `VERSION` field in that file's `FILE INFORMATION` block |
 | **Every PR** | **Bump the patch version** — increment `XX.YY.ZZ` in `README.md`; `sync-version-on-merge` propagates it |
@@ -301,4 +282,4 @@ Approved prefixes: `dev/` · `rc/` · `version/` · `patch/` · `copilot/` · `d
 - Never add `defined('_JEXEC') or die;` to CLI scripts or model tests — only to web-accessible PHP files
 - Never hardcode version numbers in body text — update `README.md` and let automation propagate
 - Never use `github.token` or `secrets.GITHUB_TOKEN` in workflows — always use `secrets.GH_TOKEN`
-- Never let `manifest.xml` version, `updates.xml` version, and `README.md` version go out of sync
+- Never let `manifest.xml` version, `update.xml` version, and `README.md` version go out of sync
