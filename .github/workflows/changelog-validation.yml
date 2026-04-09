@@ -8,18 +8,20 @@
 # DEFGROUP: GitHub.Workflow.Template
 # INGROUP: MokoStandards.CI
 # REPO: https://github.com/mokoconsulting-tech/MokoStandards
-# PATH: /templates/workflows/shared/changelog-validation.yml.template
-# VERSION: 04.06.00
+# PATH: /templates/workflows/shared/changelog-validation.yml
+# VERSION: 04.05.13
 # BRIEF: Validates CHANGELOG.md format and version consistency
 # NOTE: Deployed to .github/workflows/changelog-validation.yml in governed repos.
 
 name: Changelog Validation
 
 on:
+  push:
+    branches:
+      - main
   pull_request:
     branches:
       - main
-      - 'dev/**'
   workflow_dispatch:
 
 permissions:
