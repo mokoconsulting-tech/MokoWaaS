@@ -8,18 +8,25 @@
 # DEFGROUP: GitHub.Workflow.Template
 # INGROUP: MokoStandards.CI
 # REPO: https://github.com/mokoconsulting-tech/MokoStandards
-# PATH: /templates/workflows/joomla/ci-joomla.yml.template
-# VERSION: 04.06.00
+# PATH: /templates/workflows/joomla/ci-joomla.yml
+# VERSION: 04.05.13
 # BRIEF: CI workflow for Joomla extensions — lint, validate, test
 # NOTE: Deployed to .github/workflows/ci-joomla.yml in governed Joomla extension repos.
 
 name: Joomla Extension CI
 
 on:
+  push:
+    branches:
+      - main
+      - dev/**
+      - rc/**
+      - version/**
   pull_request:
     branches:
       - main
-      - 'dev/**'
+      - dev/**
+      - rc/**
   workflow_dispatch:
 
 permissions:
